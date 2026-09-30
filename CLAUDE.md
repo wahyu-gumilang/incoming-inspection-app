@@ -115,9 +115,10 @@ Add new commands as `package.json` scripts, not as ad-hoc instructions. Items ma
 |---|---|---|
 | `npm run dev` | `nodemon server.js` | Dev server with auto-reload on `http://localhost:5000` |
 | `npm start` | `node server.js` | Production start |
-| `npm test` | `jest` | Unit + integration tests *(Phase 1)* |
-| `npm run lint` | `eslint .` | Lint *(Phase 1)* |
-| `npm run format` | `prettier --write .` | Format *(Phase 1)* |
+| `npm test` | `jest` | Unit + integration tests |
+| `npm run lint` | `eslint .` | Lint |
+| `npm run format` | `prettier --write .` | Format |
+| `npm run format:check` | `prettier --check .` | Check formatting without writing |
 | `npm run db:schema` | `node scripts/dump-schema.js` | Write the live `csi_db` table definitions to `../docs/schema.sql` *(Phase 1)* |
 | `npm run db:migrate` | `node scripts/migrate.js` | Apply pending files in `db/migrations/` *(Phase 1)* |
 
@@ -130,8 +131,8 @@ Add new commands as `package.json` scripts, not as ad-hoc instructions. Items ma
 | `npm test` | Unit tests |
 | `npm run lint` | `ng lint` (angular-eslint) |
 
-Quick check: `curl http://localhost:5000/api/health` should report `"db": "connected"`
-(inside `data` once the Phase 1 response helpers are in).
+Quick check: `curl http://localhost:5000/api/health` should return
+`{ "success": true, "data": { "status": "ok", "db": "connected", ... } }`.
 
 **Before saying a change is done:** run `npm run lint && npm test` in every package you
 touched, and for API changes start the dev server and call the endpoint. Report what
@@ -200,7 +201,8 @@ Every API response uses one of these shapes.
 ```
 
 Rules:
-- Build responses with `utils/response.js` (`ok(res, data, meta?)`, `created(res, data)`). Don't hand-write `res.json({...})` in controllers.
+- Build responses with `utils/response.js` (`ok(res, data, meta?)`, `created(res, data)`, `noContent(res)`). Don't hand-write `res.json({...})` in controllers. `fail()` is only for the error and not-found middlewares.
+- List endpoints build their query schema with `listQuery(sortable)` from `validators/common.validator.js` and turn it into SQL with `toSqlPaging`, `resolveSort` and `buildMeta` from `utils/pagination.js`.
 - **Status codes:**
   - `200`: read or update
   - `201`: create
@@ -228,7 +230,7 @@ Rules:
 - Formatting: 2-space indent, single quotes, semicolons, trailing commas (Prettier).
 - **Express 5:** errors from async handlers go to the error middleware automatically. Don't add try/catch or `asyncHandler` wrappers just to call `next(err)`.
 - Throw `new AppError(status, code, message, details?)` for expected failures. Anything else becomes a `500` in the error handler.
-- Validate `params`, `query` and `body` in the route, before the controller runs.
+- Validate `params`, `query` and `body` in the route with `validate({ params, query, body })` (Zod schemas), before the controller runs. Controllers read the parsed values from `req.validated`, not `req.query` / `req.body` (Express 5 doesn't allow overwriting `req.query`).
 - **SQL:**
   - Always use placeholders (`execute('... WHERE itemid = ?', [id])`). Never put request values into SQL strings. Sort columns come from a whitelist.
   - SQL only lives in `repositories/`, and repositories return plain rows (not mysql2 `[rows, fields]` tuples).
