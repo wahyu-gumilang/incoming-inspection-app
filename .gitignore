@@ -1,3 +1,7 @@
 node_modules/
 .env
 npm-debug.log*
+.env.test
+
+# Full DB dump: real data and oauth credentials. Only docs/schema.sql is committed.
+docs/csi_db.sql

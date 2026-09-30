@@ -1,221 +1,273 @@
-# PLAN.md — Incoming Inspection App Development Roadmap
+# PLAN.md — Incoming Inspection QC System Roadmap
 
 Status: `[ ]` todo · `[~]` in progress · `[x]` done
-Last updated: 2026-09-29
+Last updated: 2026-09-30
 
 ## 1. Goal
 
-A web app for the Quality team to:
+A web app for the Quality team of **PT. Chubb Safes Indonesia** to record, evaluate and
+store the inspection of materials and parts received from suppliers, replacing the paper
+**Form No 7.4.3-F1 "Incoming Inspection Check List"** (`docs/chek sheet-qhse.pdf`).
 
-1. Maintain the **Item Master** (`inventtable`) with each item's inspection characteristics (`inventinspectitem`), and the **Vendor Master** (`vendtable`).
-2. Record **incoming inspections**: a header per delivery (`inspecttable`) and measurement lines per characteristic (`inspectline`), judged OK/NG against standard ± tolerance.
-3. Generate an **inspection result PDF** for each inspection.
-4. Do all of the above through an **Angular** UI.
+1. Pick an item and a supplier; the item's QC standards load automatically.
+2. Enter up to 7 delivery columns (P/O, delivery date, qty, inspection category) and the actual measurements.
+3. Get OK/NG per value in real time and an NG count per delivery.
+4. Decide Accepted / Rejected / Concession per delivery, sign off (*Inspected by*, *Checked by*).
+5. Print the result in the 7.4.3-F1 layout as PDF.
 
-**Stack:** Node.js · Express 5 · MySQL `csi_db` (`mysql2/promise`) · PDFKit or Puppeteer · Angular.
+**Stack:** Node.js · Express 5 · MariaDB 10.4 `csi_db` (`mysql2/promise`) · Puppeteer (PDF) · Angular (latest) + Angular Material.
+
+**Repository layout:** `backend/`, `frontend/`, `docs/` (see `CLAUDE.md`).
 
 ## 2. Current state
 
-- [x] Express 5 server: CORS, JSON body parsing, 404 and 500 handlers
+- [x] Express 5 server: CORS, JSON body parsing, 404 and 500 handlers (still at the repo root)
 - [x] `GET /api/health` with DB connectivity check
 - [x] `config/db.js`: pool with WSL2 host auto-detection, `dateStrings`, `decimalNumbers`
 - [x] `csi_db` imported with existing data
-- [x] `CLAUDE.md` and `PLAN.md`
-- [ ] Git: no commits yet
+- [x] Reference files copied to `docs/`: `csi_db.sql`, `chek sheet-qhse.pdf`, `chek sheet-qhse (cara isi).pdf`
+- [x] `CLAUDE.md` and `PLAN.md` rewritten for the `backend/` + `frontend/` layout and the 7.4.3-F1 workflow
+- [x] Git: initial commit on `main`, pushed to `origin/main`
 
-## 3. Data model (from `csi_db` — verify against `db/schema.sql`)
+## 3. Data model (confirmed from `docs/csi_db.sql`, 2026-09-28 dump)
 
 ```
-vendtable 1───* inspecttable 1───* inspectline *───1 inventinspectitem *───1 inventtable
-                      *                                                         1
-                      └─────────────────────────────────────────────────────────┘
+inventtable 1───* inventinspectitem              (itemid; standards per item)
+     │ itemid
+     ▼
+inspecttable *───1 vendtable                     (inspecttable.accountnum = vendtable.vendaccount)
+     │ inspectnum
+     ├──* inspectline        STD lines, actual_1..7 / status_1..7
+     └──* inspectlineother   VISUAL / FITTING / CERTIFIKAT lines
+inspectsetup                                      list of "Checked by" names
 ```
 
-| Table | Role | Known / expected columns |
+| Table | Rows | Columns | Notes |
+|---|---|---|---|
+| `inventtable` | 1 685 | `itemid`, `name`, `inspectqty` | No PK. Meaning of `inspectqty` unknown (Q4). |
+| `inventinspectitem` | ~11 900 | `itemid`, `itemname`, `inspecttype`, `inspectitem`, `standard_txt`, `standard` (dec 18,2), `tolerance` (text), `tolerance_plus`, `tolerance_minus` (dec 19,2) | PK (`itemid`,`inspecttype`,`inspectitem`). Types: `STD` 10 366, `VISUAL` 993, `FITTING` 343, `CERTIFIKAT` 191, some with a trailing space. Up to 28 `STD` lines per item. |
+| `vendtable` | **0** | `vendaccount`, `name` | No PK. Empty: vendors must be loaded (Q2). |
+| `inspecttable` | 2 (test data) | `inspectnum` (PK, `INS-000001`), `inspectdate`, `itemid`, `itemname`, `accountnum`, `name`, `inspectstatus` (varchar), `purchordernum1..7`, `deliverydate1..7` (default today), `qty_received1..7`, `inspectcategory1..7` (int), `notgood1..7` (int), `judgment1..7` (int), `qfnum`, `inspectby`, `checkedby`, `recid` | One row = one form = up to 7 delivery columns. |
+| `inspectline` | 0 | `inspectnum`, `linenum` (PK together), `inspectitem`, `standard`, `tolerance` (single dec), `actual_1..7`, `status_1..7` (int, default 0) | Column N ↔ delivery column N. |
+| `inspectlineother` | 0 | `inspectnum`, `linenum`, `inspecttype`, `inspectitem` | No PK and **no result columns** yet. |
+| `inspectsetup` | 0 | `id`, `checkedby` | No PK. |
+| `numseqtable` | 1 | `processid`, `processname`, `formatstring`, `length_tag`, `nextid` | Number sequences (currently only `Sales Order`). |
+| `oauth_*`, `password_reset_temp`, `orders` | — | — | Owned by another system. Not used until §5 auth. Never exposed or modified. |
+
+### Gaps between the paper form and the schema
+
+| Form 7.4.3-F1 field | In schema? | Plan |
 |---|---|---|
-| `inventtable` | Item master | item id (PK), item name, unit, … |
-| `inventinspectitem` | Inspection characteristics per item | item id (FK), sequence, characteristic, method/instrument, `standard`, `tolerance`, unit |
-| `vendtable` | Vendor master | vendor account (PK), name, address, contact, … |
-| `inspecttable` | Inspection header | inspection id/no, vendor, item, PO/lot, `inspectdate`, `deliverydate1..7`, `qty_received1..7`, judgement, inspector, status, remarks |
-| `inspectline` | Inspection lines | inspection id (FK), inspect-item ref, `standard`, `tolerance`, `actual_1..n`, line judgement |
+| Actual + OK/NG per STD line per delivery | `inspectline.actual_N`, `status_N` | Make nullable (migration 002) |
+| Asymmetric tolerance (`+0.3/-0`), `Min`, `Max`, display texts | Only `inspectline.tolerance` (one decimal) | Add snapshot columns (migration 003) |
+| Visual / Fitting / Certificate result per delivery | `inspectlineother` has no result columns | Add `actual_txt_N`, `status_N` (migration 004) |
+| Measuring Instrument (one row for the whole form) | Missing | Add `inspecttable.instrument` (migration 005) |
+| NG / **Total sample** per delivery | `notgoodN` only | Q5, add `totalsampleN` if confirmed |
+| QF No., Inspected by, Checked by **per delivery column** | Single `qfnum`, `inspectby`, `checkedby` | Q6; default: one value per form, printed in every used column |
+| Remarks, approval timestamps | Missing | Phase 4 migration |
 
-The real PK/FK column names, the number of `actual_n` columns, and whether
-tolerance is symmetric or split into upper/lower are confirmed in Phase 1.0 before
-any repository code is written.
+### Code maps (proposed, confirm with QC — Q1)
 
-**Judgement rule (default, confirm with QC):**
-- A measurement is OK if `standard − tolerance ≤ actual ≤ standard + tolerance`.
-- A line is NG if any of its measurements is NG.
-- The header is NG if any line is NG.
-- Empty `actual_n` values are ignored. A line with no measurements is `PENDING`.
+| Column | Values |
+|---|---|
+| `inspectcategoryN` | `0` = no mark (100 % inspection), `1` = N Normal, `2` = R Reduce, `3` = T Tightening |
+| `judgmentN` | `0` = not judged, `1` = O Accepted, `2` = X Rejected, `3` = C Concession |
+| `status_N` | `NULL` = not measured, `1` = OK, `0` = NG |
+| `inspectstatus` | `DRAFT`, `SUBMITTED`, `CHECKED` (legacy `'1'` rows shown as-is, read-only) |
+
+### Judgement rule (from the spec; edge cases to confirm — Q3)
+
+- `STD` value: OK when `standard − tolerance_minus ≤ actual ≤ standard + tolerance_plus`.
+- Tolerance text `Min` → OK when `actual ≥ standard`; `Max` → OK when `actual ≤ standard`.
+- Qualitative lines: OK/NG chosen by the inspector.
+- `notgoodN` = count of NG values in column N across all lines. `judgmentN = Accepted` is refused when `notgoodN > 0`.
+- Data quality in the master (reported by the Phase 1 check script, not fixed silently):
+  ~700 `STD` rows with tolerance text `' 0.0'` and both limits `0` (exact match? reference dimension?),
+  STD rows whose tolerance text is qualitative (`Tidak Terangkat`, `Fitting OK`), and at least one
+  negative `tolerance_minus` (`1-1-29-04` / C: `-0.5/-0` stored as `-5.00`).
 
 ---
 
-## Phase 1 — Master Data REST API (Item Master & Vendor Master)
+## Phase 1 — Foundation: Setup & Database
 
-### 1.0 Foundation (do first)
-- [ ] `scripts/dump-schema.js` + `npm run db:schema` → `db/schema.sql`. Record the confirmed columns in §3.
+Goal: both projects run, tooling is in place, and the schema can store everything the form needs.
+
+### 1.1 Repository restructure
+- [ ] Move `server.js`, `config/`, `package.json`, `package-lock.json`, `.env.example` into `backend/` (with `git mv`); fix paths; `npm run dev` still works from `backend/`
+- [ ] Root `.gitignore` covers `node_modules/`, `.env`, `.env.test`, `docs/csi_db.sql`, generated PDFs, `frontend/dist/`
 - [ ] Split `server.js` into `app.js` (the Express app) and `server.js` (listen), so tests can load the app
-- [ ] `routes/index.js` mounted at `/api`; keep `/api/health`
-- [ ] `utils/AppError.js`, `utils/response.js` (`ok`, `created`), `utils/pagination.js`
-- [ ] `middlewares/errorHandler.js` and `notFound.js` returning the JSON error shape from `CLAUDE.md`
-- [ ] `middlewares/validate.js` + validation library (Zod recommended)
-- [ ] Add ESLint, Prettier, Jest, Supertest; `npm run lint`, `npm test`
-- [ ] Separate test database `csi_db_test` loaded from `db/schema.sql`, configured in `.env.test`
-- [ ] Initial commit on `main`, then work on `feature/*` branches
 
-### 1.1 Vendor Master — `vendtable`
-| Method | Path | Description |
-|---|---|---|
-| GET | `/api/vendors` | List with `page`, `limit`, `sort`, `order`, `q` (search account/name) |
-| GET | `/api/vendors/:accountnum` | Get one vendor |
-| POST | `/api/vendors` | Create (`409 DUPLICATE_KEY` if the account already exists) |
-| PUT | `/api/vendors/:accountnum` | Update (the key can't be changed) |
-| DELETE | `/api/vendors/:accountnum` | Delete; `409` if any inspections reference the vendor |
-| GET | `/api/vendors/lookup?q=` | Lightweight `{ accountnum, name }` list for dropdowns |
+### 1.2 Backend plumbing
+- [ ] `routes/index.js` mounted at `/api`; `/api/health` moved to the standard shape (`{ success, data: { status, db, timestamp } }`)
+- [ ] `utils/app-error.js`, `utils/response.js` (`ok`, `created`), `utils/pagination.js`
+- [ ] `middlewares/error-handler.middleware.js` and `not-found.middleware.js` returning the JSON error shape (replaces the current `{ message }` handlers)
+- [ ] `middlewares/validate.middleware.js` + Zod
+- [ ] `constants/inspection.js`: column lists for `_1..7`, inspect types, the code maps from §3
+- [ ] ESLint (flat config), Prettier, Jest, Supertest; `npm run lint`, `npm test`, `npm run format`
 
-- [ ] `vendor.repository.js`, `vendor.service.js`, `vendor.controller.js`, `vendor.routes.js`, `vendor.validator.js`
-- [ ] Integration tests: list/paging/search, get 404, create/duplicate, update, delete-in-use
+### 1.3 Database
+- [ ] `scripts/dump-schema.js` + `npm run db:schema` → `docs/schema.sql` (schema only, no data). Commit it.
+- [ ] `scripts/migrate.js` + `npm run db:migrate`: applies `db/migrations/NNN_*.sql` in order and records them in a `schema_migrations` table
+- [ ] `scripts/check-data.js`: reports duplicate keys, trailing-space `inspecttype`, zero/negative tolerances, qualitative STD rows (§3). Output reviewed with QC.
+- [ ] Migrations (each checks its preconditions first):
+  - [ ] `001_add_primary_keys.sql`: `inventtable(itemid)`, `vendtable(vendaccount)`, `inspectsetup(id)` AUTO_INCREMENT, `inspectlineother(inspectnum, linenum)`
+  - [ ] `002_inspectline_nullable_results.sql`: `actual_1..7`, `status_1..7` → `NULL DEFAULT NULL` (table is empty, so no data changes)
+  - [ ] `003_inspectline_snapshot.sql`: add `inspecttype`, `standard_txt`, `tolerance_txt`, `tolerance_plus`, `tolerance_minus`
+  - [ ] `004_inspectlineother_results.sql`: add `standard_txt`, `actual_txt_1..7`, `status_1..7`
+  - [ ] `005_inspecttable_instrument.sql`: add `instrument`; indexes on `inspectdate`, `itemid`, `accountnum`
+  - [ ] Inspection number sequence: a `numseqtable` row for incoming inspection (`INS-`, length 6, continuing after the highest existing `inspectnum`), or a dedicated table if Q7 says `numseqtable` is off-limits
+- [ ] Test database `csi_db_test` built from `docs/schema.sql` + migrations + small seed fixtures (no real data); `.env.test` (git-ignored) and `.env.test.example`
 
-### 1.2 Item Master — `inventtable` + `inventinspectitem`
-| Method | Path | Description |
-|---|---|---|
-| GET | `/api/items` | List with paging, sort and search (id/name) |
-| GET | `/api/items/:itemId` | Item with its `inspectItems[]` |
-| POST | `/api/items` | Create an item (optionally with `inspectItems[]` in one transaction) |
-| PUT | `/api/items/:itemId` | Update item fields |
-| DELETE | `/api/items/:itemId` | Delete; `409` if any inspections reference it |
-| GET | `/api/items/lookup?q=` | Dropdown list |
-| GET | `/api/items/:itemId/inspect-items` | Inspection characteristics, ordered by sequence |
-| PUT | `/api/items/:itemId/inspect-items` | Replace the whole list in one transaction (add, edit, delete, reorder) |
-| POST / PUT / DELETE | `/api/items/:itemId/inspect-items/:lineId` | Change a single characteristic |
+### 1.4 Frontend scaffold
+- [ ] `npx @angular/cli@latest new frontend` (standalone, routing, SCSS, strict); Angular Material; angular-eslint; Prettier
+- [ ] `proxy.conf.json` sends `/api` to `http://localhost:5000`; API base URL from `environments/`
+- [ ] App shell: sidebar (Inspections, Master Data: Items, Vendors, Checkers) and top bar with the company name
 
-- [ ] Validation: `standard` and `tolerance` are numeric, `tolerance ≥ 0`, sequence is unique per item
-- [ ] Repository, service, controller, routes and validator files for items and inspect-items
-- [ ] Integration tests, including the replace-all transaction rolling back on invalid input
-
-### 1.3 Database hygiene
-- [ ] Review indexes on search/FK columns (`vendtable` name, `inventtable` name, `inventinspectitem` item id). Add them via `db/migrations/001_*.sql` if missing.
-
-**Phase 1 done when:** all vendor and item endpoints return the standard JSON shapes, and `npm run lint && npm test` passes.
+**Phase 1 done when:** `npm run lint && npm test` pass in `backend/` and `frontend/`, `npm run db:migrate` applies cleanly on a fresh copy of `csi_db`, and `/api/health` answers in the new shape.
 
 ---
 
-## Phase 2 — Incoming Inspection Transactions (`inspecttable` + `inspectline`)
+## Phase 2 — Backend API & OK/NG Logic
 
-### 2.1 Endpoints
+Goal: the whole inspection can be created, measured and judged through the API alone.
+
+### 2.1 Judgement engine (`services/judgement.js`, pure functions)
+- [ ] `judgeValue(line, actual)` → `1 | 0 | null` (range, `Min`, `Max`, empty)
+- [ ] `judgeLines(lines)` → `status_N` for every line and column
+- [ ] `countNotGood(lines, otherLines)` → `notgood1..7`
+- [ ] `validateJudgments(header)`: `Accepted` not allowed with NG; used column without judgment blocks submit
+- [ ] Integer-hundredths arithmetic
+- [ ] Unit tests: exactly on each limit, 0.01 outside, `+x/-0` and `+0/-x`, `Min`/`Max`, zero tolerance, empty values, negative standard, qualitative lines, all 7 columns
+
+### 2.2 Master data API (read-heavy; the item data already exists)
 | Method | Path | Description |
 |---|---|---|
-| GET | `/api/inspections` | List. Filters: `dateFrom`, `dateTo` (on `inspectdate`), `vendor`, `item`, `judgement`, `status`, `q` (no/PO/lot) |
-| GET | `/api/inspections/:id` | Header + `lines[]` + vendor/item names |
-| GET | `/api/inspections/template?itemId=` | New header defaults + lines pre-filled from `inventinspectitem` (standard, tolerance copied) |
-| POST | `/api/inspections` | Create header + lines in **one transaction**. Returns `201` with the full inspection. |
-| PUT | `/api/inspections/:id` | Update header + replace lines in one transaction (only while status is `draft`) |
-| PATCH | `/api/inspections/:id/lines/:lineId` | Save one line's measurements (autosave from the grid) |
-| POST | `/api/inspections/:id/submit` | Recalculate the judgement, lock for approval |
-| POST | `/api/inspections/:id/approve` / `reject` | QC decision, with `reason` required on reject |
-| DELETE | `/api/inspections/:id` | Only while status is `draft` |
+| GET | `/api/items` | List with `page`, `limit`, `sort`, `order`, `q` (itemid/name) |
+| GET | `/api/items/lookup?q=` | `{ itemid, name }` for autocomplete (Part no / Part name) |
+| GET | `/api/items/:itemId` | Item with `inspectItems[]` grouped by normalized `inspecttype` |
+| GET | `/api/items/:itemId/inspect-items` | Standards ordered by type (`STD` → `CERTIFIKAT` → `VISUAL` → `FITTING`) then `inspectitem` |
+| POST / PUT / DELETE | `/api/items/:itemId/inspect-items[/...]` | Maintain standards (validation: numeric `standard`, `tolerance_plus/minus ≥ 0`, unique key) |
+| GET / POST / PUT / DELETE | `/api/vendors[/:vendaccount]` | Vendor CRUD; `409` on duplicate, `409` on delete when referenced by `inspecttable.accountnum` |
+| POST | `/api/vendors/import` | Bulk load from CSV (vendor table is empty, Q2) |
+| GET | `/api/vendors/lookup?q=` | `{ vendaccount, name }` |
+| GET / POST / DELETE | `/api/setup/checkers` | `inspectsetup` names for the *Checked by* dropdown |
 
-### 2.2 Business rules (`services/inspection.service.js`)
-- [ ] **Inspection number:** generated on the server, e.g. `IQC/YYYY/MM/####`. Match the existing format if the data already uses one. Must be unique even when two users save at the same time (lock the sequence row or retry on a duplicate key).
-- [ ] **Deliveries:** up to 7 pairs of `deliverydateN` / `qty_receivedN`. Filled pairs must be consecutive, and a quantity needs a date. Total received = sum of the quantities.
-- [ ] **Line snapshot:** each line copies `standard` and `tolerance` from `inventinspectitem` when created. Later changes to the master don't change past inspections.
-- [ ] **Judgement:** a pure-function module `services/judgement.js`, computed on the server on every save. The client never decides it.
-- [ ] **Status flow:** `draft → submitted → approved | rejected`, and `rejected → draft` to correct it. Actions in the wrong status return `409 INVALID_STATUS`.
-- [ ] Vendor and item must exist (`422` if not).
+- [ ] Repository, service, controller, routes and validator files for items, inspect items, vendors, checkers
+- [ ] Integration tests: paging/search/sort whitelist, 404s, duplicates, delete-in-use
 
-### 2.3 Tests
-- [ ] Unit tests for `judgement.js`: exactly on the limit, just outside it, empty samples, negative standards, decimal precision
-- [ ] Integration tests: create with lines, rollback when a line fails, update blocked after submit, full status flow, filters
-
-**Phase 2 done when:** an inspection can be created from the template, measured, submitted and approved through the API alone, with judgements computed correctly.
-
----
-
-## Phase 3 — PDF Report Generator Engine
-
-### 3.1 Engine choice
-| | PDFKit | Puppeteer |
+### 2.3 Inspection API
+| Method | Path | Description |
 |---|---|---|
-| How | Draw text and tables with code | Render an HTML/CSS template in headless Chrome |
-| Pros | Lightweight, fast, no browser needed | Easy layout changes, wide tables, the same template can be previewed as HTML |
-| Cons | Tables and page breaks are done by hand | Downloads Chromium (~170 MB), more RAM, needs Chrome dependencies on the server |
+| GET | `/api/inspections` | List. Filters: `dateFrom`, `dateTo` (`inspectdate`), `item`, `vendor`, `status`, `judgment`, `q` (inspectnum / P/O) |
+| GET | `/api/inspections/template?itemId=` | Empty header + `lines[]` / `otherLines[]` snapshotted from `inventinspectitem` |
+| GET | `/api/inspections/:inspectnum` | Header + `lines[]` + `otherLines[]` + computed `columns[]` (used flag, `totalReceived`) |
+| POST | `/api/inspections` | Create header + lines in **one transaction**; server assigns `inspectnum`, computes `status_N` and `notgoodN`; `201` |
+| PUT | `/api/inspections/:inspectnum` | Replace header + lines in one transaction (only in `DRAFT`) |
+| PATCH | `/api/inspections/:inspectnum/columns/:n` | Save one delivery column (header fields + that column's actuals) for autosave |
+| DELETE | `/api/inspections/:inspectnum` | Only in `DRAFT`; `204` |
 
-**Recommendation:** Puppeteer with an EJS template, because inspection sheets are wide tables
-(lines × `actual_1..n` × deliveries) and layout changes are frequent. Keep the
-engine behind an interface (`reports/engine.js` → `renderInspectionPdf(inspection)`)
-so it can be switched to PDFKit if the deployment server can't run Chromium.
+Business rules (`services/inspection.service.js`):
+- [ ] `inspectnum` generated on the server, unique under concurrent saves (`SELECT … FOR UPDATE` on the sequence row)
+- [ ] Item and vendor must exist (`422`); `itemname` / `name` copied into the header at save time
+- [ ] Delivery columns: used columns are consecutive from 1; a used column needs P/O, delivery date, qty > 0 and a category; unused columns are stored empty (`NULL` P/O, qty `0`), their dates ignored
+- [ ] Line snapshot from the master on create; later master edits don't touch saved inspections
+- [ ] `status_N` and `notgoodN` always recomputed by the server; client-sent values are ignored
+- [ ] Wrong status for an action → `409 INVALID_STATUS`
+- [ ] Integration tests: create from template, rollback when one line fails, update blocked outside `DRAFT`, number uniqueness under parallel creates, filters
 
-### 3.2 Tasks
-- [ ] Spike: build the same one-page report with both engines on WSL2; confirm the choice
-- [ ] `reports/templates/inspection-report.ejs`
-  - Header: company logo, title, inspection no, dates, vendor, item, PO/lot, deliveries
-  - Body: lines table (characteristic, standard, tolerance, actual_1..n, judgement)
-  - Summary: overall judgement, remarks, inspector / checked by / approved by signature boxes
-- [ ] Report layout: A4 landscape, repeating table headers across pages, page X of Y footer, NG values highlighted
-- [ ] `services/report.service.js`: load the inspection (reuse the Phase 2 repository), render, return a buffer
-- [ ] Reuse one browser instance for all requests, with a page pool or a limit on concurrent renders, and a render timeout. Close the browser on shutdown.
-- [ ] Endpoints:
-  - `GET /api/reports/inspections/:id/pdf`: `inline` for viewing, `?download=1` sends it as a download
-  - `GET /api/reports/inspections/:id/html`: preview the template (dev only)
-- [ ] Draft inspections get a "DRAFT" watermark
-- [ ] Tests: returns `application/pdf`, returns `404` for an unknown id, a snapshot of the rendered HTML
-
-**Phase 3 done when:** any inspection opens as a correctly paginated PDF in the browser in under about 3 seconds.
+**Phase 2 done when:** an inspection for a real item (e.g. `000-228`) can be created from the template, measured in several delivery columns and read back with correct OK/NG and NG counts, using only `curl`.
 
 ---
 
-## Phase 4 — Frontend (Angular UI)
+## Phase 3 — Frontend: Inspection UI & Validation
 
-### 4.1 Setup (`client/`)
-- [ ] `ng new client` (standalone components, routing, SCSS). UI kit: Angular Material.
-- [ ] `proxy.conf.json` sends `/api` to `http://localhost:5000`, and the API base URL comes from `environments/`
-- [ ] `core/`:
-  - `ApiService` that unwraps `{ success, data, meta }`
-  - HTTP error interceptor that shows `error.message` in a snackbar
-  - loading indicator
-- [ ] `shared/`: data table with server-side paging/sort/search, confirm dialog, lookup autocomplete (vendor/item), judgement badge (OK/NG/PENDING)
-- [ ] App shell: sidebar with Master Data (Items, Vendors), Inspections, and a top bar
-- [ ] TypeScript interfaces in `core/models/` that match the API JSON field names exactly
+Goal: a QC inspector can fill the whole check sheet in the browser as fast as on paper.
 
-### 4.2 Master Forms
-- [ ] **Vendors:** list page (search, paging) and a create/edit form (reactive form with validation messages from the API `details[]`)
-- [ ] **Items:** list page and an item form with an editable **inspection characteristics grid** (add, remove, reorder, standard/tolerance input)
+### 3.1 Core
+- [ ] `core/ApiService` unwrapping `{ success, data, meta }`; error interceptor → snackbar with `error.message`, field errors mapped from `error.details[]`
+- [ ] `core/models/`: interfaces with the exact API field names; code maps mirrored from `backend/constants/`
+- [ ] `shared/judgement.ts`: the same OK/NG rules as `judgement.js`, with a shared test-case table (JSON fixture used by both test suites)
+- [ ] Shared components: server-side data table, lookup autocomplete, OK/NG badge, confirm dialog, loading indicator
 
-### 4.3 Inspection Form
-- [ ] **List page:** filters (date range, vendor, item, judgement, status), paginated table, "New inspection"
-- [ ] **Form page:**
-  - Header section: vendor and item lookups, PO/lot, inspect date, 7 delivery date/qty rows with a live total
-  - When an item is chosen, load `/api/inspections/template` to fill the lines
-  - **Measurement grid:** rows = characteristics, columns = `actual_1..n`. Keyboard navigation (Enter/Tab moves to the next cell). Each cell turns OK/NG as you type, using the same rule as the backend. The saved server value is authoritative.
-  - Actions: Save draft, Submit, Approve/Reject (only in the right status), Print/PDF
-  - Warn when leaving with unsaved changes
-- [ ] Read-only view for submitted/approved inspections
+### 3.2 Master data screens
+- [ ] Items: list + detail with the standards grid (grouped STD / Certificate / Visual / Fitting), edit standards
+- [ ] Vendors: list, create/edit form, CSV import
+- [ ] Checkers (`inspectsetup`): simple list editor
 
-### 4.4 PDF Viewer
-- [ ] Viewer page/dialog that embeds `/api/reports/inspections/:id/pdf` (`ngx-extended-pdf-viewer`, or an `<iframe>` of the blob URL as a first version)
-- [ ] Download and print buttons. Loading and error states.
-- [ ] Open from the inspection list (row action) and from the inspection form
+### 3.3 Inspection form (mirrors Form 7.4.3-F1)
+- [ ] **Header:** Part name / Part no (item lookup), Supplier (vendor lookup), inspect date, measuring instrument
+- [ ] Choosing the item loads `/api/inspections/template` and fills the lines; changing the item on a filled form asks for confirmation
+- [ ] **Grid:** rows = `STD` lines (No, Item, Standard, Tolerance), then Certificate No, Visual, Fitting; columns = 7 delivery columns of `Actual | OK/NG`
+  - Numeric input with 2 decimals; OK/NG cell updates as you type, NG highlighted red
+  - Qualitative rows: OK/NG toggle; Certificate row: COA number text + OK/NG
+  - Keyboard: Enter moves down within a column (the way QC measures one delivery), Tab moves right
+- [ ] **Footer rows per column:** P/O No, Delivery date, QTY received / Insp. category (N / R / T / 100 %), NG / Total sample (computed), Judgment (O / X / C), QF No
+- [ ] Validation mirrors the server: unused columns disabled until the previous one is used, required fields per used column, `Accepted` disabled when the column has NG
+- [ ] Save draft (and autosave per column), unsaved-changes guard, server values replace local ones after each save
+- [ ] Inspection list: filters (date range, item, supplier, status, judgment), paging, row actions (open, PDF)
+- [ ] Read-only view for inspections outside `DRAFT`
 
-### 4.5 Frontend quality
-- [ ] Unit tests for services and the judgement helper. A component test for the measurement grid.
-- [ ] E2E smoke test (Playwright): create vendor → create item with characteristics → create inspection → submit → open PDF
+### 3.4 Frontend quality
+- [ ] Unit tests: services, `judgement.ts` (shared fixture), form validators
+- [ ] Component test for the grid: typing an out-of-tolerance value marks NG and increments NG / Total sample
+- [ ] Responsive enough for a tablet on the receiving floor (landscape)
 
-**Phase 4 done when:** a QC user can do the whole flow (master data → inspection → PDF) in the browser without using the API directly.
+**Phase 3 done when:** an inspector can create, fill and save an inspection matching the filled example in `docs/chek sheet-qhse (cara isi).pdf`, with OK/NG identical to the server's result.
+
+---
+
+## Phase 4 — Reporting (PDF) & Approval Workflow
+
+Goal: the inspection is signed off and prints as the official check sheet.
+
+### 4.1 Approval workflow
+- [ ] Migration `006_inspecttable_approval.sql`: `submitted_at`, `checked_at`, `return_reason`, `remarks` (only the columns Q6 leaves missing)
+- [ ] Status flow `DRAFT → SUBMITTED → CHECKED`, and `SUBMITTED → DRAFT` (returned with a reason)
+- [ ] `POST /api/inspections/:inspectnum/submit`: needs `inspectby`, all used columns judged; recomputes OK/NG; locks editing
+- [ ] `POST /api/inspections/:inspectnum/check`: `checkedby` must be a name from `inspectsetup`; final
+- [ ] `POST /api/inspections/:inspectnum/return`: `reason` required
+- [ ] Until auth exists (§5), names are chosen in the form; the API records them as sent
+- [ ] UI: Submit / Check / Return buttons shown only in the right status; status badge on list and form
+- [ ] Tests: full flow, every wrong-status action returns `409`, `Accepted` with NG returns `422`
+
+### 4.2 PDF report (Form 7.4.3-F1)
+- [ ] Engine: Puppeteer + EJS template behind `reports/engine.js` → `renderInspectionPdf(inspection)`, so it can be swapped for PDFKit if the server can't run Chromium. Spike on WSL2 first.
+- [ ] `reports/templates/inspection-check-list.ejs` copying `docs/chek sheet-qhse.pdf`:
+  - Title block: *Form No : 7.4.3-F1*, *INCOMING INSPECTION CHECK LIST*, *PT. Chubb Safes Indonesia*, Rev / Tanggal / Hal. boxes (form revision from config)
+  - Part name, Part no., Supplier name
+  - Dimensions table (No, Item, Standard, Tolerance) + 7 × (Actual, OK/NG), grey Actual cells as on the form
+  - Certificate No, Visual, Fitting rows
+  - Footer rows: P/O No, Delivery date, Measuring Instrument, QTY received / Insp. Category, NG / Total sample, Judgment, QF No, Inspected by, Checked by
+  - Legend: `*) T: Tightening N: Normal R: Reduce` · `**) O: Accepted X: Rejected C: Concession No Mark: 100 % inspection`
+- [ ] A4 landscape; more than 13 STD lines continue on the next page with repeated headers; "Hal. X/Y"
+- [ ] NG values marked; `DRAFT` / `SUBMITTED` inspections get a watermark, only `CHECKED` prints clean
+- [ ] `services/report.service.js` reuses the inspection repository; one shared browser instance, limited concurrent renders, render timeout, browser closed on shutdown
+- [ ] `GET /api/reports/inspections/:inspectnum/pdf` (`inline`; `?download=1` for attachment; filename `<inspectnum>.pdf`)
+- [ ] `GET /api/reports/inspections/:inspectnum/html` preview (dev only)
+- [ ] Frontend: PDF viewer dialog (iframe of the blob URL), download and print buttons, opened from the list and the form
+- [ ] Tests: `application/pdf` + filename header, `404` for unknown id, HTML snapshot of the template
+
+### 4.3 Release checklist
+- [ ] Playwright E2E: create vendor → pick item → fill 2 delivery columns with one NG → judge → submit → check → open PDF
+- [ ] QC walks through the app with the paper form side by side and signs off the layout
+
+**Phase 4 done when:** a checked inspection opens as a correctly paginated 7.4.3-F1 PDF in under about 3 seconds, and QC accepts it as a replacement for the paper form.
 
 ---
 
 ## 5. Later (not scheduled)
-- Authentication and roles (JWT; inspector / QC supervisor / viewer) before any real deployment
-- Dashboard: NG rate per vendor, item and month. Excel export.
-- Attachments (photos, mill certificates) on an inspection
-- Audit log of changes to inspections
+- Authentication and roles (inspector / checker / viewer), possibly reusing the existing `oauth_users` table
+- Dashboard: NG rate per supplier, item and month; Excel export
+- Attachments (photos, COA scans) on an inspection
+- Audit log of changes
 - Deployment: Nginx serving the Angular build and proxying `/api`, PM2 for Node, database backups
 
 ## 6. Open questions
-1. What are the exact PK/FK columns linking `inspecttable` ↔ `inspectline` ↔ `inventinspectitem`? (Answered by the Phase 1.0 schema dump.)
-2. How many `actual_n` columns are there, and is that the fixed maximum number of samples?
-3. Is `tolerance` a single ± value, or are there separate upper/lower limits? Are there attribute (visual OK/NG) characteristics?
-4. Does the existing data already use an inspection number format that must be continued?
-5. Is `csi_db` shared with another system (e.g. an ERP sync)? If so, the API may need to treat some tables or columns as read-only.
-6. Is the PDF layout fixed by an existing paper form? If yes, get a sample to copy.
+1. **Code maps:** are the values in §3 right for `inspectcategoryN`, `judgmentN` and `inspectstatus`? The two existing rows use `1` everywhere and look like test data — may they be deleted?
+2. **Vendors:** `vendtable` is empty. Where does the supplier list come from (ERP export, Excel)? Is `vendaccount` a supplier code from another system?
+3. **Tolerance edge cases:** how should the ~700 STD standards with tolerance `' 0.0'` and both limits `0` be judged (exact match, or reference only / not judged)? Are qualitative texts in STD rows (`Tidak Terangkat`) really visual checks?
+4. What does `inventtable.inspectqty` mean (sample size? AQL?) and should it prefill *Total sample*?
+5. **NG / Total sample:** is the total sample entered per delivery column? If so, add `totalsample1..7` (the schema has only `notgood1..7`).
+6. **Per-column sign-off:** the form has *QF No*, *Inspected by* and *Checked by* per delivery column, the schema has one each per inspection. Is one per form enough?
+7. Is `csi_db` shared with another application (the `oauth_*`, `orders`, `numseqtable` tables suggest so)? May we add a row to `numseqtable` and add keys/columns to the inspection tables?
+8. Should the PDF show the form revision as fixed `Rev. 01 / 24/10/23`, or from a setting?
