@@ -21,7 +21,7 @@ store the inspection of materials and parts received from suppliers, replacing t
 
 ## 2. Current state
 
-- [x] Express 5 server: CORS, JSON body parsing, 404 and 500 handlers (still at the repo root)
+- [x] Express 5 server: CORS, JSON body parsing, 404 and 500 handlers, in `backend/` (`app.js` + `server.js`)
 - [x] `GET /api/health` with DB connectivity check
 - [x] `config/db.js`: pool with WSL2 host auto-detection, `dateStrings`, `decimalNumbers`
 - [x] `csi_db` imported with existing data
@@ -93,9 +93,9 @@ inspectsetup                                      list of "Checked by" names
 Goal: both projects run, tooling is in place, and the schema can store everything the form needs.
 
 ### 1.1 Repository restructure
-- [ ] Move `server.js`, `config/`, `package.json`, `package-lock.json`, `.env.example` into `backend/` (with `git mv`); fix paths; `npm run dev` still works from `backend/`
-- [ ] Root `.gitignore` covers `node_modules/`, `.env`, `.env.test`, `docs/csi_db.sql`, generated PDFs, `frontend/dist/`
-- [ ] Split `server.js` into `app.js` (the Express app) and `server.js` (listen), so tests can load the app
+- [x] Move `server.js`, `config/`, `package.json`, `package-lock.json`, `.env.example` into `backend/` (with `git mv`); fix paths; `npm run dev` still works from `backend/`
+- [x] Root `.gitignore` covers `node_modules/`, `.env`, `.env.test`, `docs/csi_db.sql`, generated PDFs, `frontend/dist/`
+- [x] Split `server.js` into `app.js` (the Express app) and `server.js` (listen), so tests can load the app
 
 ### 1.2 Backend plumbing
 - [ ] `routes/index.js` mounted at `/api`; `/api/health` moved to the standard shape (`{ success, data: { status, db, timestamp } }`)
