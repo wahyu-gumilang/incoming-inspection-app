@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const pool = require('./config/db');
+const notFound = require('./middlewares/not-found.middleware');
+const errorHandler = require('./middlewares/error-handler.middleware');
 
 const app = express();
 
@@ -23,13 +25,7 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
-
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ message: 'Internal server error' });
-});
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;
