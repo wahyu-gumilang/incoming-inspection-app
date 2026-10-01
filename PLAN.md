@@ -46,22 +46,22 @@ inspectsetup                                      list of "Checked by" names
 |---|---|---|---|
 | `inventtable` | 1 685 | `itemid`, `name`, `inspectqty` | No PK. Meaning of `inspectqty` unknown (Q4). |
 | `inventinspectitem` | ~11 900 | `itemid`, `itemname`, `inspecttype`, `inspectitem`, `standard_txt`, `standard` (dec 18,2), `tolerance` (text), `tolerance_plus`, `tolerance_minus` (dec 19,2) | PK (`itemid`,`inspecttype`,`inspectitem`). Types: `STD` 10 366, `VISUAL` 993, `FITTING` 343, `CERTIFIKAT` 191, some with a trailing space. Up to 28 `STD` lines per item. |
-| `vendtable` | **0** | `vendaccount`, `name` | No PK. Empty: vendors must be loaded (Q2). |
+| `vendtable` | **0** | `vendaccount`, `name` | No PK. Empty: dummy vendors will be seeded (Q2 answered). |
 | `inspecttable` | 2 (test data) | `inspectnum` (PK, `INS-000001`), `inspectdate`, `itemid`, `itemname`, `accountnum`, `name`, `inspectstatus` (varchar), `purchordernum1..7`, `deliverydate1..7` (default today), `qty_received1..7`, `inspectcategory1..7` (int), `notgood1..7` (int), `judgment1..7` (int), `qfnum`, `inspectby`, `checkedby`, `recid` | One row = one form = up to 7 delivery columns. |
 | `inspectline` | 0 | `inspectnum`, `linenum` (PK together), `inspectitem`, `standard`, `tolerance` (single dec), `actual_1..7`, `status_1..7` (int, default 0) | Column N ↔ delivery column N. |
 | `inspectlineother` | 0 | `inspectnum`, `linenum`, `inspecttype`, `inspectitem` | No PK and **no result columns** yet. |
 | `inspectsetup` | 0 | `id`, `checkedby` | No PK. |
-| `numseqtable` | 1 | `processid`, `processname`, `formatstring`, `length_tag`, `nextid` | Number sequences (currently only `Sales Order`). |
+| `numseqtable` | 1 | `processid`, `processname`, `formatstring`, `length_tag`, `nextid` | Unrelated leftover (`Sales Order`). Not used: the app has its own `inspectnumseq`. |
 | `oauth_*`, `password_reset_temp`, `orders` | — | — | Owned by another system. Not used until §5 auth. Never exposed or modified. |
 
 ### Gaps between the paper form and the schema
 
 | Form 7.4.3-F1 field | In schema? | Plan |
 |---|---|---|
-| Actual + OK/NG per STD line per delivery | `inspectline.actual_N`, `status_N` | Make nullable (migration 002) |
-| Asymmetric tolerance (`+0.3/-0`), `Min`, `Max`, display texts | Only `inspectline.tolerance` (one decimal) | Add snapshot columns (migration 003) |
-| Visual / Fitting / Certificate result per delivery | `inspectlineother` has no result columns | Add `actual_txt_N`, `status_N` (migration 004) |
-| Measuring Instrument (one row for the whole form) | Missing | Add `inspecttable.instrument` (migration 005) |
+| Actual + OK/NG per STD line per delivery | `inspectline.actual_N`, `status_N` | Make nullable (migration 005) |
+| Asymmetric tolerance (`+0.3/-0`), `Min`, `Max`, display texts | Only `inspectline.tolerance` (one decimal) | Add snapshot columns (migration 006) |
+| Visual / Fitting / Certificate result per delivery | `inspectlineother` has no result columns | Add `actual_txt_N`, `status_N` (migration 007) |
+| Measuring Instrument (one row for the whole form) | Missing | Add `inspecttable.instrument` (migration 008) |
 | NG / **Total sample** per delivery | `notgoodN` only | Q5, add `totalsampleN` if confirmed |
 | QF No., Inspected by, Checked by **per delivery column** | Single `qfnum`, `inspectby`, `checkedby` | Q6; default: one value per form, printed in every used column |
 | Remarks, approval timestamps | Missing | Phase 4 migration |
@@ -81,10 +81,13 @@ inspectsetup                                      list of "Checked by" names
 - Tolerance text `Min` → OK when `actual ≥ standard`; `Max` → OK when `actual ≤ standard`.
 - Qualitative lines: OK/NG chosen by the inspector.
 - `notgoodN` = count of NG values in column N across all lines. `judgmentN = Accepted` is refused when `notgoodN > 0`.
-- Data quality in the master (reported by the Phase 1 check script, not fixed silently):
-  ~700 `STD` rows with tolerance text `' 0.0'` and both limits `0` (exact match? reference dimension?),
-  STD rows whose tolerance text is qualitative (`Tidak Terangkat`, `Fitting OK`), and at least one
-  negative `tolerance_minus` (`1-1-29-04` / C: `-0.5/-0` stored as `-5.00`).
+- Data quality in the master, from `npm run db:check` on 2026-10-01 (reported, not fixed silently):
+  - 700 `STD` rows with tolerance text `' 0.0'` and both limits `0` (exact match? reference dimension? Q3)
+  - 12 `STD` rows whose tolerance is qualitative text (`Tidak Terangkat`)
+  - 1 negative `tolerance_minus` (`1-1-29-04` / C: `-0.5/-0` stored as `-5.00`)
+  - 9 `STD` rows whose tolerance text disagrees with the numbers, e.g. `1074-253` / A: `±0.3` stored as `+0.3/-1.3`, `3-1-12-05` / B: `+0/-0.1` stored as `+0.1/-0.1` (Q10)
+  - 91 `STD` rows where `standard` is about 100 × the printed `standard_txt` (`0.7` → `70`, `0.0012` → `0.12`), probably because `decimal(18,2)` can't hold more than 2 decimals (Q9)
+  - `inspecttype` with a trailing space: `'FITTING '` 286 rows, `'VISUAL '` 14 rows
 
 ---
 
@@ -106,17 +109,23 @@ Goal: both projects run, tooling is in place, and the schema can store everythin
 - [x] ESLint (flat config), Prettier, Jest, Supertest; `npm run lint`, `npm test`, `npm run format`
 
 ### 1.3 Database
-- [ ] `scripts/dump-schema.js` + `npm run db:schema` → `docs/schema.sql` (schema only, no data). Commit it.
-- [ ] `scripts/migrate.js` + `npm run db:migrate`: applies `db/migrations/NNN_*.sql` in order and records them in a `schema_migrations` table
-- [ ] `scripts/check-data.js`: reports duplicate keys, trailing-space `inspecttype`, zero/negative tolerances, qualitative STD rows (§3). Output reviewed with QC.
-- [ ] Migrations (each checks its preconditions first):
-  - [ ] `001_add_primary_keys.sql`: `inventtable(itemid)`, `vendtable(vendaccount)`, `inspectsetup(id)` AUTO_INCREMENT, `inspectlineother(inspectnum, linenum)`
-  - [ ] `002_inspectline_nullable_results.sql`: `actual_1..7`, `status_1..7` → `NULL DEFAULT NULL` (table is empty, so no data changes)
-  - [ ] `003_inspectline_snapshot.sql`: add `inspecttype`, `standard_txt`, `tolerance_txt`, `tolerance_plus`, `tolerance_minus`
-  - [ ] `004_inspectlineother_results.sql`: add `standard_txt`, `actual_txt_1..7`, `status_1..7`
-  - [ ] `005_inspecttable_instrument.sql`: add `instrument`; indexes on `inspectdate`, `itemid`, `accountnum`
-  - [ ] Inspection number sequence: a `numseqtable` row for incoming inspection (`INS-`, length 6, continuing after the highest existing `inspectnum`), or a dedicated table if Q7 says `numseqtable` is off-limits
-- [ ] Test database `csi_db_test` built from `docs/schema.sql` + migrations + small seed fixtures (no real data); `.env.test` (git-ignored) and `.env.test.example`
+- [x] `scripts/dump-schema.js` + `npm run db:schema` → `docs/schema.sql` (schema only, no data, unrelated legacy tables excluded)
+- [x] `scripts/migrate.js`: `npm run db:migrate` applies `db/migrations/NNN_*.sql` in order and records them in `schema_migrations`; `npm run db:migrate:status` lists pending ones without changing anything
+- [x] `scripts/check-data.js` (`npm run db:check`): read-only report of duplicate keys, trailing-space `inspecttype`, tolerance problems, `standard_txt` vs `standard`. Findings in §3, to review with QC.
+- [x] `scripts/backup-db.js` (`npm run db:backup`): `mysqldump` of `csi_db` to `DB_BACKUP_DIR`, outside the repo. Backups taken 2026-10-01 at 08:43 and 08:49 (right before migrating).
+- [x] `db/baseline.sql`: structure of `csi_db` as imported, the starting point for `csi_db_test`
+- [x] Migrations: tested on `csi_db_test`, applied to `csi_db` on 2026-10-01 (row counts unchanged). One `ALTER` per file, because MariaDB can't roll back DDL.
+  - [x] `001_inventtable_primary_key.sql`
+  - [x] `002_vendtable_primary_key.sql`
+  - [x] `003_inspectsetup_primary_key.sql` (`id` becomes AUTO_INCREMENT)
+  - [x] `004_inspectlineother_primary_key.sql` (`inspectnum`, `linenum`)
+  - [x] `005_inspectline_nullable_results.sql`: `actual_1..7`, `status_1..7` → `NULL DEFAULT NULL`
+  - [x] `006_inspectline_snapshot_columns.sql`: `inspecttype`, `standard_txt`, `tolerance_txt`, `tolerance_plus`, `tolerance_minus`
+  - [x] `007_inspectlineother_result_columns.sql`: `standard_txt`, `actual_txt_1..7`, `status_1..7`
+  - [x] `008_inspecttable_instrument_and_indexes.sql`: `instrument`; indexes on `inspectdate`, `itemid`, `accountnum`
+  - [x] `009_create_inspectnumseq.sql`: the app's own number sequence (`INS-`, 6 digits, continuing after the highest existing `inspectnum`; next is `INS-000003`)
+- [x] After migrating `csi_db`: `npm run db:schema` and commit `docs/schema.sql`
+- [x] Test database `csi_db_test`: `npm run db:test:reset` rebuilds it from `db/baseline.sql` + all migrations + `db/seeds/test-fixtures.sql` (real item ids, dummy vendors/checkers). The `db` Jest project does this before every run. `.env.test` (git-ignored) and `.env.test.example`.
 
 ### 1.4 Frontend scaffold
 - [ ] `npx @angular/cli@latest new frontend` (standalone, routing, SCSS, strict); Angular Material; angular-eslint; Prettier
@@ -221,7 +230,7 @@ Goal: a QC inspector can fill the whole check sheet in the browser as fast as on
 Goal: the inspection is signed off and prints as the official check sheet.
 
 ### 4.1 Approval workflow
-- [ ] Migration `006_inspecttable_approval.sql`: `submitted_at`, `checked_at`, `return_reason`, `remarks` (only the columns Q6 leaves missing)
+- [ ] Migration `010_inspecttable_approval.sql`: `submitted_at`, `checked_at`, `return_reason`, `remarks` (only the columns Q6 leaves missing)
 - [ ] Status flow `DRAFT → SUBMITTED → CHECKED`, and `SUBMITTED → DRAFT` (returned with a reason)
 - [ ] `POST /api/inspections/:inspectnum/submit`: needs `inspectby`, all used columns judged; recomputes OK/NG; locks editing
 - [ ] `POST /api/inspections/:inspectnum/check`: `checkedby` must be a name from `inspectsetup`; final
@@ -264,10 +273,12 @@ Goal: the inspection is signed off and prints as the official check sheet.
 
 ## 6. Open questions
 1. **Code maps:** are the values in §3 right for `inspectcategoryN`, `judgmentN` and `inspectstatus`? The two existing rows use `1` everywhere and look like test data — may they be deleted?
-2. **Vendors:** `vendtable` is empty. Where does the supplier list come from (ERP export, Excel)? Is `vendaccount` a supplier code from another system?
+2. ~~**Vendors:** where does the supplier list come from?~~ **Answered 2026-10-01:** dummy data is fine, as long as table/column names and ids follow `csi_db`.
 3. **Tolerance edge cases:** how should the ~700 STD standards with tolerance `' 0.0'` and both limits `0` be judged (exact match, or reference only / not judged)? Are qualitative texts in STD rows (`Tidak Terangkat`) really visual checks?
 4. What does `inventtable.inspectqty` mean (sample size? AQL?) and should it prefill *Total sample*?
 5. **NG / Total sample:** is the total sample entered per delivery column? If so, add `totalsample1..7` (the schema has only `notgood1..7`).
 6. **Per-column sign-off:** the form has *QF No*, *Inspected by* and *Checked by* per delivery column, the schema has one each per inspection. Is one per form enough?
-7. Is `csi_db` shared with another application (the `oauth_*`, `orders`, `numseqtable` tables suggest so)? May we add a row to `numseqtable` and add keys/columns to the inspection tables?
+7. ~~Is `csi_db` shared with another application?~~ **Answered 2026-10-01:** no, it's a development copy. The `docs/` files are references for the form's shape, content and columns. Inspection numbers use the app's own table (`inspectnumseq`).
 8. Should the PDF show the form revision as fixed `Rev. 01 / 24/10/23`, or from a setting?
+9. **Precision:** `standard`, `tolerance_*` and `actual_N` are `decimal(18,2)`. 91 standards look stored ×100 (`0.0012` printed, `0.12` stored). Should those be judged in the stored unit, or do the columns need more decimals (a migration to `decimal(18,4)`)?
+10. **Tolerance typos:** 9 standards have numbers that disagree with their tolerance text (see §3). Which is right, the text or the numbers? Judging uses the numbers.
