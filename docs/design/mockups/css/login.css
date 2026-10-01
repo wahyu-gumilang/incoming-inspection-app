@@ -135,6 +135,22 @@
   font-size: 13px;
 }
 
+.login-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--ng-bg);
+  color: var(--ng);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.login-error .icon {
+  font-size: 20px;
+}
+
 .btn-signin {
   height: 46px;
 }

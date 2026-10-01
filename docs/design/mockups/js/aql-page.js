@@ -64,7 +64,7 @@ document.getElementById('calc-cat').addEventListener('change', (e) => {
   cat = e.target.value;
   renderAqlPage();
 });
-document.getElementById('edit-rows').addEventListener('click', openEditRows);
+document.getElementById('edit-rows')?.addEventListener('click', openEditRows);
 document.getElementById('edit-save').addEventListener('click', () => {
   closeModal();
   toast('AQL rows saved');

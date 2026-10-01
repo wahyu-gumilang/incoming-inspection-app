@@ -1,8 +1,10 @@
 // app.js — shared behaviour for every page after login:
 // the navbar (written once here), profile menu, theme, modals and toasts.
 // Each page sets <body data-page="…"> to mark its menu entry as active.
-
-const USER = { name: 'Siti Rahayu', initials: 'SR', username: '10234', role: 'Checker' };
+// Needs js/users.js first. Everything user-specific comes from the signed-in user:
+//   data-user="name|initials|username|role|email"  → filled with that field
+//   data-requires="ADMIN" / "CHECKER,ADMIN"        → removed for other roles
+//   data-open-roles="ADMIN"                         → only these roles can open its modal
 
 const NAV = [
   { page: 'dashboard', label: 'Dashboard', icon: 'space_dashboard', href: 'dashboard.html' },
@@ -16,17 +18,18 @@ const NAV = [
       { page: 'aql', label: 'AQL table', hint: 'Sample size and Ac / Re', icon: 'table_chart', href: 'aql.html' },
     ],
   },
-  { page: 'users', label: 'Users', icon: 'group', href: 'users.html' },
+  { page: 'users', label: 'Users', icon: 'group', href: 'users.html', roles: ['ADMIN'] },
 ];
 
 // Pages that belong to a menu entry without being in the menu themselves.
 const PARENT = { 'inspection-detail': 'inspections', profile: null };
 
-function renderNavbar() {
+function renderNavbar(me) {
   const page = document.body.dataset.page;
   const active = page in PARENT ? PARENT[page] : page;
+  const nav = NAV.filter((n) => !n.roles || n.roles.includes(me.role));
 
-  const desktop = NAV.map((n) => {
+  const desktop = nav.map((n) => {
     if (n.children) {
       const on = n.children.some((c) => c.page === active);
       return `<div class="dd ${on ? 'active' : ''}">
@@ -42,7 +45,7 @@ function renderNavbar() {
     return `<a href="${n.href}" class="${n.page === active ? 'active' : ''}">${n.label}${n.badge ? `<span class="badge">${n.badge}</span>` : ''}</a>`;
   }).join('');
 
-  const mobile = NAV.map((n) =>
+  const mobile = nav.map((n) =>
     n.children
       ? `<div class="group">${n.label}</div>${n.children
           .map((c) => `<a href="${c.href}" class="${c.page === active ? 'active' : ''}"><span class="icon">${c.icon}</span>${c.label}</a>`)
@@ -63,12 +66,12 @@ function renderNavbar() {
       <span class="api-chip" title="db: connected · checked 10:41"><span class="pulse"></span><span class="txt">All systems online</span></span>
       <div class="profile">
         <button class="profile-btn" type="button" aria-haspopup="menu" aria-expanded="false">
-          <span class="avatar">${USER.initials}</span>
-          <span class="who"><b>${USER.name}</b><span>QC ${USER.role}</span></span>
+          <span class="avatar" style="background:${me.avatar}">${me.initials}</span>
+          <span class="who"><b>${me.name}</b><span>QC ${me.roleLabel}</span></span>
           <span class="icon subtle" style="font-size:20px">expand_more</span>
         </button>
         <div class="dropdown" role="menu">
-          <div class="menu-head"><span class="avatar">${USER.initials}</span><div><b>${USER.name}</b><br /><span>@${USER.username} · ${USER.role}</span></div></div>
+          <div class="menu-head"><span class="avatar" style="background:${me.avatar}">${me.initials}</span><div><b>${me.name}</b><br /><span>@${me.username} · ${me.roleLabel}</span></div></div>
           <a href="profile.html" role="menuitem" class="${page === 'profile' ? 'active' : ''}"><span class="icon">person</span>Profile settings</a>
           <div class="sep"></div>
           <div class="label">Theme</div>
@@ -78,7 +81,7 @@ function renderNavbar() {
             <button type="button" data-theme-mode="system"><span class="icon">computer</span>Auto</button>
           </div>
           <div class="sep"></div>
-          <a href="login.html" role="menuitem" class="item danger"><span class="icon">logout</span>Log out</a>
+          <a href="login.html" role="menuitem" class="item danger" id="logout"><span class="icon">logout</span>Log out</a>
         </div>
       </div>
     </div>
@@ -119,6 +122,28 @@ function wireNavbar() {
 
   document.querySelectorAll('[data-theme-mode]').forEach((b) => b.addEventListener('click', () => setTheme(b.dataset.themeMode)));
   markTheme();
+  document.getElementById('logout').addEventListener('click', signOut);
+}
+
+/* ---------- Signed-in user on the page ---------- */
+function applyUser(me) {
+  const values = { name: me.name, initials: me.initials, username: me.username, role: me.roleLabel, email: me.email || 'Not set' };
+  document.querySelectorAll('[data-user]').forEach((el) => {
+    const v = values[el.dataset.user];
+    if ('value' in el && el.tagName !== 'BUTTON') el.value = el.dataset.user === 'email' ? me.email : v;
+    else el.textContent = v;
+    if (el.classList.contains('avatar')) el.style.background = me.avatar;
+  });
+  document.querySelectorAll('[data-greeting]').forEach((el) => (el.textContent = greeting()));
+  // data-open-roles: only these roles may open the modal (e.g. editing a vendor row)
+  document.querySelectorAll('[data-open-roles]').forEach((el) => {
+    if (el.dataset.openRoles.split(',').includes(me.role)) return;
+    el.removeAttribute('data-open');
+    el.classList.remove('clickable');
+  });
+  document.querySelectorAll('[data-requires]').forEach((el) => {
+    if (!el.dataset.requires.split(',').includes(me.role)) el.remove();
+  });
 }
 
 /* ---------- Theme (only switchable from the profile menu) ---------- */
@@ -207,10 +232,15 @@ function wireFilterChips() {
   );
 }
 
+// Pages behind the login send you to login.html when nobody is signed in.
+const ME = document.body.dataset.page ? currentUser() : null;
+if (document.body.dataset.page && !ME) location.replace('login.html');
+
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('navbar')) {
-    renderNavbar();
+  if (ME) {
+    renderNavbar(ME);
     wireNavbar();
+    applyUser(ME);
   }
   wireModals();
   wireFilterChips();

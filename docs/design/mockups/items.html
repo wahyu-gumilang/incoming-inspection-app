@@ -24,7 +24,7 @@
           <h1>Items &amp; standards</h1>
           <p>1,685 parts and their dimension, visual, fitting and certificate standards. Open a part to see or add standards.</p>
         </div>
-        <button class="btn btn-primary" type="button" data-open="m-item"><span class="icon">add</span>Add item</button>
+        <button class="btn btn-primary" type="button" data-open="m-item" data-requires="ADMIN"><span class="icon">add</span>Add item</button>
       </div>
 
       <div class="card">
@@ -90,7 +90,7 @@
         </div>
         <div class="modal-foot">
           <button type="button" class="btn btn-ghost" data-close>Close</button>
-          <button type="button" class="btn btn-primary" data-open="m-add-std"><span class="icon">add</span>Add standard</button>
+          <button type="button" class="btn btn-primary" data-open="m-add-std" data-requires="ADMIN"><span class="icon">add</span>Add standard</button>
         </div>
       </div>
     </div>
@@ -119,6 +119,7 @@
       </form>
     </div>
 
+    <script src="js/users.js"></script>
     <script src="js/app.js"></script>
     <script src="js/forms.js"></script>
   </body>

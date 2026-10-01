@@ -24,6 +24,9 @@ let DELIVERIES = isNew
       { po: '34561', date: '2026-10-01', qty: 100, cat: 'N', actual: ['12.71', '16.20', '28.21'], visual: ['OK', 'OK', 'OK'], fitting: ['OK'], ng: 0, j: 'o', note: '', qf: '' },
     ];
 
+// An existing inspection was made by Budi Santoso; a new one by whoever is signed in.
+const INSPECTOR = isNew ? ME : USERS['10187'];
+
 if (isNew) {
   document.getElementById('insp-no').textContent = 'INS-000129';
   document.title = 'INS-000129 · Incoming Inspection';
@@ -108,7 +111,7 @@ function renderSheet() {
   }));
   rows.push(foot('Judgment **)', (d) => (d.j ? `<span class="mark ${d.j}" title="${d.note ? esc(d.note) : ''}">${MARK[d.j]}</span>` : '<span class="subtle">—</span>')));
   rows.push(foot('QF No.', (d) => esc(d.qf || '—')));
-  rows.push(foot('Inspected by', () => '<span class="signer"><span class="avatar sm" style="background:linear-gradient(135deg,var(--teal),var(--sky))">BS</span>Budi S.</span>'));
+  rows.push(foot('Inspected by', () => `<span class="signer"><span class="avatar sm" style="background:${INSPECTOR.avatar}">${INSPECTOR.initials}</span>${INSPECTOR.name}</span>`));
   rows.push(foot('Checked by', () => '<span class="subtle" style="font-weight:500">Waiting</span>'));
   document.getElementById('sheet-body').innerHTML = rows.join('');
 
