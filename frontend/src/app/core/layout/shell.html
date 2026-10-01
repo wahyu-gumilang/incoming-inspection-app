@@ -1,0 +1,54 @@
+<mat-toolbar class="topbar">
+  <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <a class="brand" routerLink="/">
+    <span class="app-name">Incoming Inspection</span>
+    <span class="company">PT. Chubb Safes Indonesia</span>
+  </a>
+  <span class="spacer"></span>
+  <app-api-status />
+</mat-toolbar>
+
+<mat-sidenav-container class="container">
+  <mat-sidenav #sidenav [mode]="sidenavMode()" [opened]="!narrow()" class="sidenav">
+    <mat-nav-list aria-label="Main">
+      @for (item of mainNav; track item.path) {
+        <a
+          mat-list-item
+          [routerLink]="item.path"
+          routerLinkActive
+          #main="routerLinkActive"
+          [activated]="main.isActive"
+          (click)="narrow() && sidenav.close()"
+        >
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+
+    <h2 class="nav-heading" id="master-data-heading">Master Data</h2>
+    <mat-nav-list aria-labelledby="master-data-heading">
+      @for (item of masterDataNav; track item.path) {
+        <a
+          mat-list-item
+          [routerLink]="item.path"
+          routerLinkActive
+          #master="routerLinkActive"
+          [activated]="master.isActive"
+          (click)="narrow() && sidenav.close()"
+        >
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <main class="content">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

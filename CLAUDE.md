@@ -10,7 +10,7 @@ suppliers against each item's standard and tolerance, then prints the result on 
 company check sheet **Form No 7.4.3-F1 "Incoming Inspection Check List"**.
 
 - **Backend (`backend/`):** Node.js, Express 5, MariaDB/MySQL via `mysql2/promise`, CommonJS.
-- **Frontend (`frontend/`):** Angular (latest stable: standalone components, signals, new control flow), Angular Material.
+- **Frontend (`frontend/`):** Angular 22 (standalone components, signals, new control flow, zoneless), Angular Material, Vitest.
 - **Database:** `csi_db` on MariaDB 10.4 (already imported with production-like data).
 - **Docs (`docs/`):** DB dump, generated schema snapshot, and the reference paper forms.
 - **Roadmap:** `PLAN.md` is the source of truth. Work on the current phase and tick its checkboxes when a task is done.
@@ -103,7 +103,7 @@ belongs to header column N of `inspecttable` (`purchordernumN`, `deliverydateN`,
 
 - Request flow: `route → validate → controller → service → repository → db`. Each layer calls only the layer below it.
 - Backend file names are kebab-case with a role suffix: `vendor.controller.js`, `vendor.service.js`, `vendor.repository.js`, `error-handler.middleware.js`. Files in `utils/`, `constants/`, `scripts/` and `reports/` are plain kebab-case (`app-error.js`, `dump-schema.js`); the class inside can still be `AppError`.
-- Frontend follows the Angular CLI naming style for the installed version (`inspection-form.ts` or `inspection-form.component.ts`, whichever `ng generate` produces). Don't mix both styles.
+- Frontend follows the Angular 22 CLI naming style: no type suffix in file or class names (`inspection-form.ts` → `InspectionForm`, `vendor.service.ts` → `VendorService`, specs next to the file as `*.spec.ts`). Generate with `ng generate` so new files match.
 - Only create a folder when the first file needs it.
 
 ## Commands
@@ -135,8 +135,9 @@ Add new commands as `package.json` scripts, not as ad-hoc instructions.
 |---|---|
 | `npm start` | `ng serve` on port `4200`, proxies `/api` to `http://localhost:5000` |
 | `npm run build` | Production build |
-| `npm test` | Unit tests |
+| `npm test` | Unit tests (Vitest; `npx ng test --watch=false` for a single run) |
 | `npm run lint` | `ng lint` (angular-eslint) |
+| `npm run format` / `format:check` | Prettier |
 
 Quick check: `curl http://localhost:5000/api/health` should return
 `{ "success": true, "data": { "status": "ok", "db": "connected", ... } }`.
@@ -256,6 +257,8 @@ Rules:
 - Components never call `HttpClient` directly: go through feature services built on `core/ApiService`, which unwraps `{ success, data, meta }`.
 - TypeScript interfaces in `core/models/` use the API field names exactly (`itemid`, `actual_1`, …). `strict` mode stays on; no `any`.
 - Formatting: Prettier (same settings as the backend), angular-eslint.
+- Styling: Angular Material (M3) with its `--mat-sys-*` CSS variables; no other UI kit. Fonts and icons are bundled from npm (`@fontsource/roboto`, `material-symbols`), never loaded from a CDN, because the plant network may have no internet.
+- UI language is English, matching the labels on Form 7.4.3-F1 (*Part name*, *Supplier name*, *Inspected by*).
 
 ### Both
 - Keep comments for the *why*. No commented-out code.
