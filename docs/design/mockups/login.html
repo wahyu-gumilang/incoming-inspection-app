@@ -42,27 +42,39 @@
             <label for="username">Username</label>
             <div class="input-icon">
               <span class="icon">badge</span>
-              <input id="username" name="username" class="input" autocomplete="username" placeholder="Employee NIK" value="10234" required />
+              <input id="username" name="username" class="input" autocomplete="username" placeholder="Employee NIK" required />
             </div>
           </div>
           <div class="field">
             <label for="password">Password</label>
             <div class="input-icon pw-wrap">
               <span class="icon">lock</span>
-              <input id="password" name="password" class="input" type="password" autocomplete="current-password" value="password123" required />
+              <input id="password" name="password" class="input" type="password" autocomplete="current-password" required />
               <button type="button" class="icon-btn" id="toggle-pw" aria-label="Show password"><span class="icon">visibility</span></button>
             </div>
           </div>
+          <div class="login-error hidden" id="login-error" role="alert"><span class="icon">error</span><span></span></div>
           <label class="remember"><input type="checkbox" checked /> Keep me signed in on this device</label>
           <button class="btn btn-primary btn-signin" type="submit">Sign in <span class="icon">arrow_forward</span></button>
           <p class="help">Forgot your password? Ask a QC administrator to reset it.</p>
         </form>
       </section>
     </main>
+    <script src="js/users.js"></script>
     <script>
-      // The app POSTs to /api/auth/login and gets an httpOnly cookie; the mockup just moves on.
+      // The app POSTs to /api/auth/login and gets an httpOnly cookie; the mockup checks js/users.js.
+      if (currentUser()) location.replace('dashboard.html');
       document.getElementById('signin').addEventListener('submit', function (e) {
         e.preventDefault();
+        var result = signIn(document.getElementById('username').value.trim(), document.getElementById('password').value);
+        var box = document.getElementById('login-error');
+        if (result.error) {
+          box.lastElementChild.textContent = result.error;
+          box.classList.remove('hidden');
+          document.getElementById('password').value = '';
+          document.getElementById('password').focus();
+          return;
+        }
         location.href = 'dashboard.html';
       });
       document.getElementById('toggle-pw').addEventListener('click', function () {

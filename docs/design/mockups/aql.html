@@ -44,7 +44,7 @@
               <div class="tabs" id="cat-tabs" role="tablist" aria-label="Inspection category">
                 <button type="button" data-cat="N" role="tab">Normal</button><button type="button" data-cat="T" role="tab">Tightened</button><button type="button" data-cat="R" role="tab">Reduced</button>
               </div>
-              <button class="btn btn-outline btn-sm" type="button" id="edit-rows"><span class="icon" style="font-size: 18px">edit</span>Edit rows</button>
+              <button class="btn btn-outline btn-sm" type="button" id="edit-rows" data-requires="ADMIN"><span class="icon" style="font-size: 18px">edit</span>Edit rows</button>
             </div>
           </div>
           <div class="table-wrap" id="plan-table"></div>
@@ -87,6 +87,7 @@
       </div>
     </div>
 
+    <script src="js/users.js"></script>
     <script src="js/app.js"></script>
     <script src="js/aql.js"></script>
     <script src="js/aql-page.js"></script>
