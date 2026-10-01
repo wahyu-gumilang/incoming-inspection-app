@@ -212,7 +212,7 @@ Decided 2026-10-01: items can be added and renamed but not deleted (they come fr
 - [x] Repository, service, controller, routes and validator files for items, standards and vendors; `utils/csv.js`
 - [x] Integration tests: paging/search/sort whitelist, 404s, duplicates (incl. against a stored trailing space), delete-in-use, CSV import all-or-nothing, Admin-only writes (226 backend tests)
 - [x] Checked read-only on `csi_db`: page 1 of 1,685 items in ~36 ms; ids with spaces and trailing spaces resolve
-- [ ] Dummy vendors loaded into `csi_db` (`npm run db:seed:dev`, waiting for approval)
+- [x] Dummy vendors loaded into `csi_db` (`npm run db:seed:dev`, 2026-10-01 18:37 after a backup; 15 vendors, re-run adds 0)
 
 ### 2.3 AQL sampling (requested by Pak Fajar, 2026-10-01)
 The system decides each delivery's sample size and accept/reject numbers from its lot size (`qty_receivedN`) and inspection category (`inspectcategoryN`: N / R / T), using an AQL table admins can view and edit. His Laravel example is the reference for intent only: no new `materials` / `inspections` tables, no random inspection numbers, no free-text inspector.
