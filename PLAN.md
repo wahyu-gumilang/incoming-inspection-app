@@ -155,7 +155,7 @@ Decisions (2026-10-01): username + password; accounts are created by an Admin (n
 | `CHECKER` | Everything an Inspector can, plus check/return submitted inspections (*Checked by*) |
 | `ADMIN` | Everything, plus users and master data (items, standards, vendors) |
 
-- [~] Migration `010_create_usertable.sql` (tested on `csi_db_test`; waiting for approval to apply to `csi_db`): `usertable` (`userid` PK auto, `username` unique, `fullname`, `email` NULL, `role`, `password_hash`, `active`, `must_change_password`, `theme` `light|dark|system`, `last_login_at`, `created_at`, `updated_at`)
+- [x] Migration `010_create_usertable.sql` (applied to `csi_db` 2026-10-01 16:51 after a backup): `usertable` (`userid` PK auto, `username` unique, `fullname`, `email` NULL, `role`, `password_hash`, `active`, `must_change_password`, `theme` `light|dark|system`, `last_login_at`, `created_at`, `updated_at`)
 - [x] Passwords hashed with bcrypt (`bcryptjs`, cost 12); 8–72 characters; never returned by the API
 - [x] Session: signed JWT (HS256, user id only) in an `httpOnly`, `SameSite=Strict` cookie `iqc_session` (`Secure` in production), expires after one shift (8 h); role and active flag re-read from the database on every request; `JWT_SECRET` in `.env`, server refuses to start without it
 - [x] Login rate limit: 5 failed attempts per username per 15 minutes → `429` (in memory, single process); same `401` for unknown user and wrong password, with equal timing
