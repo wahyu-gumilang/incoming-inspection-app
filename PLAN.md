@@ -98,12 +98,12 @@ Goal: both projects run, tooling is in place, and the schema can store everythin
 - [x] Split `server.js` into `app.js` (the Express app) and `server.js` (listen), so tests can load the app
 
 ### 1.2 Backend plumbing
-- [ ] `routes/index.js` mounted at `/api`; `/api/health` moved to the standard shape (`{ success, data: { status, db, timestamp } }`)
-- [ ] `utils/app-error.js`, `utils/response.js` (`ok`, `created`), `utils/pagination.js`
-- [ ] `middlewares/error-handler.middleware.js` and `not-found.middleware.js` returning the JSON error shape (replaces the current `{ message }` handlers)
-- [ ] `middlewares/validate.middleware.js` + Zod
-- [ ] `constants/inspection.js`: column lists for `_1..7`, inspect types, the code maps from §3
-- [ ] ESLint (flat config), Prettier, Jest, Supertest; `npm run lint`, `npm test`, `npm run format`
+- [x] `routes/index.js` mounted at `/api`; `/api/health` moved to the standard shape (`{ success, data: { status, db, timestamp } }`)
+- [x] `utils/app-error.js`, `utils/response.js` (`ok`, `created`, `noContent`), `utils/pagination.js`
+- [x] `middlewares/error-handler.middleware.js` and `not-found.middleware.js` returning the JSON error shape (replaces the current `{ message }` handlers)
+- [x] `middlewares/validate.middleware.js` + Zod
+- [x] `constants/inspection.js`: column lists for `_1..7`, inspect types, the code maps from §3
+- [x] ESLint (flat config), Prettier, Jest, Supertest; `npm run lint`, `npm test`, `npm run format`
 
 ### 1.3 Database
 - [ ] `scripts/dump-schema.js` + `npm run db:schema` → `docs/schema.sql` (schema only, no data). Commit it.
