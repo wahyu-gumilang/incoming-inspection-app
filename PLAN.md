@@ -12,7 +12,7 @@ store the inspection of materials and parts received from suppliers, replacing t
 0. Log in with a username and password; what you can do depends on your role (Inspector, Checker, Admin).
 1. Pick an item and a supplier; the item's QC standards load automatically.
 2. Enter up to 7 delivery columns (P/O, delivery date, qty, inspection category) and the actual measurements.
-3. Get OK/NG per value in real time; the **AQL table** sets each delivery's sample size and accept/reject numbers from its lot size (§2.4).
+3. Get OK/NG per value in real time; the **AQL table** sets each delivery's sample size and accept/reject numbers from its lot size (§2.3).
 4. Decide Accepted / Rejected / Concession per delivery; *Inspected by* and *Checked by* come from the logged-in users.
 5. Print the result in the 7.4.3-F1 layout as PDF.
 
@@ -65,7 +65,7 @@ inspectsetup                                      list of "Checked by" names
 | Asymmetric tolerance (`+0.3/-0`), `Min`, `Max`, display texts | Only `inspectline.tolerance` (one decimal) | Add snapshot columns (migration 006) |
 | Visual / Fitting / Certificate result per delivery | `inspectlineother` has no result columns | Add `actual_txt_N`, `status_N` (migration 007) |
 | Measuring Instrument (one row for the whole form) | Missing | Add `inspecttable.instrument` (migration 008) |
-| NG / **Total sample** per delivery | `notgoodN` only | Total sample comes from the AQL plan; snapshot in `samplesize1..7` (migration 012, §2.4) |
+| NG / **Total sample** per delivery | `notgoodN` only | Total sample comes from the AQL plan; snapshot in `samplesize1..7` (migration 012, §2.3) |
 | QF No., Inspected by, Checked by **per delivery column** | Single `qfnum`, `inspectby`, `checkedby` | Q6; default: one value per form, printed in every used column |
 | Remarks, approval timestamps | Missing | Phase 4 migration |
 
@@ -84,7 +84,7 @@ inspectsetup                                      list of "Checked by" names
 - Tolerance text `Min` → OK when `actual ≥ standard`; `Max` → OK when `actual ≤ standard`.
 - Qualitative lines: OK/NG chosen by the inspector.
 - `notgoodN` = number of **defective pieces** in delivery N's sample (AQL counts units, not characteristics: one piece with two NG dimensions is 1). The inspector enters it; it can't be `0` while any value in column N is NG.
-- AQL (§2.4): from `qty_receivedN` and `inspectcategoryN` the plan gives `samplesizeN`, `acceptnumN` (Ac), `rejectnumN` (Re). The system **suggests** O when `notgoodN ≤ Ac` and X when `notgoodN ≥ Re`. `Accepted` is refused when `notgoodN > Ac`; `Concession` is only allowed when the delivery would be rejected, with a note.
+- AQL (§2.3): from `qty_receivedN` and `inspectcategoryN` the plan gives `samplesizeN`, `acceptnumN` (Ac), `rejectnumN` (Re). The system **suggests** O when `notgoodN ≤ Ac` and X when `notgoodN ≥ Re`. `Accepted` is refused when `notgoodN > Ac`; `Concession` is only allowed when the delivery would be rejected, with a note.
 - Data quality in the master, from `npm run db:check` on 2026-10-01 (reported, not fixed silently):
   - 700 `STD` rows with tolerance text `' 0.0'` and both limits `0` (exact match? reference dimension? Q3)
   - 12 `STD` rows whose tolerance is qualitative text (`Tidak Terangkat`)
@@ -146,6 +146,8 @@ Goal: both projects run, tooling is in place, and the schema can store everythin
 
 Goal: users can log in, and the whole inspection can be created, measured and judged through the API alone.
 
+Sections are numbered in working order (renumbered 2026-10-01): 2.4 needs the items, vendors and AQL of 2.2 and 2.3.
+
 ### 2.0 Authentication and users
 Decisions (2026-10-01): username + password; accounts are created by an Admin (no self-signup, no email server); an Admin resets forgotten passwords. Usernames allow letters, digits, `.`, `_`, `-` (convention: employee NIK).
 
@@ -189,45 +191,30 @@ Decided 2026-10-01: STD rules without usable limits (both tolerances 0, or a tex
 - [x] `standardWarnings(row)` → `NO_LIMITS`, `QUALITATIVE_TOLERANCE`, `NEGATIVE_TOLERANCE`, `TOLERANCE_TEXT_MISMATCH`, `STANDARD_TEXT_MISMATCH` (shared with `npm run db:check`)
 - [x] Unit tests: exactly on each limit, 0.01 outside, `+x/-0` and `+0/-x`, `Min`/`Max`, zero tolerance, empty values, negative standard, floating-point edge (0.3 ± 0.1), qualitative lines, all 7 columns; plus a run over all 10,375 STD rules in `csi_db` (nominal value OK, ±0.01 beyond each limit NG, no errors)
 
-### 2.2 Master data API (read-heavy; the item data already exists)
+### 2.2 Master data API
+Decided 2026-10-01: items can be added and renamed but not deleted (they come from the company item master); vendors can be deleted while no inspection uses them; 15 dummy vendors for the empty dev `vendtable`.
+
 | Method | Path | Description |
 |---|---|---|
-| GET | `/api/items` | List with `page`, `limit`, `sort`, `order`, `q` (itemid/name) |
-| GET | `/api/items/lookup?q=` | `{ itemid, name }` for autocomplete (Part no / Part name) |
-| GET | `/api/items/:itemId` | Item with `inspectItems[]` grouped by normalized `inspecttype` |
-| GET | `/api/items/:itemId/inspect-items` | Standards ordered by type (`STD` → `CERTIFIKAT` → `VISUAL` → `FITTING`) then `inspectitem` |
-| POST / PUT / DELETE | `/api/items/:itemId/inspect-items[/...]` | Maintain standards (validation: numeric `standard`, `tolerance_plus/minus ≥ 0`, unique key) |
-| GET / POST / PUT / DELETE | `/api/vendors[/:vendaccount]` | Vendor CRUD; `409` on duplicate, `409` on delete when referenced by `inspecttable.accountnum` |
-| POST | `/api/vendors/import` | Bulk load from CSV |
-| — | `npm run db:seed:dev` | Dummy vendors (and a few sample inspections) for the empty dev `vendtable` (Q2) |
-| GET | `/api/vendors/lookup?q=` | `{ vendaccount, name }` |
+| GET | `/api/items` | List with `page`, `limit`, `sort` (`itemid`, `name`), `order`, `q` (part no / name), `hasStandards`; each item has computed `standardCounts` per type and `warningCount` (doubtful standards) |
+| GET | `/api/items/lookup?q=` | `{ itemid, name }` for the "Part no." autocomplete (20 max) |
+| GET | `/api/items/:itemId` | Item with `inspectItems[]` in form order (STD → CERTIFIKAT → VISUAL → FITTING, items sorted naturally), trimmed texts, computed `mode` and `warnings` |
+| POST / PUT | `/api/items[/:itemId]` | Admin: add an item; rename it (the name copied into its standards changes in the same transaction) |
+| POST / PUT / DELETE | `/api/items/:itemId/inspect-items` | Admin: add / update / delete a standard, identified by `inspecttype` + `inspectitem` in the body (query for DELETE). Applies to new inspections only |
+| GET | `/api/vendors` | List with paging, `sort` (`vendaccount`, `name`, `inspectionCount`), `q`; computed `inspectionCount` |
+| GET | `/api/vendors/lookup?q=` · `/api/vendors/:vendaccount` | Autocomplete and one vendor |
+| POST / PUT / DELETE | `/api/vendors[/:vendaccount]` | Admin: create (`409` on duplicate), rename, delete (`409 IN_USE` when an inspection uses it) |
+| POST | `/api/vendors/import` | Admin: CSV body (`text/csv`, `,` or `;`, optional header, Excel BOM); every row is checked first and nothing is saved if one is invalid; existing accounts are skipped |
+| — | `npm run db:seed:dev` | 15 dummy vendors for the development database |
 
-- Reads are open to every logged-in user; creating, editing and deleting master data needs `ADMIN`. The *Checked by* list comes from `/api/users/lookup?role=CHECKER` (§2.0).
-- [ ] Repository, service, controller, routes and validator files for items, inspect items, vendors
-- [ ] Integration tests: paging/search/sort whitelist, 404s, duplicates, delete-in-use
+- Reads are open to every signed-in user; writes need `ADMIN`. The *Checked by* list comes from `/api/users/lookup?role=CHECKER` (§2.0).
+- Keys with trailing spaces (`'FITTING '`, item ids like `'1-1-02-03 '`) are found by their trimmed value (the collation ignores trailing spaces) and shown trimmed; stored values are never rewritten.
+- [x] Repository, service, controller, routes and validator files for items, standards and vendors; `utils/csv.js`
+- [x] Integration tests: paging/search/sort whitelist, 404s, duplicates (incl. against a stored trailing space), delete-in-use, CSV import all-or-nothing, Admin-only writes (226 backend tests)
+- [x] Checked read-only on `csi_db`: page 1 of 1,685 items in ~36 ms; ids with spaces and trailing spaces resolve
+- [x] Dummy vendors loaded into `csi_db` (`npm run db:seed:dev`, 2026-10-01 18:37 after a backup; 15 vendors, re-run adds 0)
 
-### 2.3 Inspection API
-| Method | Path | Description |
-|---|---|---|
-| GET | `/api/inspections` | List. Filters: `dateFrom`, `dateTo` (`inspectdate`), `item`, `vendor`, `status`, `judgment`, `q` (inspectnum / P/O) |
-| GET | `/api/inspections/template?itemId=` | Empty header + `lines[]` / `otherLines[]` snapshotted from `inventinspectitem` |
-| GET | `/api/inspections/:inspectnum` | Header + `lines[]` + `otherLines[]` + computed `columns[]` (used flag, `totalReceived`) |
-| POST | `/api/inspections` | Create header + lines in **one transaction**; server assigns `inspectnum`, computes `status_N` and `notgoodN`; `201` |
-| PUT | `/api/inspections/:inspectnum` | Replace header + lines in one transaction (only in `DRAFT`) |
-| PATCH | `/api/inspections/:inspectnum/columns/:n` | Save one delivery column (header fields + that column's actuals) for autosave |
-| DELETE | `/api/inspections/:inspectnum` | Only in `DRAFT`; `204` |
-
-Business rules (`services/inspection.service.js`):
-- [ ] `inspectnum` generated on the server, unique under concurrent saves (`SELECT … FOR UPDATE` on the sequence row)
-- [ ] Item and vendor must exist (`422`); `itemname` / `name` copied into the header at save time
-- [ ] `inspectby` is set from the logged-in user on create; the client can't choose it
-- [ ] Delivery columns: used columns are consecutive from 1; a used column needs P/O, delivery date, qty > 0 and a category; unused columns are stored empty (`NULL` P/O, qty `0`), their dates ignored
-- [ ] Line snapshot from the master on create; later master edits don't touch saved inspections
-- [ ] `status_N` and `notgoodN` always recomputed by the server; client-sent values are ignored
-- [ ] Wrong status for an action → `409 INVALID_STATUS`
-- [ ] Integration tests: create from template, rollback when one line fails, update blocked outside `DRAFT`, number uniqueness under parallel creates, filters
-
-### 2.4 AQL sampling (requested by Pak Fajar, 2026-10-01)
+### 2.3 AQL sampling (requested by Pak Fajar, 2026-10-01)
 The system decides each delivery's sample size and accept/reject numbers from its lot size (`qty_receivedN`) and inspection category (`inspectcategoryN`: N / R / T), using an AQL table admins can view and edit. His Laravel example is the reference for intent only: no new `materials` / `inspections` tables, no random inspection numbers, no free-text inspector.
 
 **Provisional decisions (2026-10-01, to confirm with QC, Q12–Q14):**
@@ -258,6 +245,27 @@ General Level II, AQL 2.5, normal, arrows already resolved: 2–50 → 5 (0/1), 
 | PUT | `/api/aql/plans/:planId/default` | Admin: choose the plan new inspections use |
 
 - [ ] Tests: every range boundary of both plans, lot below sample size, N/R/T, overlapping/gapped rows rejected, `Accepted` with `notgoodN > Ac` → `422`, `Concession` without note or below Re → `422`, saved snapshot unchanged after editing a plan
+
+### 2.4 Inspection API
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/inspections` | List. Filters: `dateFrom`, `dateTo` (`inspectdate`), `item`, `vendor`, `status`, `judgment`, `q` (inspectnum / P/O) |
+| GET | `/api/inspections/template?itemId=` | Empty header + `lines[]` / `otherLines[]` snapshotted from `inventinspectitem` |
+| GET | `/api/inspections/:inspectnum` | Header + `lines[]` + `otherLines[]` + computed `columns[]` (used flag, `totalReceived`) |
+| POST | `/api/inspections` | Create header + lines in **one transaction**; server assigns `inspectnum`, computes `status_N` and `notgoodN`; `201` |
+| PUT | `/api/inspections/:inspectnum` | Replace header + lines in one transaction (only in `DRAFT`) |
+| PATCH | `/api/inspections/:inspectnum/columns/:n` | Save one delivery column (header fields + that column's actuals) for autosave |
+| DELETE | `/api/inspections/:inspectnum` | Only in `DRAFT`; `204` |
+
+Business rules (`services/inspection.service.js`):
+- [ ] `inspectnum` generated on the server, unique under concurrent saves (`SELECT … FOR UPDATE` on the sequence row)
+- [ ] Item and vendor must exist (`422`); `itemname` / `name` copied into the header at save time
+- [ ] `inspectby` is set from the logged-in user on create; the client can't choose it
+- [ ] Delivery columns: used columns are consecutive from 1; a used column needs P/O, delivery date, qty > 0 and a category; unused columns are stored empty (`NULL` P/O, qty `0`), their dates ignored
+- [ ] Line snapshot from the master on create; later master edits don't touch saved inspections
+- [ ] `status_N` and `notgoodN` always recomputed by the server; client-sent values are ignored
+- [ ] Wrong status for an action → `409 INVALID_STATUS`
+- [ ] Integration tests: create from template, rollback when one line fails, update blocked outside `DRAFT`, number uniqueness under parallel creates, filters
 
 **Phase 2 done when:** an inspection for a real item (e.g. `000-228`) can be created from the template, measured in several delivery columns and read back with correct OK/NG, sample sizes and accept/reject numbers, using only `curl`.
 
@@ -375,7 +383,7 @@ Goal: the inspection is signed off and prints as the official check sheet.
 2. ~~**Vendors:** where does the supplier list come from?~~ **Answered 2026-10-01:** dummy data is fine, as long as table/column names and ids follow `csi_db`.
 3. ~~**Tolerance edge cases:**~~ **Decided 2026-10-01:** STD rules without usable limits (700 zero-tolerance + 12 qualitative) are judged by the inspector, like a visual check.
 4. ~~What does `inventtable.inspectqty` mean?~~ **Checked 2026-10-01:** `0` on all 1 685 items, so it is unused and ignored.
-5. ~~**NG / Total sample:** where does the total sample come from?~~ **Decided 2026-10-01:** from the AQL plan (§2.4), snapshot in `samplesize1..7`. NG = defective pieces.
+5. ~~**NG / Total sample:** where does the total sample come from?~~ **Decided 2026-10-01:** from the AQL plan (§2.3), snapshot in `samplesize1..7`. NG = defective pieces.
 6. **Per-column sign-off:** the form has *QF No*, *Inspected by* and *Checked by* per delivery column, the schema has one each per inspection. Is one per form enough?
 7. ~~Is `csi_db` shared with another application?~~ **Answered 2026-10-01:** no, it's a development copy. The `docs/` files are references for the form's shape, content and columns. Inspection numbers use the app's own table (`inspectnumseq`).
 8. Should the PDF show the form revision as fixed `Rev. 01 / 24/10/23`, or from a setting?
@@ -384,4 +392,4 @@ Goal: the inspection is signed off and prints as the official check sheet.
 11. Should *Inspected by* / *Checked by* store the user's full name (as the form prints it) or the username? Default: full name in the existing `varchar(50)` columns, plus a later migration for the user ids if traceability is needed.
 12. **AQL plan (confirm with QC / Pak Fajar):** is the practice "ISO 2859-1 Special Level S-1 with zero defects (Ac 0 / Re 1)", as the filled example suggests, or a specific AQL value (and which)? One plan for all items, or per item / defect class (critical / major / minor)?
 13. **Tightened / Reduced** for the default plan: is "one code letter larger / smaller" acceptable, or does QC use the ISO tightened / reduced tables?
-14. **General Level II, AQL 2.5** values in §2.4 were entered from memory of the ISO tables: verify against the official standard before using that plan.
+14. **General Level II, AQL 2.5** values in §2.3 were entered from memory of the ISO tables: verify against the official standard before using that plan.

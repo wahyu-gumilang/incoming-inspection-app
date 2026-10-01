@@ -18,7 +18,8 @@
     "db:check": "node scripts/check-data.js",
     "db:backup": "node scripts/backup-db.js",
     "db:test:reset": "node scripts/reset-test-db.js",
-    "user:create-admin": "node scripts/create-admin.js"
+    "user:create-admin": "node scripts/create-admin.js",
+    "db:seed:dev": "node scripts/seed-dev.js"
   },
   "keywords": [],
   "author": "",
