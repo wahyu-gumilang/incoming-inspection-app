@@ -3,6 +3,7 @@ const healthRoutes = require('./health.routes');
 const authRoutes = require('./auth.routes');
 const userRoutes = require('./user.routes');
 const itemRoutes = require('./item.routes');
+const vendorRoutes = require('./vendor.routes');
 const { requireAuth, requirePasswordChanged } = require('../middlewares/auth.middleware');
 
 const router = Router();
@@ -15,5 +16,6 @@ router.use('/auth', authRoutes);
 const signedIn = [requireAuth, requirePasswordChanged];
 router.use('/users', ...signedIn, userRoutes);
 router.use('/items', ...signedIn, itemRoutes);
+router.use('/vendors', ...signedIn, vendorRoutes);
 
 module.exports = router;
