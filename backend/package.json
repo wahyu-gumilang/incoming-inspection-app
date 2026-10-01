@@ -10,11 +10,14 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test:unit": "jest --selectProjects unit",
+    "test:db": "jest --selectProjects db",
     "db:schema": "node scripts/dump-schema.js",
     "db:migrate": "node scripts/migrate.js",
     "db:migrate:status": "node scripts/migrate.js --status",
     "db:check": "node scripts/check-data.js",
-    "db:backup": "node scripts/backup-db.js"
+    "db:backup": "node scripts/backup-db.js",
+    "db:test:reset": "node scripts/reset-test-db.js"
   },
   "keywords": [],
   "author": "",
