@@ -1,7 +1,14 @@
 const fs = require('fs');
 const net = require('net');
+const path = require('path');
 const mysql = require('mysql2/promise');
-require('dotenv').config();
+
+// Jest sets NODE_ENV=test, so tests always read .env.test (csi_db_test) and can
+// never reach the development database by accident.
+require('dotenv').config({
+  path: path.join(__dirname, '..', process.env.NODE_ENV === 'test' ? '.env.test' : '.env'),
+  quiet: true,
+});
 
 const DB_PORT = Number(process.env.DB_PORT) || 3306;
 const PROBE_TIMEOUT_MS = 1500;
@@ -70,25 +77,38 @@ async function detectHost() {
   throw err;
 }
 
-async function createPool() {
-  const host = await detectHost();
-  console.log(`[db] Using MySQL at ${host}:${DB_PORT}`);
-  return mysql.createPool({
+function connectionOptions(host) {
+  return {
     host,
     port: DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
     charset: 'utf8mb4',
     // Return DATE columns (inspectdate, deliverydate1..7) as 'YYYY-MM-DD' strings
     // instead of JS Date objects, avoiding timezone shifts.
     dateStrings: true,
     // Return DECIMAL columns (standard, tolerance, actual_n, qty_receivedn) as numbers.
     decimalNumbers: true,
+  };
+}
+
+async function createPool() {
+  const host = await detectHost();
+  console.log(`[db] Using MySQL at ${host}:${DB_PORT}`);
+  return mysql.createPool({
+    ...connectionOptions(host),
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
   });
+}
+
+// A single connection outside the pool, for scripts that need options the app
+// never should have (multipleStatements for migration files, no default database).
+async function createConnection(overrides = {}) {
+  const host = await detectHost();
+  return mysql.createConnection({ ...connectionOptions(host), ...overrides });
 }
 
 let poolPromise = null;
@@ -118,10 +138,20 @@ async function withPool(fn) {
   }
 }
 
+// Lets tests and scripts exit cleanly instead of waiting on idle connections.
+async function close() {
+  const current = poolPromise;
+  poolPromise = null;
+  const pool = current && (await current.catch(() => null));
+  if (pool) await pool.end();
+}
+
 // Same surface as a mysql2 pool for the methods the app uses.
 module.exports = {
   query: (...args) => withPool((pool) => pool.query(...args)),
   execute: (...args) => withPool((pool) => pool.execute(...args)),
   getConnection: () => withPool((pool) => pool.getConnection()),
   getPool,
+  createConnection,
+  close,
 };
