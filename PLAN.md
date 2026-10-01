@@ -265,7 +265,7 @@ Goal: a QC inspector can fill the whole check sheet in the browser as fast as on
 ### 3.0 UI/UX foundation (design first, then code)
 Agreed direction (2026-10-01): as modern as possible; brand colors from the Chubbsafes logo (`#004F9C` blue, `#1D1D1D` text) with extra accents that don't clash; the logo always sits on a light (or, in dark mode, dark) surface, never on a colored bar; tables follow Form 7.4.3-F1 and may be prettier but must not drift from it.
 
-- [~] **Mockups** in `docs/design/mockups/`, approved by the owner before any screen is coded. One HTML + CSS file per page (`login`, `dashboard`, `inspections`, `inspection-detail`, `items`, `vendors`, `aql`, `users`, `profile`), shared `css/base.css` (tokens), `css/components.css`, `css/navbar.css`, `js/app.js` (navbar, profile menu, theme, modal), mirroring the Angular folders:
+- [x] **Mockups** in `docs/design/mockups/`, **approved by the owner on 2026-10-01** as the design reference for Phase 3 (open `login.html`). Later design changes stay possible: update the mockup first and add a review note below. One HTML + CSS file per page (`login`, `dashboard`, `inspections`, `inspection-detail`, `items`, `vendors`, `aql`, `users`, `profile`), shared `css/base.css` (tokens), `css/components.css`, `css/navbar.css`, `js/app.js` (navbar, profile menu, theme, modal), mirroring the Angular folders:
   - Login as its own page (brand panel with the white logo + sign-in form); Logout returns to it
   - Top navbar only (logo, menu, API status, profile menu with Profile settings / Theme / Logout); no sidebar
   - Dashboard: KPI cards, NG chart, recent inspections, inspections waiting for check
