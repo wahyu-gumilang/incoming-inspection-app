@@ -133,6 +133,7 @@ Add new commands as `package.json` scripts, not as ad-hoc instructions.
 | `npm run db:check` | `node scripts/check-data.js` | Read-only data-quality report |
 | `npm run db:backup` | `node scripts/backup-db.js` | `mysqldump` of `DB_NAME` into `DB_BACKUP_DIR` |
 | `npm run db:test:reset` | `node scripts/reset-test-db.js` | Drop and rebuild `csi_db_test` (baseline + migrations + fixtures) |
+| `npm run db:seed:dev` | `node scripts/seed-dev.js` | Add the 15 dummy vendors to `DB_NAME` (idempotent). Ask before running it on `csi_db` |
 | `npm run user:create-admin` | `node scripts/create-admin.js` | Create an Admin. Asks for the password at a hidden prompt; run it yourself in a terminal (`! npm run user:create-admin`), never pass a password as an argument |
 
 **Frontend** (run from `frontend/`):
@@ -231,11 +232,11 @@ Rules:
   - `401`: not logged in, or bad credentials on login
   - `403`: logged in but the role isn't allowed, account deactivated, temporary password not changed yet, or a write from a foreign `Origin`
   - `404`: not found
-  - `409`: duplicate key or wrong status for the action
+  - `409`: duplicate key, record still in use (`IN_USE`), or wrong status for the action
   - `422`: business rule violation
   - `429`: too many login attempts
   - `500`: unexpected error
-- **Error codes** are UPPER_SNAKE constants: `VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `PASSWORD_CHANGE_REQUIRED`, `NOT_FOUND`, `DUPLICATE_KEY`, `INVALID_STATUS`, `BUSINESS_RULE`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`.
+- **Error codes** are UPPER_SNAKE constants: `VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `PASSWORD_CHANGE_REQUIRED`, `NOT_FOUND`, `DUPLICATE_KEY`, `IN_USE`, `INVALID_STATUS`, `BUSINESS_RULE`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`.
 - **Auth:** every `/api` route requires a login except `GET /api/health` and `POST /api/auth/login`. The session is a JWT in an `httpOnly` cookie; never put tokens in `localStorage` or in responses. Never return `password_hash`. New routers are mounted in `routes/index.js` behind `...signedIn` (`requireAuth` + `requirePasswordChanged`) and restrict writes with `requireRole(...)`; `req.user` is the signed-in user.
 - Never send stack traces or SQL errors to the client. Log them on the server and return `INTERNAL_ERROR`.
 - **Field names** in JSON match the `csi_db` column names (lowercase, e.g. `itemid`, `accountnum`, `inspectdate`, `deliverydate1`, `tolerance_plus`). Don't rename them to camelCase, so the frontend, API and DB all use the same names.

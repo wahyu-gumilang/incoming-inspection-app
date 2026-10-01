@@ -191,22 +191,28 @@ Decided 2026-10-01: STD rules without usable limits (both tolerances 0, or a tex
 - [x] `standardWarnings(row)` → `NO_LIMITS`, `QUALITATIVE_TOLERANCE`, `NEGATIVE_TOLERANCE`, `TOLERANCE_TEXT_MISMATCH`, `STANDARD_TEXT_MISMATCH` (shared with `npm run db:check`)
 - [x] Unit tests: exactly on each limit, 0.01 outside, `+x/-0` and `+0/-x`, `Min`/`Max`, zero tolerance, empty values, negative standard, floating-point edge (0.3 ± 0.1), qualitative lines, all 7 columns; plus a run over all 10,375 STD rules in `csi_db` (nominal value OK, ±0.01 beyond each limit NG, no errors)
 
-### 2.2 Master data API (read-heavy; the item data already exists)
+### 2.2 Master data API
+Decided 2026-10-01: items can be added and renamed but not deleted (they come from the company item master); vendors can be deleted while no inspection uses them; 15 dummy vendors for the empty dev `vendtable`.
+
 | Method | Path | Description |
 |---|---|---|
-| GET | `/api/items` | List with `page`, `limit`, `sort`, `order`, `q` (itemid/name) |
-| GET | `/api/items/lookup?q=` | `{ itemid, name }` for autocomplete (Part no / Part name) |
-| GET | `/api/items/:itemId` | Item with `inspectItems[]` grouped by normalized `inspecttype` |
-| GET | `/api/items/:itemId/inspect-items` | Standards ordered by type (`STD` → `CERTIFIKAT` → `VISUAL` → `FITTING`) then `inspectitem` |
-| POST / PUT / DELETE | `/api/items/:itemId/inspect-items[/...]` | Maintain standards (validation: numeric `standard`, `tolerance_plus/minus ≥ 0`, unique key) |
-| GET / POST / PUT / DELETE | `/api/vendors[/:vendaccount]` | Vendor CRUD; `409` on duplicate, `409` on delete when referenced by `inspecttable.accountnum` |
-| POST | `/api/vendors/import` | Bulk load from CSV |
-| — | `npm run db:seed:dev` | Dummy vendors (and a few sample inspections) for the empty dev `vendtable` (Q2) |
-| GET | `/api/vendors/lookup?q=` | `{ vendaccount, name }` |
+| GET | `/api/items` | List with `page`, `limit`, `sort` (`itemid`, `name`), `order`, `q` (part no / name), `hasStandards`; each item has computed `standardCounts` per type and `warningCount` (doubtful standards) |
+| GET | `/api/items/lookup?q=` | `{ itemid, name }` for the "Part no." autocomplete (20 max) |
+| GET | `/api/items/:itemId` | Item with `inspectItems[]` in form order (STD → CERTIFIKAT → VISUAL → FITTING, items sorted naturally), trimmed texts, computed `mode` and `warnings` |
+| POST / PUT | `/api/items[/:itemId]` | Admin: add an item; rename it (the name copied into its standards changes in the same transaction) |
+| POST / PUT / DELETE | `/api/items/:itemId/inspect-items` | Admin: add / update / delete a standard, identified by `inspecttype` + `inspectitem` in the body (query for DELETE). Applies to new inspections only |
+| GET | `/api/vendors` | List with paging, `sort` (`vendaccount`, `name`, `inspectionCount`), `q`; computed `inspectionCount` |
+| GET | `/api/vendors/lookup?q=` · `/api/vendors/:vendaccount` | Autocomplete and one vendor |
+| POST / PUT / DELETE | `/api/vendors[/:vendaccount]` | Admin: create (`409` on duplicate), rename, delete (`409 IN_USE` when an inspection uses it) |
+| POST | `/api/vendors/import` | Admin: CSV body (`text/csv`, `,` or `;`, optional header, Excel BOM); every row is checked first and nothing is saved if one is invalid; existing accounts are skipped |
+| — | `npm run db:seed:dev` | 15 dummy vendors for the development database |
 
-- Reads are open to every logged-in user; creating, editing and deleting master data needs `ADMIN`. The *Checked by* list comes from `/api/users/lookup?role=CHECKER` (§2.0).
-- [ ] Repository, service, controller, routes and validator files for items, inspect items, vendors
-- [ ] Integration tests: paging/search/sort whitelist, 404s, duplicates, delete-in-use
+- Reads are open to every signed-in user; writes need `ADMIN`. The *Checked by* list comes from `/api/users/lookup?role=CHECKER` (§2.0).
+- Keys with trailing spaces (`'FITTING '`, item ids like `'1-1-02-03 '`) are found by their trimmed value (the collation ignores trailing spaces) and shown trimmed; stored values are never rewritten.
+- [x] Repository, service, controller, routes and validator files for items, standards and vendors; `utils/csv.js`
+- [x] Integration tests: paging/search/sort whitelist, 404s, duplicates (incl. against a stored trailing space), delete-in-use, CSV import all-or-nothing, Admin-only writes (226 backend tests)
+- [x] Checked read-only on `csi_db`: page 1 of 1,685 items in ~36 ms; ids with spaces and trailing spaces resolve
+- [ ] Dummy vendors loaded into `csi_db` (`npm run db:seed:dev`, waiting for approval)
 
 ### 2.3 AQL sampling (requested by Pak Fajar, 2026-10-01)
 The system decides each delivery's sample size and accept/reject numbers from its lot size (`qty_receivedN`) and inspection category (`inspectcategoryN`: N / R / T), using an AQL table admins can view and edit. His Laravel example is the reference for intent only: no new `materials` / `inspections` tables, no random inspection numbers, no free-text inspector.
