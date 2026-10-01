@@ -133,6 +133,7 @@ Add new commands as `package.json` scripts, not as ad-hoc instructions.
 | `npm run db:check` | `node scripts/check-data.js` | Read-only data-quality report |
 | `npm run db:backup` | `node scripts/backup-db.js` | `mysqldump` of `DB_NAME` into `DB_BACKUP_DIR` |
 | `npm run db:test:reset` | `node scripts/reset-test-db.js` | Drop and rebuild `csi_db_test` (baseline + migrations + fixtures) |
+| `npm run user:create-admin` | `node scripts/create-admin.js` | Create an Admin. Asks for the password at a hidden prompt; run it yourself in a terminal (`! npm run user:create-admin`), never pass a password as an argument |
 
 **Frontend** (run from `frontend/`):
 
@@ -164,6 +165,9 @@ never reach `csi_db`. Neither `.env` nor `.env.test` is ever committed.
 | `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` | MariaDB connection (`csi_db`; `csi_db_test` in `.env.test`, which must end in `_test`) |
 | `DB_BACKUP_DIR` | Folder for `npm run db:backup`, outside the repo (`/mnt/c/Apps/Doc_QC-incoming-inspection/backup`) |
 | `MYSQLDUMP` | Optional path to `mysqldump`; defaults to XAMPP's `mysqldump.exe` |
+| `JWT_SECRET` | Signs the session cookie; 32+ random characters, different per environment. The server won't start without it |
+| `ALLOWED_ORIGINS` | Browser origins allowed to write with cookies (CORS + CSRF origin check). Default `http://localhost:4200,http://localhost:5000` |
+| `BCRYPT_ROUNDS` | Only in `.env.test` (`4`) to keep tests fast; production uses the default 12 |
 
 Development runs on WSL2 with MariaDB (XAMPP) on the Windows host. `config/db.js` detects
 the host and rebuilds the pool after network errors. Don't replace it with a plain
@@ -224,14 +228,14 @@ Rules:
   - `204`: delete, with no body
   - `400`: validation failed
   - `401`: not logged in, or bad credentials on login
-  - `403`: logged in but the role isn't allowed
+  - `403`: logged in but the role isn't allowed, account deactivated, temporary password not changed yet, or a write from a foreign `Origin`
   - `404`: not found
   - `409`: duplicate key or wrong status for the action
   - `422`: business rule violation
   - `429`: too many login attempts
   - `500`: unexpected error
-- **Error codes** are UPPER_SNAKE constants: `VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOUND`, `DUPLICATE_KEY`, `INVALID_STATUS`, `BUSINESS_RULE`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`.
-- **Auth:** every `/api` route requires a login except `GET /api/health` and `POST /api/auth/login`. The session is a JWT in an `httpOnly` cookie; never put tokens in `localStorage` or in responses. Never return `password_hash`.
+- **Error codes** are UPPER_SNAKE constants: `VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `PASSWORD_CHANGE_REQUIRED`, `NOT_FOUND`, `DUPLICATE_KEY`, `INVALID_STATUS`, `BUSINESS_RULE`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`.
+- **Auth:** every `/api` route requires a login except `GET /api/health` and `POST /api/auth/login`. The session is a JWT in an `httpOnly` cookie; never put tokens in `localStorage` or in responses. Never return `password_hash`. New routers are mounted in `routes/index.js` behind `...signedIn` (`requireAuth` + `requirePasswordChanged`) and restrict writes with `requireRole(...)`; `req.user` is the signed-in user.
 - Never send stack traces or SQL errors to the client. Log them on the server and return `INTERNAL_ERROR`.
 - **Field names** in JSON match the `csi_db` column names (lowercase, e.g. `itemid`, `accountnum`, `inspectdate`, `deliverydate1`, `tolerance_plus`). Don't rename them to camelCase, so the frontend, API and DB all use the same names.
 - **Keys that aren't DB columns** (nested collections, computed values, query parameters) are camelCase: `inspectItems`, `lines`, `otherLines`, `totalReceived`, `?dateFrom=&dateTo=`. Never give a computed key the same name as a real column.
