@@ -117,8 +117,10 @@ describe('POST /api/users', () => {
 });
 
 describe('PUT /api/users/:userid', () => {
+  // Uses 10412, created above in this file: the db test files run in parallel, and
+  // auth.test signs in as the fixture users, so this file must not deactivate them.
   it('changes role and deactivates another user', async () => {
-    const id = await idOf('10276');
+    const id = await idOf('10412');
     const res = await request(app)
       .put(`/api/users/${id}`)
       .set('Cookie', admin)
