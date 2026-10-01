@@ -12,7 +12,7 @@ store the inspection of materials and parts received from suppliers, replacing t
 0. Log in with a username and password; what you can do depends on your role (Inspector, Checker, Admin).
 1. Pick an item and a supplier; the item's QC standards load automatically.
 2. Enter up to 7 delivery columns (P/O, delivery date, qty, inspection category) and the actual measurements.
-3. Get OK/NG per value in real time and an NG count per delivery.
+3. Get OK/NG per value in real time; the **AQL table** sets each delivery's sample size and accept/reject numbers from its lot size (§2.4).
 4. Decide Accepted / Rejected / Concession per delivery; *Inspected by* and *Checked by* come from the logged-in users.
 5. Print the result in the 7.4.3-F1 layout as PDF.
 
@@ -47,7 +47,7 @@ inspectsetup                                      list of "Checked by" names
 
 | Table | Rows | Columns | Notes |
 |---|---|---|---|
-| `inventtable` | 1 685 | `itemid`, `name`, `inspectqty` | No PK. Meaning of `inspectqty` unknown (Q4). |
+| `inventtable` | 1 685 | `itemid`, `name`, `inspectqty` | PK added (001). `inspectqty` is `0` on every row: unused, ignored (Q4). |
 | `inventinspectitem` | ~11 900 | `itemid`, `itemname`, `inspecttype`, `inspectitem`, `standard_txt`, `standard` (dec 18,2), `tolerance` (text), `tolerance_plus`, `tolerance_minus` (dec 19,2) | PK (`itemid`,`inspecttype`,`inspectitem`). Types: `STD` 10 366, `VISUAL` 993, `FITTING` 343, `CERTIFIKAT` 191, some with a trailing space. Up to 28 `STD` lines per item. |
 | `vendtable` | **0** | `vendaccount`, `name` | No PK. Empty: dummy vendors will be seeded (Q2 answered). |
 | `inspecttable` | 2 (test data) | `inspectnum` (PK, `INS-000001`), `inspectdate`, `itemid`, `itemname`, `accountnum`, `name`, `inspectstatus` (varchar), `purchordernum1..7`, `deliverydate1..7` (default today), `qty_received1..7`, `inspectcategory1..7` (int), `notgood1..7` (int), `judgment1..7` (int), `qfnum`, `inspectby`, `checkedby`, `recid` | One row = one form = up to 7 delivery columns. |
@@ -65,7 +65,7 @@ inspectsetup                                      list of "Checked by" names
 | Asymmetric tolerance (`+0.3/-0`), `Min`, `Max`, display texts | Only `inspectline.tolerance` (one decimal) | Add snapshot columns (migration 006) |
 | Visual / Fitting / Certificate result per delivery | `inspectlineother` has no result columns | Add `actual_txt_N`, `status_N` (migration 007) |
 | Measuring Instrument (one row for the whole form) | Missing | Add `inspecttable.instrument` (migration 008) |
-| NG / **Total sample** per delivery | `notgoodN` only | Q5, add `totalsampleN` if confirmed |
+| NG / **Total sample** per delivery | `notgoodN` only | Total sample comes from the AQL plan; snapshot in `samplesize1..7` (migration 012, §2.4) |
 | QF No., Inspected by, Checked by **per delivery column** | Single `qfnum`, `inspectby`, `checkedby` | Q6; default: one value per form, printed in every used column |
 | Remarks, approval timestamps | Missing | Phase 4 migration |
 
@@ -83,7 +83,8 @@ inspectsetup                                      list of "Checked by" names
 - `STD` value: OK when `standard − tolerance_minus ≤ actual ≤ standard + tolerance_plus`.
 - Tolerance text `Min` → OK when `actual ≥ standard`; `Max` → OK when `actual ≤ standard`.
 - Qualitative lines: OK/NG chosen by the inspector.
-- `notgoodN` = count of NG values in column N across all lines. `judgmentN = Accepted` is refused when `notgoodN > 0`.
+- `notgoodN` = number of **defective pieces** in delivery N's sample (AQL counts units, not characteristics: one piece with two NG dimensions is 1). The inspector enters it; it can't be `0` while any value in column N is NG.
+- AQL (§2.4): from `qty_receivedN` and `inspectcategoryN` the plan gives `samplesizeN`, `acceptnumN` (Ac), `rejectnumN` (Re). The system **suggests** O when `notgoodN ≤ Ac` and X when `notgoodN ≥ Re`. `Accepted` is refused when `notgoodN > Ac`; `Concession` is only allowed when the delivery would be rejected, with a note.
 - Data quality in the master, from `npm run db:check` on 2026-10-01 (reported, not fixed silently):
   - 700 `STD` rows with tolerance text `' 0.0'` and both limits `0` (exact match? reference dimension? Q3)
   - 12 `STD` rows whose tolerance is qualitative text (`Tidak Terangkat`)
@@ -221,7 +222,39 @@ Business rules (`services/inspection.service.js`):
 - [ ] Wrong status for an action → `409 INVALID_STATUS`
 - [ ] Integration tests: create from template, rollback when one line fails, update blocked outside `DRAFT`, number uniqueness under parallel creates, filters
 
-**Phase 2 done when:** an inspection for a real item (e.g. `000-228`) can be created from the template, measured in several delivery columns and read back with correct OK/NG and NG counts, using only `curl`.
+### 2.4 AQL sampling (requested by Pak Fajar, 2026-10-01)
+The system decides each delivery's sample size and accept/reject numbers from its lot size (`qty_receivedN`) and inspection category (`inspectcategoryN`: N / R / T), using an AQL table admins can view and edit. His Laravel example is the reference for intent only: no new `materials` / `inspections` tables, no random inspection numbers, no free-text inspector.
+
+**Provisional decisions (2026-10-01, to confirm with QC, Q12–Q14):**
+| Topic | Decision |
+|---|---|
+| Sample size | ISO 2859-1 **Special Level S-1**. The filled example matches it exactly: lot 20 and 50 → 2 pcs, lot 100 → 3 pcs |
+| Accept / reject | **Ac 0 / Re 1** (zero defects) for the default plan |
+| Alternative plan | **ISO General Level II, AQL 2.5** (normal), seeded as a second plan; values to verify against the official standard |
+| Tightened / Reduced | Default plan: T = next larger code letter, R = next smaller (min 2 pcs); Ac 0 / Re 1 |
+| Lot smaller than the sample | 100 % inspection (`samplesize = lot`) |
+| N / R / T | Chosen by the inspector, default N; automatic switching from supplier history is a later feature (§5) |
+
+S-1 code letters (ISO 2859-1 Table 1): 2–50 A (2 pcs), 51–500 B (3), 501–35 000 C (5), 35 001+ D (8). Default plan, normal: 1 → 1 (100 %), 2–50 → 2, 51–500 → 3, 501–35 000 → 5, 35 001+ → 8, all Ac 0 / Re 1.
+
+General Level II, AQL 2.5, normal, arrows already resolved: 2–50 → 5 (0/1), 51–150 → 20 (1/2), 151–280 → 32 (2/3), 281–500 → 50 (3/4), 501–1 200 → 80 (5/6), 1 201–3 200 → 125 (7/8), 3 201–10 000 → 200 (10/11), 10 001–35 000 → 315 (14/15), 35 001+ → 500 (21/22). (Pak Fajar's seeder skipped the ISO arrows for lots 1–8, 26–50 and 51–90 and used 315 above 35 000.)
+
+- [ ] Migration `011_create_aql_tables.sql`: `aqlplan` (`planid` PK, `name`, `inspectlevel`, `aql`, `isdefault`, `active`, `note`) and `aqlplanrow` (`planid`, `inspectcategory`, `lotmin`, `lotmax`, `codeletter`, `samplesize`, `acceptnum`, `rejectnum`; PK `planid, inspectcategory, lotmin`), seeded with the two plans above
+- [ ] Migration `012_inspecttable_aql_columns.sql`: `aqlplanid`, `samplesize1..7`, `acceptnum1..7`, `rejectnum1..7`, `concessionnote1..7` (snapshot per delivery, so editing the AQL table never changes saved inspections)
+- [ ] `services/aql.js` (pure): `findPlanRow(rows, lot, category)` → `{ codeletter, samplesize, acceptnum, rejectnum, fullInspection }`, `suggestJudgment(defects, row)`
+- [ ] Recomputed on every save from the server's own tables; values sent by the client are ignored (what the Laravel example called the "security guard")
+- [ ] CSRF: besides the `SameSite=Strict` cookie, state-changing requests must carry an allowed `Origin` header (the equivalent of Laravel's `@csrf`)
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/aql/lookup?lot=&category=&planId=` | Real-time sample size / Ac / Re while typing the lot size |
+| GET | `/api/aql/plans` · `/api/aql/plans/:planId` | Plans and their rows (all logged-in users) |
+| PUT | `/api/aql/plans/:planId/rows` | Admin: replace a plan's rows in one transaction (ranges must not overlap or leave gaps) |
+| PUT | `/api/aql/plans/:planId/default` | Admin: choose the plan new inspections use |
+
+- [ ] Tests: every range boundary of both plans, lot below sample size, N/R/T, overlapping/gapped rows rejected, `Accepted` with `notgoodN > Ac` → `422`, `Concession` without note or below Re → `422`, saved snapshot unchanged after editing a plan
+
+**Phase 2 done when:** an inspection for a real item (e.g. `000-228`) can be created from the template, measured in several delivery columns and read back with correct OK/NG, sample sizes and accept/reject numbers, using only `curl`.
 
 ---
 
@@ -259,6 +292,7 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 - [ ] Items: list + detail with the standards grid (grouped STD / Certificate / Visual / Fitting), edit standards
 - [ ] Vendors: list, create/edit form, CSV import
 - [ ] Users (Admin only, replaces the former "Checkers" menu): list, create, edit role / active, reset password
+- [ ] AQL table: plans, N / R / T tabs, the rows with the active range highlighted, a "try a lot size" calculator; editable by Admin
 
 ### 3.3 Inspection form (mirrors Form 7.4.3-F1)
 - [ ] **Header:** Part name / Part no (item lookup), Supplier (vendor lookup), inspect date, measuring instrument
@@ -267,8 +301,8 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
   - Numeric input with 2 decimals; OK/NG cell updates as you type, NG highlighted red
   - Qualitative rows: OK/NG toggle; Certificate row: COA number text + OK/NG
   - Keyboard: Enter moves down within a column (the way QC measures one delivery), Tab moves right
-- [ ] **Footer rows per column:** P/O No, Delivery date, QTY received / Insp. category (N / R / T / 100 %), NG / Total sample (computed), Judgment (O / X / C), QF No
-- [ ] Validation mirrors the server: unused columns disabled until the previous one is used, required fields per used column, `Accepted` disabled when the column has NG
+- [ ] **Footer rows per column:** P/O No, Delivery date, QTY received / Insp. category (N / R / T / 100 %), **Sample (AQL)** shown live (n, Ac, Re), NG / Total sample (NG pcs entered, prefilled from the grid; total from AQL), Judgment (O / X / C, with the system's suggestion highlighted), QF No
+- [ ] Validation mirrors the server: unused columns disabled until the previous one is used, required fields per used column, `Accepted` disabled when NG > Ac, `Concession` only when NG ≥ Re and with a note
 - [ ] Save draft (and autosave per column), unsaved-changes guard, server values replace local ones after each save
 - [ ] Inspection list: filters (date range, item, supplier, status, judgment), paging, row actions (open, PDF)
 - [ ] Read-only view for inspections outside `DRAFT`
@@ -287,7 +321,7 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 Goal: the inspection is signed off and prints as the official check sheet.
 
 ### 4.1 Approval workflow
-- [ ] Migration `010_inspecttable_approval.sql`: `submitted_at`, `checked_at`, `return_reason`, `remarks` (only the columns Q6 leaves missing)
+- [ ] Migration `013_inspecttable_approval.sql`: `submitted_at`, `checked_at`, `return_reason`, `remarks` (only the columns Q6 leaves missing)
 - [ ] Status flow `DRAFT → SUBMITTED → CHECKED`, and `SUBMITTED → DRAFT` (returned with a reason)
 - [ ] `POST /api/inspections/:inspectnum/submit`: needs `inspectby`, all used columns judged; recomputes OK/NG; locks editing
 - [ ] `POST /api/inspections/:inspectnum/check`: only a `CHECKER` or `ADMIN`; `checkedby` is the logged-in user; final
@@ -302,7 +336,7 @@ Goal: the inspection is signed off and prints as the official check sheet.
   - Part name, Part no., Supplier name
   - Dimensions table (No, Item, Standard, Tolerance) + 7 × (Actual, OK/NG), grey Actual cells as on the form
   - Certificate No, Visual, Fitting rows
-  - Footer rows: P/O No, Delivery date, Measuring Instrument, QTY received / Insp. Category, NG / Total sample, Judgment, QF No, Inspected by, Checked by
+  - Footer rows: P/O No, Delivery date, Measuring Instrument, QTY received / Insp. Category, NG / Total sample (sample from the AQL snapshot), Judgment, QF No, Inspected by, Checked by
   - Legend: `*) T: Tightening N: Normal R: Reduce` · `**) O: Accepted X: Rejected C: Concession No Mark: 100 % inspection`
 - [ ] A4 landscape; more than 13 STD lines continue on the next page with repeated headers; "Hal. X/Y"
 - [ ] NG values marked; `DRAFT` / `SUBMITTED` inspections get a watermark, only `CHECKED` prints clean
@@ -322,6 +356,7 @@ Goal: the inspection is signed off and prints as the official check sheet.
 
 ## 5. Later (not scheduled)
 - Dashboard drill-downs (NG rate per supplier, item and month); Excel export
+- AQL switching rules (ISO 2859-1): suggest N → T after 2 of 5 consecutive lots rejected, T → N after 5 accepted, N → R after 10 accepted, per supplier and item
 - Attachments (photos, COA scans) on an inspection
 - Audit log of changes
 - Deployment: Nginx serving the Angular build and proxying `/api`, PM2 for Node, database backups
@@ -330,11 +365,14 @@ Goal: the inspection is signed off and prints as the official check sheet.
 1. **Code maps:** are the values in §3 right for `inspectcategoryN`, `judgmentN` and `inspectstatus`? The two existing rows use `1` everywhere and look like test data — may they be deleted?
 2. ~~**Vendors:** where does the supplier list come from?~~ **Answered 2026-10-01:** dummy data is fine, as long as table/column names and ids follow `csi_db`.
 3. **Tolerance edge cases:** how should the ~700 STD standards with tolerance `' 0.0'` and both limits `0` be judged (exact match, or reference only / not judged)? Are qualitative texts in STD rows (`Tidak Terangkat`) really visual checks?
-4. What does `inventtable.inspectqty` mean (sample size? AQL?) and should it prefill *Total sample*?
-5. **NG / Total sample:** is the total sample entered per delivery column? If so, add `totalsample1..7` (the schema has only `notgood1..7`).
+4. ~~What does `inventtable.inspectqty` mean?~~ **Checked 2026-10-01:** `0` on all 1 685 items, so it is unused and ignored.
+5. ~~**NG / Total sample:** where does the total sample come from?~~ **Decided 2026-10-01:** from the AQL plan (§2.4), snapshot in `samplesize1..7`. NG = defective pieces.
 6. **Per-column sign-off:** the form has *QF No*, *Inspected by* and *Checked by* per delivery column, the schema has one each per inspection. Is one per form enough?
 7. ~~Is `csi_db` shared with another application?~~ **Answered 2026-10-01:** no, it's a development copy. The `docs/` files are references for the form's shape, content and columns. Inspection numbers use the app's own table (`inspectnumseq`).
 8. Should the PDF show the form revision as fixed `Rev. 01 / 24/10/23`, or from a setting?
 9. **Precision:** `standard`, `tolerance_*` and `actual_N` are `decimal(18,2)`. 91 standards look stored ×100 (`0.0012` printed, `0.12` stored). Should those be judged in the stored unit, or do the columns need more decimals (a migration to `decimal(18,4)`)?
 10. **Tolerance typos:** 9 standards have numbers that disagree with their tolerance text (see §3). Which is right, the text or the numbers? Judging uses the numbers.
 11. Should *Inspected by* / *Checked by* store the user's full name (as the form prints it) or the username? Default: full name in the existing `varchar(50)` columns, plus a later migration for the user ids if traceability is needed.
+12. **AQL plan (confirm with QC / Pak Fajar):** is the practice "ISO 2859-1 Special Level S-1 with zero defects (Ac 0 / Re 1)", as the filled example suggests, or a specific AQL value (and which)? One plan for all items, or per item / defect class (critical / major / minor)?
+13. **Tightened / Reduced** for the default plan: is "one code letter larger / smaller" acceptable, or does QC use the ISO tightened / reduced tables?
+14. **General Level II, AQL 2.5** values in §2.4 were entered from memory of the ISO tables: verify against the official standard before using that plan.
