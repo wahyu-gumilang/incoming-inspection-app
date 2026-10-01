@@ -112,19 +112,19 @@ Goal: both projects run, tooling is in place, and the schema can store everythin
 - [x] `scripts/dump-schema.js` + `npm run db:schema` → `docs/schema.sql` (schema only, no data, unrelated legacy tables excluded)
 - [x] `scripts/migrate.js`: `npm run db:migrate` applies `db/migrations/NNN_*.sql` in order and records them in `schema_migrations`; `npm run db:migrate:status` lists pending ones without changing anything
 - [x] `scripts/check-data.js` (`npm run db:check`): read-only report of duplicate keys, trailing-space `inspecttype`, tolerance problems, `standard_txt` vs `standard`. Findings in §3, to review with QC.
-- [x] `scripts/backup-db.js` (`npm run db:backup`): `mysqldump` of `csi_db` to `DB_BACKUP_DIR`, outside the repo. Backup taken 2026-10-01 08:43 before any migration.
+- [x] `scripts/backup-db.js` (`npm run db:backup`): `mysqldump` of `csi_db` to `DB_BACKUP_DIR`, outside the repo. Backups taken 2026-10-01 at 08:43 and 08:49 (right before migrating).
 - [x] `db/baseline.sql`: structure of `csi_db` as imported, the starting point for `csi_db_test`
-- [~] Migrations: written and tested on `csi_db_test`; **not yet applied to `csi_db`** (waiting for approval). One `ALTER` per file, because MariaDB can't roll back DDL.
-  - [ ] `001_inventtable_primary_key.sql`
-  - [ ] `002_vendtable_primary_key.sql`
-  - [ ] `003_inspectsetup_primary_key.sql` (`id` becomes AUTO_INCREMENT)
-  - [ ] `004_inspectlineother_primary_key.sql` (`inspectnum`, `linenum`)
-  - [ ] `005_inspectline_nullable_results.sql`: `actual_1..7`, `status_1..7` → `NULL DEFAULT NULL`
-  - [ ] `006_inspectline_snapshot_columns.sql`: `inspecttype`, `standard_txt`, `tolerance_txt`, `tolerance_plus`, `tolerance_minus`
-  - [ ] `007_inspectlineother_result_columns.sql`: `standard_txt`, `actual_txt_1..7`, `status_1..7`
-  - [ ] `008_inspecttable_instrument_and_indexes.sql`: `instrument`; indexes on `inspectdate`, `itemid`, `accountnum`
-  - [ ] `009_create_inspectnumseq.sql`: the app's own number sequence (`INS-`, 6 digits, continuing after the highest existing `inspectnum`)
-- [ ] After migrating `csi_db`: `npm run db:schema` and commit `docs/schema.sql`
+- [x] Migrations: tested on `csi_db_test`, applied to `csi_db` on 2026-10-01 (row counts unchanged). One `ALTER` per file, because MariaDB can't roll back DDL.
+  - [x] `001_inventtable_primary_key.sql`
+  - [x] `002_vendtable_primary_key.sql`
+  - [x] `003_inspectsetup_primary_key.sql` (`id` becomes AUTO_INCREMENT)
+  - [x] `004_inspectlineother_primary_key.sql` (`inspectnum`, `linenum`)
+  - [x] `005_inspectline_nullable_results.sql`: `actual_1..7`, `status_1..7` → `NULL DEFAULT NULL`
+  - [x] `006_inspectline_snapshot_columns.sql`: `inspecttype`, `standard_txt`, `tolerance_txt`, `tolerance_plus`, `tolerance_minus`
+  - [x] `007_inspectlineother_result_columns.sql`: `standard_txt`, `actual_txt_1..7`, `status_1..7`
+  - [x] `008_inspecttable_instrument_and_indexes.sql`: `instrument`; indexes on `inspectdate`, `itemid`, `accountnum`
+  - [x] `009_create_inspectnumseq.sql`: the app's own number sequence (`INS-`, 6 digits, continuing after the highest existing `inspectnum`; next is `INS-000003`)
+- [x] After migrating `csi_db`: `npm run db:schema` and commit `docs/schema.sql`
 - [x] Test database `csi_db_test`: `npm run db:test:reset` rebuilds it from `db/baseline.sql` + all migrations + `db/seeds/test-fixtures.sql` (real item ids, dummy vendors/checkers). The `db` Jest project does this before every run. `.env.test` (git-ignored) and `.env.test.example`.
 
 ### 1.4 Frontend scaffold
