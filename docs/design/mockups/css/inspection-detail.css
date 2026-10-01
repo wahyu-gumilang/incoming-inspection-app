@@ -1,0 +1,543 @@
+/* inspection-detail.css — features/inspections/inspection-detail (+ delivery-dialog).
+   The check sheet is a read-only view with the structure of Form 7.4.3-F1. */
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Header details */
+.details {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
+  gap: 16px 24px;
+  align-items: center;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+
+.kv span {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.kv b {
+  display: block;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Read-only check sheet ---------- */
+.sheet-card .card-head {
+  padding-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.sheet-wrap {
+  overflow: auto;
+  max-height: 72vh;
+  border-top: 1px solid var(--border);
+}
+
+table.sheet {
+  width: 100%;
+  min-width: 1240px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+table.sheet th,
+table.sheet td {
+  height: 38px;
+  padding: 0 8px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+table.sheet thead th {
+  position: sticky;
+  z-index: 3;
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+table.sheet thead tr:first-child th {
+  top: 0;
+  height: 52px;
+}
+
+table.sheet thead tr:nth-child(2) th {
+  top: 52px;
+  height: 30px;
+}
+
+table.sheet .group {
+  background: var(--brand-50);
+  color: var(--brand);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Delivery column headers: open / add */
+.col-btn {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.col-btn small {
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.col-btn:hover {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--brand-100);
+  color: var(--brand);
+}
+
+.col-btn .edit {
+  font-size: 14px;
+  vertical-align: -2px;
+  margin-left: 2px;
+  color: var(--text-3);
+}
+
+.col-btn.add {
+  border: 1px dashed var(--brand);
+  color: var(--brand);
+  flex-direction: row;
+  gap: 4px;
+}
+
+.col-btn.add .icon {
+  font-size: 18px;
+}
+
+.col-empty {
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+/* Sticky left columns: No, Item, Standard, Tolerance */
+.sx {
+  position: sticky;
+  z-index: 2;
+  background: var(--surface);
+}
+
+thead .sx {
+  z-index: 4;
+  background: var(--surface-2);
+}
+
+.sx0 {
+  left: 0;
+  width: 44px;
+  min-width: 44px;
+}
+
+.sx1 {
+  left: 44px;
+  width: 170px;
+  min-width: 170px;
+  text-align: left !important;
+}
+
+.sx2 {
+  left: 214px;
+  width: 104px;
+  min-width: 104px;
+}
+
+.sx3 {
+  left: 318px;
+  width: 104px;
+  min-width: 104px;
+  box-shadow: 6px 0 8px -6px rgba(15, 23, 42, 0.18);
+}
+
+.sxspan {
+  left: 0;
+  text-align: right !important;
+  padding-right: 12px !important;
+  box-shadow: 6px 0 8px -6px rgba(15, 23, 42, 0.18);
+}
+
+td.sx1 {
+  font-weight: 600;
+}
+
+td.sx2 {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+td.sx3 {
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+td.act {
+  min-width: 88px;
+  background: var(--surface-sunk);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+td.act.ng {
+  background: var(--ng-bg);
+  color: var(--ng);
+}
+
+td.res {
+  min-width: 56px;
+}
+
+.unused {
+  opacity: 0.35;
+}
+
+tr.section td {
+  height: 28px;
+  padding: 0 12px;
+  background: var(--surface-2);
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+tr.foot th {
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+tr.foot td {
+  font-weight: 600;
+}
+
+tr.foot.aql td {
+  background: color-mix(in srgb, var(--brand) 5%, var(--surface));
+}
+
+tr.foot.instrument td {
+  text-align: left;
+  padding-left: 12px;
+  background: color-mix(in srgb, var(--teal) 9%, var(--surface));
+}
+
+.aql-cell {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.aql-cell span {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.mark {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.mark.o {
+  background: var(--ok);
+  color: #fff;
+}
+
+.mark.x {
+  background: var(--ng);
+  color: #fff;
+}
+
+.mark.c {
+  background: var(--amber);
+  color: #3b2300;
+}
+
+.signer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.sheet-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  font-size: 12px;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* ---------- Delivery modal ---------- */
+.aql-box {
+  display: grid;
+  grid-template-columns: auto repeat(3, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--brand-50);
+}
+
+.aql-box .icon {
+  font-size: 28px;
+  color: var(--brand);
+}
+
+.aql-box div {
+  text-align: center;
+}
+
+.aql-box b {
+  display: block;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.aql-box span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.aql-box .ac b {
+  color: var(--ok);
+}
+
+.aql-box .re b {
+  color: var(--ng);
+}
+
+.aql-note {
+  margin: -6px 0 0;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+table.measure {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table.measure th {
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  border-bottom: 1px solid var(--border);
+}
+
+table.measure td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+table.measure tr.sec td {
+  padding: 12px 10px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border-bottom: 0;
+}
+
+table.measure .num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+table.measure .actual {
+  width: 120px;
+  height: 40px;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-sunk);
+}
+
+table.measure .actual.ng {
+  color: var(--ng);
+  border-color: color-mix(in srgb, var(--ng) 50%, transparent);
+  background: var(--ng-bg);
+}
+
+table.measure .seg {
+  width: 140px;
+}
+
+table.measure .seg button.on.ok-btn {
+  background: var(--ok);
+  color: #fff;
+}
+
+table.measure .seg button.on.ng-btn {
+  background: var(--ng);
+  color: #fff;
+}
+
+.ng-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ng-row .input {
+  width: 96px;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ng-row .of {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-3);
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.suggestion.o {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.suggestion.x {
+  background: var(--ng-bg);
+  color: var(--ng);
+}
+
+.judgment {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.judgment button {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  padding: 14px 10px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.judgment button b {
+  font-size: 22px;
+}
+
+.judgment button span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.judgment button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.judgment button.o.on {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.judgment button.x.on {
+  border-color: var(--ng);
+  background: var(--ng-bg);
+  color: var(--ng);
+}
+
+.judgment button.c.on {
+  border-color: var(--amber);
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+@media (max-width: 1199.98px) {
+  .details {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .details .actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .details {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .aql-box {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .aql-box > .icon {
+    display: none;
+  }
+
+  table.measure .actual {
+    width: 96px;
+  }
+
+  table.measure .tol-col {
+    display: none;
+  }
+}

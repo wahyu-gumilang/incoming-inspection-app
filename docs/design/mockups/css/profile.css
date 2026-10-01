@@ -1,0 +1,50 @@
+/* profile.css — features/profile (Profile settings) */
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+}
+
+.profile-card h2 {
+  font-size: 18px;
+}
+
+.info-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+
+.info-list span {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.info-list b {
+  font-weight: 600;
+}
+
+@media (max-width: 959.98px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .info-list {
+    grid-template-columns: 1fr;
+  }
+}

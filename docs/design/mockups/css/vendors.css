@@ -1,0 +1,20 @@
+/* vendors.css — features/vendors */
+
+.ng-rate {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ng-rate .track {
+  width: 80px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-sunk);
+  overflow: hidden;
+}
+
+.ng-rate .fill {
+  height: 100%;
+  border-radius: 999px;
+}

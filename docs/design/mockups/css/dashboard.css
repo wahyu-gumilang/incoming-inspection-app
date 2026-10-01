@@ -1,0 +1,167 @@
+/* dashboard.css — features/dashboard */
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.kpi {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px;
+}
+
+.kpi .top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpi .label {
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.kpi .k-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+}
+
+.kpi .value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.kpi .delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.kpi .delta .icon {
+  font-size: 16px;
+}
+
+.kpi .delta.good {
+  color: var(--ok);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.legend {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: -1px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 52px;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.bar-row .name {
+  font-weight: 500;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bar-row b {
+  text-align: right;
+}
+
+.bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-sunk);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.pending-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.pending-item:last-child {
+  border-bottom: 0;
+}
+
+.pending-item .what {
+  flex: 1;
+  min-width: 0;
+}
+
+.pending-item .what b {
+  display: block;
+}
+
+.pending-item .what span {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+@media (max-width: 1199.98px) {
+  .kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .kpis {
+    gap: 10px;
+  }
+
+  .kpi {
+    padding: 14px;
+  }
+
+  .kpi .value {
+    font-size: 22px;
+  }
+
+  .bar-row {
+    grid-template-columns: 110px 1fr 46px;
+  }
+}

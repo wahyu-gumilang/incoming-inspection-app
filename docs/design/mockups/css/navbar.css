@@ -1,0 +1,429 @@
+/* navbar.css — the single top navigation (core/layout/navbar in Angular). No sidebar. */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: var(--navbar);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-inner {
+  max-width: 1440px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar .brand {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.navbar .brand img {
+  height: 30px;
+}
+
+.navbar .brand .logo-dark {
+  display: none;
+}
+
+[data-theme='dark'] .navbar .brand .logo-light {
+  display: none;
+}
+
+[data-theme='dark'] .navbar .brand .logo-dark {
+  display: block;
+}
+
+.navbar .menu-btn {
+  display: none;
+}
+
+/* Main menu */
+.mainnav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 100%;
+}
+
+.mainnav > a,
+.mainnav .dd > button {
+  position: relative;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-2);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.mainnav > a:hover,
+.mainnav .dd > button:hover {
+  background: var(--surface-sunk);
+  color: var(--text);
+}
+
+.mainnav > a.active,
+.mainnav .dd.active > button {
+  color: var(--brand);
+}
+
+/* Active indicator sits on the navbar's bottom edge */
+.mainnav > a.active::after,
+.mainnav .dd.active > button::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -12px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--brand);
+}
+
+.mainnav .badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--amber);
+  color: #3b2300;
+}
+
+.mainnav .dd {
+  position: relative;
+}
+
+.mainnav .dd > button .icon {
+  font-size: 18px;
+  transition: transform 0.2s;
+}
+
+.mainnav .dd.open > button .icon {
+  transform: rotate(180deg);
+}
+
+/* Dropdowns (Master data, profile) */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  min-width: 240px;
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-2);
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+}
+
+.dd.open > .dropdown,
+.profile.open > .dropdown {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.dropdown a,
+.dropdown .item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdown a:hover,
+.dropdown .item:hover {
+  background: var(--surface-sunk);
+}
+
+.dropdown a.active {
+  background: var(--brand-50);
+  color: var(--brand);
+}
+
+.dropdown a .icon,
+.dropdown .item .icon {
+  font-size: 20px;
+  color: var(--text-2);
+}
+
+.dropdown a.active .icon {
+  color: var(--brand);
+}
+
+.dropdown a small {
+  display: block;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.dropdown .sep {
+  height: 1px;
+  margin: 6px 0;
+  background: var(--border);
+}
+
+.dropdown .label {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.dropdown .item.danger,
+.dropdown .item.danger .icon {
+  color: var(--ng);
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* API status */
+.api-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--ok-bg);
+  color: var(--ok);
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.api-chip .pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 50%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* Profile menu */
+.profile {
+  position: relative;
+  margin-left: 4px;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 8px 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.profile-btn:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-1);
+}
+
+.profile-btn .who {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  text-align: left;
+}
+
+.profile-btn .who b {
+  font-size: 13px;
+}
+
+.profile-btn .who span {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.profile .dropdown {
+  right: 0;
+  width: 280px;
+}
+
+.profile .menu-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 10px 14px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile .menu-head span {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.profile .seg {
+  margin: 2px 4px 4px;
+}
+
+/* ☰ panel for narrow screens */
+.mobile-nav {
+  position: fixed;
+  top: var(--navbar);
+  left: 0;
+  right: 0;
+  z-index: 29;
+  max-height: calc(100vh - var(--navbar));
+  overflow: auto;
+  padding: 12px 16px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-2);
+  transform: translateY(-8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.22s var(--ease), opacity 0.22s var(--ease);
+}
+
+body.mobile-open .mobile-nav {
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-nav .group {
+  padding: 12px 8px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.mobile-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 46px;
+  padding: 0 10px;
+  border-radius: 10px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.mobile-nav a .icon {
+  color: var(--text-2);
+}
+
+.mobile-nav a.active {
+  background: var(--brand-50);
+  color: var(--brand);
+}
+
+.mobile-nav a.active .icon {
+  color: var(--brand);
+}
+
+.nav-scrim {
+  position: fixed;
+  inset: var(--navbar) 0 0 0;
+  z-index: 28;
+  background: rgba(2, 8, 23, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s var(--ease);
+}
+
+body.mobile-open .nav-scrim {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 1099.98px) {
+  .api-chip .txt {
+    display: none;
+  }
+
+  .api-chip {
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 959.98px) {
+  .navbar-inner {
+    padding: 0 12px;
+  }
+
+  .navbar .menu-btn {
+    display: inline-grid;
+  }
+
+  .mainnav {
+    display: none;
+  }
+
+  .navbar .brand {
+    margin-right: 0;
+  }
+
+  .profile-btn .who,
+  .profile-btn > .icon {
+    display: none;
+  }
+
+  .profile-btn {
+    padding: 0 4px;
+  }
+}
+
+@media (min-width: 960px) {
+  .mobile-nav,
+  .nav-scrim {
+    display: none;
+  }
+}

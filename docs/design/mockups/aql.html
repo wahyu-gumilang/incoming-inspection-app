@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AQL table · Incoming Inspection</title>
+    <!-- Mockup only: Inter and Material Symbols from Google Fonts. The app bundles them from npm. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/aql.css" />
+    <script src="js/theme.js"></script>
+  </head>
+  <body data-page="aql">
+    <div id="navbar"></div>
+
+    <main class="content">
+      <div class="page-head">
+        <div>
+          <h1>AQL table</h1>
+          <p>Sample size and accept / reject numbers for each delivery, looked up from its lot size (ISO 2859-1).</p>
+        </div>
+      </div>
+
+      <div class="notice">
+        <span class="icon">info</span>
+        <div>
+          <b>Provisional plan, to confirm with QC</b>
+          <p>"S-1 · zero defects" matches the filled check sheet (lot 20 and 50 → 2 pcs, lot 100 → 3 pcs). General Level II AQL 2.5 is ready as an alternative. Only administrators can edit rows or change the default plan.</p>
+        </div>
+      </div>
+
+      <div class="plan-cards" id="plan-cards"></div>
+
+      <div class="aql-grid">
+        <div class="card">
+          <div class="card-head">
+            <h3 id="plan-title">Sampling plan</h3>
+            <div class="actions">
+              <div class="tabs" id="cat-tabs" role="tablist" aria-label="Inspection category">
+                <button type="button" data-cat="N" role="tab">Normal</button><button type="button" data-cat="T" role="tab">Tightened</button><button type="button" data-cat="R" role="tab">Reduced</button>
+              </div>
+              <button class="btn btn-outline btn-sm" type="button" id="edit-rows"><span class="icon" style="font-size: 18px">edit</span>Edit rows</button>
+            </div>
+          </div>
+          <div class="table-wrap" id="plan-table"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Try a lot size</h3></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field"><label for="calc-lot">Lot size (QTY received)</label><input id="calc-lot" class="input mono" inputmode="numeric" value="100" /></div>
+              <div class="field">
+                <label for="calc-cat">Category</label>
+                <select id="calc-cat" class="select"><option value="N">N · Normal</option><option value="T">T · Tightened</option><option value="R">R · Reduced</option></select>
+              </div>
+            </div>
+            <div class="calc-result" id="calc-result"></div>
+            <p class="calc-note" id="calc-note"></p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Edit rows (Admin) -->
+    <div class="modal-backdrop" id="m-edit">
+      <div class="modal md" role="dialog" aria-modal="true" aria-labelledby="m-edit-title">
+        <div class="modal-head">
+          <div><h2 id="m-edit-title">Edit AQL rows</h2><p id="edit-sub"></p></div>
+          <button type="button" class="icon-btn" aria-label="Close" data-close><span class="icon">close</span></button>
+        </div>
+        <div class="modal-body">
+          <table class="data edit-rows">
+            <thead><tr><th>Lot from</th><th>Lot to</th><th>Code</th><th>Sample</th><th>Ac</th><th>Re</th></tr></thead>
+            <tbody id="edit-body"></tbody>
+          </table>
+          <p class="subtle" style="margin: 0; font-size: 12px">Ranges must follow each other without gaps or overlaps. Saved inspections keep the values they were made with.</p>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+          <button type="button" class="btn btn-primary" id="edit-save">Save rows</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/aql.js"></script>
+    <script src="js/aql-page.js"></script>
+  </body>
+</html>

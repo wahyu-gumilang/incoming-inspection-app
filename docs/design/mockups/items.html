@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Mockup only: Inter and Material Symbols from Google Fonts. The app bundles them from npm. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/items.css" />
+    <title>Items &amp; standards · Incoming Inspection</title>
+    <script src="js/theme.js"></script>
+  </head>
+  <body data-page="items">
+    <div id="navbar"></div>
+
+    <main class="content">
+      <div class="page-head">
+        <div>
+          <h1>Items &amp; standards</h1>
+          <p>1,685 parts and their dimension, visual, fitting and certificate standards. Open a part to see or add standards.</p>
+        </div>
+        <button class="btn btn-primary" type="button" data-open="m-item"><span class="icon">add</span>Add item</button>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <div class="grow input-icon"><span class="icon">search</span><input class="input" placeholder="Search part no or name…" aria-label="Search" /></div>
+          <div class="filter-chips" role="group" aria-label="Filter">
+            <button type="button" class="on">All</button><button type="button">With standards</button><button type="button">Without standards</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Part no.</th><th>Part name</th><th>Standards</th><th>Last inspection</th></tr></thead>
+            <tbody>
+              <tr class="clickable" data-open="m-standards"><td class="cell-strong mono">000-228</td><td>Handle Rhino Prima</td><td><span class="std-counts"><span class="chip chip-brand type-chip">3 STD</span><span class="chip chip-neutral type-chip">3 Visual</span><span class="chip chip-neutral type-chip">1 Fitting</span></span></td><td>01 Oct 2026</td></tr>
+              <tr class="clickable" data-open="m-standards"><td class="cell-strong mono">1-1-14-39</td><td>Steel Fibre 0.4 x 16 mm</td><td><span class="std-counts"><span class="chip chip-brand type-chip">3 STD</span><span class="chip chip-neutral type-chip">1 COA</span></span></td><td>30 Sep 2026</td></tr>
+              <tr class="clickable" data-open="m-standards"><td class="cell-strong mono">1-1-14-03</td><td>Pasir Galunggung (Sand)</td><td><span class="std-counts"><span class="chip chip-brand type-chip">1 STD</span></span></td><td>30 Sep 2026</td></tr>
+              <tr class="clickable" data-open="m-standards"><td class="cell-strong mono">1-1-01-02</td><td>SPCC 1.6 x 1219 x 2438 mm</td><td><span class="std-counts"><span class="chip chip-brand type-chip">4 STD</span><span class="chip chip-neutral type-chip">1 COA</span></span></td><td class="subtle">—</td></tr>
+              <tr class="clickable" data-open="m-standards"><td class="cell-strong mono">1-1-01-05</td><td>SPCC 2.0 x 1219 x 2438 mm</td><td><span class="std-counts"><span class="chip chip-brand type-chip">4 STD</span><span class="chip chip-neutral type-chip">1 COA</span></span></td><td class="subtle">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pager"><span>Showing 1–5 of 1,685</span><div class="pages"><button type="button" aria-label="Previous page"><span class="icon" style="font-size: 18px">chevron_left</span></button><button type="button" class="on">1</button><button type="button">2</button><button type="button">…</button><button type="button">337</button><button type="button" aria-label="Next page"><span class="icon" style="font-size: 18px">chevron_right</span></button></div></div>
+      </div>
+    </main>
+
+    <!-- Add item -->
+    <div class="modal-backdrop" id="m-item">
+      <form class="modal" role="dialog" aria-modal="true" aria-labelledby="m-item-title" data-toast="Item added">
+        <div class="modal-head">
+          <div><h2 id="m-item-title">Add item</h2><p>Standards are added after the item exists.</p></div>
+          <button type="button" class="icon-btn" aria-label="Close" data-close><span class="icon">close</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="field"><label for="i-id">Part no.</label><input id="i-id" class="input mono" placeholder="e.g. 622-064" required /></div>
+          <div class="field"><label for="i-name">Part name</label><input id="i-name" class="input" placeholder="e.g. S/A Top Hinge" required /></div>
+        </div>
+        <div class="modal-foot"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn btn-primary">Add item</button></div>
+      </form>
+    </div>
+
+    <!-- Standards of one item -->
+    <div class="modal-backdrop" id="m-standards">
+      <div class="modal lg" role="dialog" aria-modal="true" aria-labelledby="m-std-title">
+        <div class="modal-head">
+          <div><h2 id="m-std-title">000-228 · Handle Rhino Prima</h2><p>QC standards. Changes apply to new inspections only.</p></div>
+          <button type="button" class="icon-btn" aria-label="Close" data-close><span class="icon">close</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="table-wrap">
+            <table class="data standards">
+              <thead><tr><th>Type</th><th>Item</th><th>Standard</th><th>Tolerance</th><th>+ / −</th></tr></thead>
+              <tbody>
+                <tr><td><span class="chip chip-brand type-chip">STD</span></td><td class="cell-strong">A</td><td class="num">12.5</td><td>±0.4</td><td class="num">+0.40 / −0.40</td></tr>
+                <tr><td><span class="chip chip-brand type-chip">STD</span></td><td class="cell-strong">B</td><td class="num">Ø16</td><td>+0.3/-0</td><td class="num">+0.30 / −0.00</td></tr>
+                <tr><td><span class="chip chip-brand type-chip">STD</span></td><td class="cell-strong">D</td><td class="num">28.0</td><td>±0.4</td><td class="num">+0.40 / −0.40</td></tr>
+                <tr><td><span class="chip chip-neutral type-chip">Visual</span></td><td class="cell-strong">Black</td><td>Black</td><td class="subtle">—</td><td class="subtle">—</td></tr>
+                <tr><td><span class="chip chip-neutral type-chip">Visual</span></td><td class="cell-strong">Cat Rata / Tidak Belang</td><td>Cat Rata / Tidak Belang</td><td class="subtle">—</td><td class="subtle">—</td></tr>
+                <tr><td><span class="chip chip-neutral type-chip">Visual</span></td><td class="cell-strong">Tidak Gores</td><td>Tidak Gores</td><td class="subtle">—</td><td class="subtle">—</td></tr>
+                <tr><td><span class="chip chip-neutral type-chip">Fitting</span></td><td class="cell-strong">C</td><td>M8</td><td>Fitting OK</td><td class="subtle">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" data-close>Close</button>
+          <button type="button" class="btn btn-primary" data-open="m-add-std"><span class="icon">add</span>Add standard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add standard (opens on top of the standards modal) -->
+    <div class="modal-backdrop" id="m-add-std">
+      <form class="modal md" role="dialog" aria-modal="true" aria-labelledby="m-add-std-title" data-toast="Standard added">
+        <div class="modal-head">
+          <div><h2 id="m-add-std-title">Add standard</h2><p>000-228 · Handle Rhino Prima</p></div>
+          <button type="button" class="icon-btn" aria-label="Close" data-close><span class="icon">close</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field"><label for="s-type">Type</label><select id="s-type" class="select"><option>STD (dimension)</option><option>Visual</option><option>Fitting</option><option>Certificate (COA)</option></select></div>
+            <div class="field"><label for="s-item">Item</label><input id="s-item" class="input" placeholder="e.g. E" required /></div>
+            <div class="field"><label for="s-std-txt">Standard (as printed)</label><input id="s-std-txt" class="input" placeholder="e.g. Ø12" /></div>
+            <div class="field"><label for="s-std">Standard value</label><input id="s-std" class="input mono" inputmode="decimal" placeholder="12.00" /></div>
+          </div>
+          <div class="tol-inputs">
+            <div class="field"><label for="s-tol">Tolerance (as printed)</label><input id="s-tol" class="input" placeholder="±0.2, +0.3/-0, Min, Max" /></div>
+            <div class="field"><label for="s-plus">Tolerance +</label><input id="s-plus" class="input mono" inputmode="decimal" placeholder="0.20" /></div>
+            <div class="field"><label for="s-minus">Tolerance −</label><input id="s-minus" class="input mono" inputmode="decimal" placeholder="0.20" /></div>
+          </div>
+        </div>
+        <div class="modal-foot"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn btn-primary">Add standard</button></div>
+      </form>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/forms.js"></script>
+  </body>
+</html>
