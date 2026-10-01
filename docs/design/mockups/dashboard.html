@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard · Incoming Inspection</title>
+    <!-- Mockup only: Inter and Material Symbols from Google Fonts. The app bundles them from npm. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <script src="js/theme.js"></script>
+  </head>
+  <body data-page="dashboard">
+    <div id="navbar"></div>
+
+    <main class="content">
+      <div class="page-head">
+        <div>
+          <h1>Good morning, Siti</h1>
+          <p>Incoming inspection at a glance for October 2026.</p>
+        </div>
+        <select class="select" style="width: 170px" aria-label="Period">
+          <option>October 2026</option>
+          <option>September 2026</option>
+          <option>Last 90 days</option>
+        </select>
+      </div>
+
+      <div class="kpis">
+        <div class="card kpi">
+          <div class="top"><span class="label">Inspections</span><span class="k-icon" style="background: var(--brand-50); color: var(--brand)"><span class="icon">fact_check</span></span></div>
+          <div class="value mono">128</div>
+          <span class="delta good"><span class="icon">trending_up</span>12% vs last month</span>
+        </div>
+        <div class="card kpi">
+          <div class="top"><span class="label">NG rate</span><span class="k-icon" style="background: var(--ng-bg); color: var(--ng)"><span class="icon">report</span></span></div>
+          <div class="value mono">3.4%</div>
+          <span class="delta good"><span class="icon">trending_down</span>0.8 pt better</span>
+        </div>
+        <div class="card kpi">
+          <div class="top"><span class="label">Waiting for check</span><span class="k-icon" style="background: var(--warn-bg); color: var(--warn)"><span class="icon">pending_actions</span></span></div>
+          <div class="value mono">7</div>
+          <span class="delta">2 older than 24 h</span>
+        </div>
+        <div class="card kpi">
+          <div class="top"><span class="label">Deliveries accepted</span><span class="k-icon" style="background: var(--ok-bg); color: var(--ok)"><span class="icon">verified</span></span></div>
+          <div class="value mono">96.1%</div>
+          <span class="delta good"><span class="icon">trending_up</span>1.3 pt vs last month</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <h3>Inspections and NG deliveries</h3>
+            <div class="legend"><span><i style="background: var(--brand)"></i>Inspections</span><span><i style="background: var(--ng)"></i>NG deliveries</span></div>
+          </div>
+          <div class="card-body">
+            <svg viewBox="0 0 640 230" width="100%" height="230" role="img" aria-label="Inspections per month, May to October, with NG deliveries">
+              <defs>
+                <linearGradient id="area" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="var(--brand)" stop-opacity=".22" />
+                  <stop offset="1" stop-color="var(--brand)" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <g stroke="var(--border)" stroke-dasharray="3 4"><line x1="40" x2="630" y1="30" y2="30" /><line x1="40" x2="630" y1="80" y2="80" /><line x1="40" x2="630" y1="130" y2="130" /><line x1="40" x2="630" y1="180" y2="180" /></g>
+              <g fill="var(--text-3)" font-size="11"><text x="8" y="34">150</text><text x="8" y="84">100</text><text x="14" y="134">50</text><text x="20" y="184">0</text></g>
+              <path d="M60 120 L170 104 L280 110 L390 86 L500 72 L610 52 L610 180 L60 180 Z" fill="url(#area)" />
+              <path d="M60 120 L170 104 L280 110 L390 86 L500 72 L610 52" fill="none" stroke="var(--brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <g fill="var(--ng)" opacity=".85"><rect x="50" y="166" width="20" height="14" rx="4" /><rect x="160" y="160" width="20" height="20" rx="4" /><rect x="270" y="168" width="20" height="12" rx="4" /><rect x="380" y="162" width="20" height="18" rx="4" /><rect x="490" y="170" width="20" height="10" rx="4" /><rect x="600" y="171" width="20" height="9" rx="4" /></g>
+              <g fill="var(--surface)" stroke="var(--brand)" stroke-width="2.5"><circle cx="60" cy="120" r="4.5" /><circle cx="170" cy="104" r="4.5" /><circle cx="280" cy="110" r="4.5" /><circle cx="390" cy="86" r="4.5" /><circle cx="500" cy="72" r="4.5" /><circle cx="610" cy="52" r="5.5" /></g>
+              <g fill="var(--text-3)" font-size="11" text-anchor="middle"><text x="60" y="204">May</text><text x="170" y="204">Jun</text><text x="280" y="204">Jul</text><text x="390" y="204">Aug</text><text x="500" y="204">Sep</text><text x="610" y="204">Oct</text></g>
+            </svg>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>NG rate by supplier</h3><span class="subtle" style="font-size: 12px">October</span></div>
+          <div class="card-body">
+            <div class="bar-row"><span class="name">PT Baja Prima Nusantara</span><div class="bar-track"><div class="bar-fill" style="width: 72%; background: var(--ng)"></div></div><b class="mono">7.2%</b></div>
+            <div class="bar-row"><span class="name">CV Maju Teknik Mandiri</span><div class="bar-track"><div class="bar-fill" style="width: 44%; background: var(--amber)"></div></div><b class="mono">4.4%</b></div>
+            <div class="bar-row"><span class="name">PT Sinar Logam Abadi</span><div class="bar-track"><div class="bar-fill" style="width: 21%; background: var(--sky)"></div></div><b class="mono">2.1%</b></div>
+            <div class="bar-row"><span class="name">PT Cahaya Plastindo</span><div class="bar-track"><div class="bar-fill" style="width: 12%; background: var(--teal)"></div></div><b class="mono">1.2%</b></div>
+            <div class="bar-row"><span class="name">PT Mitra Kemas Jaya</span><div class="bar-track"><div class="bar-fill" style="width: 4%; background: var(--teal)"></div></div><b class="mono">0.4%</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head"><h3>Recent inspections</h3><a href="inspections.html" style="font-size: 13px; font-weight: 600">View all</a></div>
+          <div class="table-wrap" style="margin-top: 12px">
+            <table class="data">
+              <thead><tr><th>Inspection</th><th>Part</th><th>Supplier</th><th>Result</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr class="clickable" onclick="location.href='inspection-detail.html'"><td><span class="cell-strong mono">INS-000128</span><span class="cell-sub">01 Oct 2026</span></td><td>Handle Rhino Prima<span class="cell-sub">000-228</span></td><td>PT Sinar Logam Abadi</td><td><span class="chip chip-ng"><span class="dot"></span>1 NG</span></td><td><span class="chip chip-neutral">Draft</span></td></tr>
+                <tr class="clickable" onclick="location.href='inspection-detail.html'"><td><span class="cell-strong mono">INS-000127</span><span class="cell-sub">30 Sep 2026</span></td><td>Steel Fibre 0.4 x 16 mm<span class="cell-sub">1-1-14-39</span></td><td>PT Baja Prima Nusantara</td><td><span class="chip chip-ok"><span class="dot"></span>All OK</span></td><td><span class="chip chip-warn">Waiting for check</span></td></tr>
+                <tr class="clickable" onclick="location.href='inspection-detail.html'"><td><span class="cell-strong mono">INS-000126</span><span class="cell-sub">30 Sep 2026</span></td><td>Pasir Galunggung (Sand)<span class="cell-sub">1-1-14-03</span></td><td>CV Maju Teknik Mandiri</td><td><span class="chip chip-ok"><span class="dot"></span>All OK</span></td><td><span class="chip chip-ok">Checked</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Waiting for your check</h3><span class="chip chip-warn">7</span></div>
+          <div class="card-body">
+            <div class="pending-item"><span class="avatar" style="background: linear-gradient(135deg, var(--teal), var(--sky))">BS</span><div class="what"><b class="mono">INS-000127</b><span>Budi Santoso · Steel Fibre · 3 deliveries</span></div><a class="btn btn-outline btn-sm" href="inspection-detail.html">Review</a></div>
+            <div class="pending-item"><span class="avatar" style="background: linear-gradient(135deg, var(--violet), var(--sky))">AW</span><div class="what"><b class="mono">INS-000125</b><span>Andi Wijaya · Handle Rhino Prima · 1 NG</span></div><a class="btn btn-outline btn-sm" href="inspection-detail.html">Review</a></div>
+            <div class="pending-item"><span class="avatar" style="background: linear-gradient(135deg, var(--amber), var(--ng))">DL</span><div class="what"><b class="mono">INS-000122</b><span>Dewi Lestari · Pasir Galunggung · 26 h ago</span></div><a class="btn btn-outline btn-sm" href="inspection-detail.html">Review</a></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>

@@ -1,7 +1,7 @@
 # PLAN.md — Incoming Inspection QC System Roadmap
 
 Status: `[ ]` todo · `[~]` in progress · `[x]` done
-Last updated: 2026-09-30
+Last updated: 2026-10-01
 
 ## 1. Goal
 
@@ -9,13 +9,16 @@ A web app for the Quality team of **PT. Chubb Safes Indonesia** to record, evalu
 store the inspection of materials and parts received from suppliers, replacing the paper
 **Form No 7.4.3-F1 "Incoming Inspection Check List"** (`docs/chek sheet-qhse.pdf`).
 
+0. Log in with a username and password; what you can do depends on your role (Inspector, Checker, Admin).
 1. Pick an item and a supplier; the item's QC standards load automatically.
 2. Enter up to 7 delivery columns (P/O, delivery date, qty, inspection category) and the actual measurements.
-3. Get OK/NG per value in real time and an NG count per delivery.
-4. Decide Accepted / Rejected / Concession per delivery, sign off (*Inspected by*, *Checked by*).
+3. Get OK/NG per value in real time; the **AQL table** sets each delivery's sample size and accept/reject numbers from its lot size (§2.4).
+4. Decide Accepted / Rejected / Concession per delivery; *Inspected by* and *Checked by* come from the logged-in users.
 5. Print the result in the 7.4.3-F1 layout as PDF.
 
-**Stack:** Node.js · Express 5 · MariaDB 10.4 `csi_db` (`mysql2/promise`) · Puppeteer (PDF) · Angular (latest) + Angular Material.
+**Stack:** Node.js · Express 5 · MariaDB 10.4 `csi_db` (`mysql2/promise`) · Puppeteer (PDF) · Angular 22 + Angular Material.
+
+**Look and feel:** modern and branded (Phase 3.0): Chubbsafes blue `#004F9C` from the logo plus non-clashing accents, light and dark mode, responsive sidebar and dialogs, tables that follow Form 7.4.3-F1.
 
 **Repository layout:** `backend/`, `frontend/`, `docs/` (see `CLAUDE.md`).
 
@@ -44,13 +47,13 @@ inspectsetup                                      list of "Checked by" names
 
 | Table | Rows | Columns | Notes |
 |---|---|---|---|
-| `inventtable` | 1 685 | `itemid`, `name`, `inspectqty` | No PK. Meaning of `inspectqty` unknown (Q4). |
+| `inventtable` | 1 685 | `itemid`, `name`, `inspectqty` | PK added (001). `inspectqty` is `0` on every row: unused, ignored (Q4). |
 | `inventinspectitem` | ~11 900 | `itemid`, `itemname`, `inspecttype`, `inspectitem`, `standard_txt`, `standard` (dec 18,2), `tolerance` (text), `tolerance_plus`, `tolerance_minus` (dec 19,2) | PK (`itemid`,`inspecttype`,`inspectitem`). Types: `STD` 10 366, `VISUAL` 993, `FITTING` 343, `CERTIFIKAT` 191, some with a trailing space. Up to 28 `STD` lines per item. |
 | `vendtable` | **0** | `vendaccount`, `name` | No PK. Empty: dummy vendors will be seeded (Q2 answered). |
 | `inspecttable` | 2 (test data) | `inspectnum` (PK, `INS-000001`), `inspectdate`, `itemid`, `itemname`, `accountnum`, `name`, `inspectstatus` (varchar), `purchordernum1..7`, `deliverydate1..7` (default today), `qty_received1..7`, `inspectcategory1..7` (int), `notgood1..7` (int), `judgment1..7` (int), `qfnum`, `inspectby`, `checkedby`, `recid` | One row = one form = up to 7 delivery columns. |
 | `inspectline` | 0 | `inspectnum`, `linenum` (PK together), `inspectitem`, `standard`, `tolerance` (single dec), `actual_1..7`, `status_1..7` (int, default 0) | Column N ↔ delivery column N. |
 | `inspectlineother` | 0 | `inspectnum`, `linenum`, `inspecttype`, `inspectitem` | No PK and **no result columns** yet. |
-| `inspectsetup` | 0 | `id`, `checkedby` | No PK. |
+| `inspectsetup` | 0 | `id`, `checkedby` | No PK. Superseded by users with the Checker role (§2.0); left in place, unused. |
 | `numseqtable` | 1 | `processid`, `processname`, `formatstring`, `length_tag`, `nextid` | Unrelated leftover (`Sales Order`). Not used: the app has its own `inspectnumseq`. |
 | `oauth_*`, `password_reset_temp`, `orders` | — | — | Owned by another system. Not used until §5 auth. Never exposed or modified. |
 
@@ -62,7 +65,7 @@ inspectsetup                                      list of "Checked by" names
 | Asymmetric tolerance (`+0.3/-0`), `Min`, `Max`, display texts | Only `inspectline.tolerance` (one decimal) | Add snapshot columns (migration 006) |
 | Visual / Fitting / Certificate result per delivery | `inspectlineother` has no result columns | Add `actual_txt_N`, `status_N` (migration 007) |
 | Measuring Instrument (one row for the whole form) | Missing | Add `inspecttable.instrument` (migration 008) |
-| NG / **Total sample** per delivery | `notgoodN` only | Q5, add `totalsampleN` if confirmed |
+| NG / **Total sample** per delivery | `notgoodN` only | Total sample comes from the AQL plan; snapshot in `samplesize1..7` (migration 012, §2.4) |
 | QF No., Inspected by, Checked by **per delivery column** | Single `qfnum`, `inspectby`, `checkedby` | Q6; default: one value per form, printed in every used column |
 | Remarks, approval timestamps | Missing | Phase 4 migration |
 
@@ -80,7 +83,8 @@ inspectsetup                                      list of "Checked by" names
 - `STD` value: OK when `standard − tolerance_minus ≤ actual ≤ standard + tolerance_plus`.
 - Tolerance text `Min` → OK when `actual ≥ standard`; `Max` → OK when `actual ≤ standard`.
 - Qualitative lines: OK/NG chosen by the inspector.
-- `notgoodN` = count of NG values in column N across all lines. `judgmentN = Accepted` is refused when `notgoodN > 0`.
+- `notgoodN` = number of **defective pieces** in delivery N's sample (AQL counts units, not characteristics: one piece with two NG dimensions is 1). The inspector enters it; it can't be `0` while any value in column N is NG.
+- AQL (§2.4): from `qty_receivedN` and `inspectcategoryN` the plan gives `samplesizeN`, `acceptnumN` (Ac), `rejectnumN` (Re). The system **suggests** O when `notgoodN ≤ Ac` and X when `notgoodN ≥ Re`. `Accepted` is refused when `notgoodN > Ac`; `Concession` is only allowed when the delivery would be rejected, with a note.
 - Data quality in the master, from `npm run db:check` on 2026-10-01 (reported, not fixed silently):
   - 700 `STD` rows with tolerance text `' 0.0'` and both limits `0` (exact match? reference dimension? Q3)
   - 12 `STD` rows whose tolerance is qualitative text (`Tidak Terangkat`)
@@ -138,9 +142,39 @@ Goal: both projects run, tooling is in place, and the schema can store everythin
 
 ---
 
-## Phase 2 — Backend API & OK/NG Logic
+## Phase 2 — Backend API: Auth, Master Data & OK/NG Logic
 
-Goal: the whole inspection can be created, measured and judged through the API alone.
+Goal: users can log in, and the whole inspection can be created, measured and judged through the API alone.
+
+### 2.0 Authentication and users
+Decisions (2026-10-01): username + password; accounts are created by an Admin (no self-signup, no email server); an Admin resets forgotten passwords. Usernames allow letters, digits, `.`, `_`, `-` (convention: employee NIK).
+
+| Role | Can do |
+|---|---|
+| `INSPECTOR` | Create and edit own draft inspections, submit them |
+| `CHECKER` | Everything an Inspector can, plus check/return submitted inspections (*Checked by*) |
+| `ADMIN` | Everything, plus users and master data (items, standards, vendors) |
+
+- [ ] Migration `010_create_usertable.sql`: `usertable` (`userid` PK auto, `username` unique, `fullname`, `email` NULL, `role`, `password_hash`, `active`, `must_change_password`, `theme` `light|dark|system`, `last_login_at`, `created_at`, `updated_at`)
+- [ ] Passwords hashed with bcrypt; minimum 8 characters; never returned by the API
+- [ ] Session: signed JWT in an `httpOnly`, `SameSite=Strict` cookie (`Secure` in production), expires after one shift (8 h); `JWT_SECRET` in `.env`
+- [ ] Login rate limit (e.g. 5 failed attempts per username per 15 minutes → `429`)
+- [ ] Middlewares: `requireAuth` (every `/api` route except `/api/health` and `/api/auth/login`), `requireRole(...roles)`
+- [ ] `npm run user:create-admin` script to create the first Admin from the terminal
+
+| Method | Path | Description |
+|---|---|---|
+| POST | `/api/auth/login` | `{ username, password }` → sets the cookie, returns the user; `401` on bad credentials (same message for unknown user and wrong password) |
+| POST | `/api/auth/logout` | Clears the cookie; `204` |
+| GET | `/api/auth/me` | Current user (`401` when not logged in) |
+| PUT | `/api/auth/me` | Update own `fullname`, `email`, `theme` |
+| PUT | `/api/auth/me/password` | `{ currentPassword, newPassword }`; clears `must_change_password` |
+| GET / POST / PUT | `/api/users[/:userid]` | Admin: list (paging, search, role filter), create, edit role/name/active |
+| POST | `/api/users/:userid/reset-password` | Admin: sets a temporary password and `must_change_password` |
+| GET | `/api/users/lookup?role=CHECKER` | `{ userid, fullname }` for dropdowns |
+
+- [ ] Users are deactivated, never deleted, so names on past inspections stay valid
+- [ ] Tests: login success/failure/rate limit, cookie flags, `401` without cookie, `403` for wrong role, password change, admin reset, inactive user can't log in
 
 ### 2.1 Judgement engine (`services/judgement.js`, pure functions)
 - [ ] `judgeValue(line, actual)` → `1 | 0 | null` (range, `Min`, `Max`, empty)
@@ -159,11 +193,12 @@ Goal: the whole inspection can be created, measured and judged through the API a
 | GET | `/api/items/:itemId/inspect-items` | Standards ordered by type (`STD` → `CERTIFIKAT` → `VISUAL` → `FITTING`) then `inspectitem` |
 | POST / PUT / DELETE | `/api/items/:itemId/inspect-items[/...]` | Maintain standards (validation: numeric `standard`, `tolerance_plus/minus ≥ 0`, unique key) |
 | GET / POST / PUT / DELETE | `/api/vendors[/:vendaccount]` | Vendor CRUD; `409` on duplicate, `409` on delete when referenced by `inspecttable.accountnum` |
-| POST | `/api/vendors/import` | Bulk load from CSV (vendor table is empty, Q2) |
+| POST | `/api/vendors/import` | Bulk load from CSV |
+| — | `npm run db:seed:dev` | Dummy vendors (and a few sample inspections) for the empty dev `vendtable` (Q2) |
 | GET | `/api/vendors/lookup?q=` | `{ vendaccount, name }` |
-| GET / POST / DELETE | `/api/setup/checkers` | `inspectsetup` names for the *Checked by* dropdown |
 
-- [ ] Repository, service, controller, routes and validator files for items, inspect items, vendors, checkers
+- Reads are open to every logged-in user; creating, editing and deleting master data needs `ADMIN`. The *Checked by* list comes from `/api/users/lookup?role=CHECKER` (§2.0).
+- [ ] Repository, service, controller, routes and validator files for items, inspect items, vendors
 - [ ] Integration tests: paging/search/sort whitelist, 404s, duplicates, delete-in-use
 
 ### 2.3 Inspection API
@@ -180,19 +215,74 @@ Goal: the whole inspection can be created, measured and judged through the API a
 Business rules (`services/inspection.service.js`):
 - [ ] `inspectnum` generated on the server, unique under concurrent saves (`SELECT … FOR UPDATE` on the sequence row)
 - [ ] Item and vendor must exist (`422`); `itemname` / `name` copied into the header at save time
+- [ ] `inspectby` is set from the logged-in user on create; the client can't choose it
 - [ ] Delivery columns: used columns are consecutive from 1; a used column needs P/O, delivery date, qty > 0 and a category; unused columns are stored empty (`NULL` P/O, qty `0`), their dates ignored
 - [ ] Line snapshot from the master on create; later master edits don't touch saved inspections
 - [ ] `status_N` and `notgoodN` always recomputed by the server; client-sent values are ignored
 - [ ] Wrong status for an action → `409 INVALID_STATUS`
 - [ ] Integration tests: create from template, rollback when one line fails, update blocked outside `DRAFT`, number uniqueness under parallel creates, filters
 
-**Phase 2 done when:** an inspection for a real item (e.g. `000-228`) can be created from the template, measured in several delivery columns and read back with correct OK/NG and NG counts, using only `curl`.
+### 2.4 AQL sampling (requested by Pak Fajar, 2026-10-01)
+The system decides each delivery's sample size and accept/reject numbers from its lot size (`qty_receivedN`) and inspection category (`inspectcategoryN`: N / R / T), using an AQL table admins can view and edit. His Laravel example is the reference for intent only: no new `materials` / `inspections` tables, no random inspection numbers, no free-text inspector.
+
+**Provisional decisions (2026-10-01, to confirm with QC, Q12–Q14):**
+| Topic | Decision |
+|---|---|
+| Sample size | ISO 2859-1 **Special Level S-1**. The filled example matches it exactly: lot 20 and 50 → 2 pcs, lot 100 → 3 pcs |
+| Accept / reject | **Ac 0 / Re 1** (zero defects) for the default plan |
+| Alternative plan | **ISO General Level II, AQL 2.5** (normal), seeded as a second plan; values to verify against the official standard |
+| Tightened / Reduced | Default plan: T = next larger code letter, R = next smaller (min 2 pcs); Ac 0 / Re 1 |
+| Lot smaller than the sample | 100 % inspection (`samplesize = lot`) |
+| N / R / T | Chosen by the inspector, default N; automatic switching from supplier history is a later feature (§5) |
+
+S-1 code letters (ISO 2859-1 Table 1): 2–50 A (2 pcs), 51–500 B (3), 501–35 000 C (5), 35 001+ D (8). Default plan, normal: 1 → 1 (100 %), 2–50 → 2, 51–500 → 3, 501–35 000 → 5, 35 001+ → 8, all Ac 0 / Re 1.
+
+General Level II, AQL 2.5, normal, arrows already resolved: 2–50 → 5 (0/1), 51–150 → 20 (1/2), 151–280 → 32 (2/3), 281–500 → 50 (3/4), 501–1 200 → 80 (5/6), 1 201–3 200 → 125 (7/8), 3 201–10 000 → 200 (10/11), 10 001–35 000 → 315 (14/15), 35 001+ → 500 (21/22). (Pak Fajar's seeder skipped the ISO arrows for lots 1–8, 26–50 and 51–90 and used 315 above 35 000.)
+
+- [ ] Migration `011_create_aql_tables.sql`: `aqlplan` (`planid` PK, `name`, `inspectlevel`, `aql`, `isdefault`, `active`, `note`) and `aqlplanrow` (`planid`, `inspectcategory`, `lotmin`, `lotmax`, `codeletter`, `samplesize`, `acceptnum`, `rejectnum`; PK `planid, inspectcategory, lotmin`), seeded with the two plans above
+- [ ] Migration `012_inspecttable_aql_columns.sql`: `aqlplanid`, `samplesize1..7`, `acceptnum1..7`, `rejectnum1..7`, `concessionnote1..7` (snapshot per delivery, so editing the AQL table never changes saved inspections)
+- [ ] `services/aql.js` (pure): `findPlanRow(rows, lot, category)` → `{ codeletter, samplesize, acceptnum, rejectnum, fullInspection }`, `suggestJudgment(defects, row)`
+- [ ] Recomputed on every save from the server's own tables; values sent by the client are ignored (what the Laravel example called the "security guard")
+- [ ] CSRF: besides the `SameSite=Strict` cookie, state-changing requests must carry an allowed `Origin` header (the equivalent of Laravel's `@csrf`)
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/aql/lookup?lot=&category=&planId=` | Real-time sample size / Ac / Re while typing the lot size |
+| GET | `/api/aql/plans` · `/api/aql/plans/:planId` | Plans and their rows (all logged-in users) |
+| PUT | `/api/aql/plans/:planId/rows` | Admin: replace a plan's rows in one transaction (ranges must not overlap or leave gaps) |
+| PUT | `/api/aql/plans/:planId/default` | Admin: choose the plan new inspections use |
+
+- [ ] Tests: every range boundary of both plans, lot below sample size, N/R/T, overlapping/gapped rows rejected, `Accepted` with `notgoodN > Ac` → `422`, `Concession` without note or below Re → `422`, saved snapshot unchanged after editing a plan
+
+**Phase 2 done when:** an inspection for a real item (e.g. `000-228`) can be created from the template, measured in several delivery columns and read back with correct OK/NG, sample sizes and accept/reject numbers, using only `curl`.
 
 ---
 
-## Phase 3 — Frontend: Inspection UI & Validation
+## Phase 3 — Frontend: UI/UX Foundation, Inspection UI & Validation
 
-Goal: a QC inspector can fill the whole check sheet in the browser as fast as on paper.
+Goal: a QC inspector can fill the whole check sheet in the browser as fast as on paper, in a modern, branded UI.
+
+### 3.0 UI/UX foundation (design first, then code)
+Agreed direction (2026-10-01): as modern as possible; brand colors from the Chubbsafes logo (`#004F9C` blue, `#1D1D1D` text) with extra accents that don't clash; the logo always sits on a light (or, in dark mode, dark) surface, never on a colored bar; tables follow Form 7.4.3-F1 and may be prettier but must not drift from it.
+
+- [x] **Mockups** in `docs/design/mockups/`, **approved by the owner on 2026-10-01** as the design reference for Phase 3 (open `login.html`). Later design changes stay possible: update the mockup first and add a review note below. One HTML + CSS file per page (`login`, `dashboard`, `inspections`, `inspection-detail`, `items`, `vendors`, `aql`, `users`, `profile`), shared `css/base.css` (tokens), `css/components.css`, `css/navbar.css`, `js/app.js` (navbar, profile menu, theme, modal), mirroring the Angular folders:
+  - Login as its own page (brand panel with the white logo + sign-in form); Logout returns to it
+  - Top navbar only (logo, menu, API status, profile menu with Profile settings / Theme / Logout); no sidebar
+  - Dashboard: KPI cards, NG chart, recent inspections, inspections waiting for check
+  - Inspections list with a "New inspection" modal; inspection detail = read-only Form 7.4.3-F1 check sheet, deliveries added and edited in a step-by-step modal (delivery + AQL → measurements → result)
+  - Items, Vendors, AQL table, Users (each with its own add/edit modal), Profile settings
+  - Light and dark mode; desktop, tablet and phone widths
+  - Review 1 (2026-10-01): sidebar + header was two navigations → top navbar only; theme was in three places → profile menu only; typing into the big grid was hard → modals; login shared the app shell → separate page
+- [ ] Design tokens: palette (brand, neutrals, OK/NG/warning/info), Inter font bundled from npm, radius, elevation, spacing, motion; mapped onto Angular Material's `--mat-sys-*` variables
+- [ ] Light / dark / system theme, saved per user (`usertable.theme`)
+- [ ] Logos in `frontend/public/brand/` (original for light surfaces, white negative for dark/brand surfaces)
+- [ ] Layout: top navbar only (logo, main menu with a "Master data" dropdown, API status, profile menu → Profile settings, Theme, Logout); below 960px the menu folds into a ☰ panel; smooth open/close transitions. Every component in its own `.ts` / `.html` / `.scss`
+- [ ] Dialogs (`shared/ui/modal`): the only way to create or edit records; centered with a backdrop on desktop, full-screen below 600px, closable with Esc / ✕, focus trapped and restored
+- [ ] Shared look for tables, forms, buttons, OK/NG and status chips, empty / loading / error states, toasts
+- [ ] Login page, auth guard (redirect to login, then back), `must_change_password` flow, role-based menu
+- [ ] Profile settings page (name, email, theme, change password)
+- [ ] Dashboard page (data from the Phase 2 API)
+- [ ] Accessibility: WCAG AA contrast in both themes, visible focus, keyboard navigation
 
 ### 3.1 Core
 - [ ] `core/ApiService` unwrapping `{ success, data, meta }`; error interceptor → snackbar with `error.message`, field errors mapped from `error.details[]`
@@ -203,27 +293,29 @@ Goal: a QC inspector can fill the whole check sheet in the browser as fast as on
 ### 3.2 Master data screens
 - [ ] Items: list + detail with the standards grid (grouped STD / Certificate / Visual / Fitting), edit standards
 - [ ] Vendors: list, create/edit form, CSV import
-- [ ] Checkers (`inspectsetup`): simple list editor
+- [ ] Users (Admin only, replaces the former "Checkers" menu): list, create, edit role / active, reset password
+- [ ] AQL table: plans, N / R / T tabs, the rows with the active range highlighted, a "try a lot size" calculator; editable by Admin
 
 ### 3.3 Inspection form (mirrors Form 7.4.3-F1)
 - [ ] **Header:** Part name / Part no (item lookup), Supplier (vendor lookup), inspect date, measuring instrument
 - [ ] Choosing the item loads `/api/inspections/template` and fills the lines; changing the item on a filled form asks for confirmation
-- [ ] **Grid:** rows = `STD` lines (No, Item, Standard, Tolerance), then Certificate No, Visual, Fitting; columns = 7 delivery columns of `Actual | OK/NG`
-  - Numeric input with 2 decimals; OK/NG cell updates as you type, NG highlighted red
-  - Qualitative rows: OK/NG toggle; Certificate row: COA number text + OK/NG
-  - Keyboard: Enter moves down within a column (the way QC measures one delivery), Tab moves right
-- [ ] **Footer rows per column:** P/O No, Delivery date, QTY received / Insp. category (N / R / T / 100 %), NG / Total sample (computed), Judgment (O / X / C), QF No
-- [ ] Validation mirrors the server: unused columns disabled until the previous one is used, required fields per used column, `Accepted` disabled when the column has NG
+- [ ] **Check sheet (read-only view):** rows = `STD` lines (No, Item, Standard, Tolerance), then Certificate No, Visual, Fitting; columns = 7 delivery columns of `Actual | OK/NG`; NG highlighted red
+- [ ] **Delivery modal** (add, or click a filled column to edit), three steps:
+  1. P/O No, delivery date, QTY received, category → AQL sample / Ac / Re shown live
+  2. Measurements: one row per characteristic (Standard, Tolerance, Actual) with OK/NG as you type; Visual / Fitting OK/NG toggles; COA number + OK/NG. Enter moves to the next row
+  3. Result: NG pieces (prefilled from step 2), suggested judgment, O / X / C, concession note, QF No
+- [ ] **Footer rows per column:** P/O No, Delivery date, QTY received / Insp. category (N / R / T / 100 %), **Sample (AQL)** shown live (n, Ac, Re), NG / Total sample (NG pcs entered, prefilled from the grid; total from AQL), Judgment (O / X / C, with the system's suggestion highlighted), QF No
+- [ ] Validation mirrors the server: unused columns disabled until the previous one is used, required fields per used column, `Accepted` disabled when NG > Ac, `Concession` only when NG ≥ Re and with a note
 - [ ] Save draft (and autosave per column), unsaved-changes guard, server values replace local ones after each save
 - [ ] Inspection list: filters (date range, item, supplier, status, judgment), paging, row actions (open, PDF)
 - [ ] Read-only view for inspections outside `DRAFT`
 
 ### 3.4 Frontend quality
 - [ ] Unit tests: services, `judgement.ts` (shared fixture), form validators
-- [ ] Component test for the grid: typing an out-of-tolerance value marks NG and increments NG / Total sample
-- [ ] Responsive enough for a tablet on the receiving floor (landscape)
+- [ ] Component test for the delivery modal: typing an out-of-tolerance value marks NG, prefills NG pieces and blocks Accepted above Ac
+- [ ] Responsive: phone, tablet on the receiving floor (landscape) and desktop
 
-**Phase 3 done when:** an inspector can create, fill and save an inspection matching the filled example in `docs/chek sheet-qhse (cara isi).pdf`, with OK/NG identical to the server's result.
+**Phase 3 done when:** an inspector can log in, create, fill and save an inspection matching the filled example in `docs/chek sheet-qhse (cara isi).pdf`, with OK/NG identical to the server's result, in the approved design.
 
 ---
 
@@ -232,12 +324,11 @@ Goal: a QC inspector can fill the whole check sheet in the browser as fast as on
 Goal: the inspection is signed off and prints as the official check sheet.
 
 ### 4.1 Approval workflow
-- [ ] Migration `010_inspecttable_approval.sql`: `submitted_at`, `checked_at`, `return_reason`, `remarks` (only the columns Q6 leaves missing)
+- [ ] Migration `013_inspecttable_approval.sql`: `submitted_at`, `checked_at`, `return_reason`, `remarks` (only the columns Q6 leaves missing)
 - [ ] Status flow `DRAFT → SUBMITTED → CHECKED`, and `SUBMITTED → DRAFT` (returned with a reason)
 - [ ] `POST /api/inspections/:inspectnum/submit`: needs `inspectby`, all used columns judged; recomputes OK/NG; locks editing
-- [ ] `POST /api/inspections/:inspectnum/check`: `checkedby` must be a name from `inspectsetup`; final
+- [ ] `POST /api/inspections/:inspectnum/check`: only a `CHECKER` or `ADMIN`; `checkedby` is the logged-in user; final
 - [ ] `POST /api/inspections/:inspectnum/return`: `reason` required
-- [ ] Until auth exists (§5), names are chosen in the form; the API records them as sent
 - [ ] UI: Submit / Check / Return buttons shown only in the right status; status badge on list and form
 - [ ] Tests: full flow, every wrong-status action returns `409`, `Accepted` with NG returns `422`
 
@@ -248,7 +339,7 @@ Goal: the inspection is signed off and prints as the official check sheet.
   - Part name, Part no., Supplier name
   - Dimensions table (No, Item, Standard, Tolerance) + 7 × (Actual, OK/NG), grey Actual cells as on the form
   - Certificate No, Visual, Fitting rows
-  - Footer rows: P/O No, Delivery date, Measuring Instrument, QTY received / Insp. Category, NG / Total sample, Judgment, QF No, Inspected by, Checked by
+  - Footer rows: P/O No, Delivery date, Measuring Instrument, QTY received / Insp. Category, NG / Total sample (sample from the AQL snapshot), Judgment, QF No, Inspected by, Checked by
   - Legend: `*) T: Tightening N: Normal R: Reduce` · `**) O: Accepted X: Rejected C: Concession No Mark: 100 % inspection`
 - [ ] A4 landscape; more than 13 STD lines continue on the next page with repeated headers; "Hal. X/Y"
 - [ ] NG values marked; `DRAFT` / `SUBMITTED` inspections get a watermark, only `CHECKED` prints clean
@@ -259,7 +350,7 @@ Goal: the inspection is signed off and prints as the official check sheet.
 - [ ] Tests: `application/pdf` + filename header, `404` for unknown id, HTML snapshot of the template
 
 ### 4.3 Release checklist
-- [ ] Playwright E2E: create vendor → pick item → fill 2 delivery columns with one NG → judge → submit → check → open PDF
+- [ ] Playwright E2E: log in as inspector → pick item → fill 2 delivery columns with one NG → judge → submit → log in as checker → check → open PDF
 - [ ] QC walks through the app with the paper form side by side and signs off the layout
 
 **Phase 4 done when:** a checked inspection opens as a correctly paginated 7.4.3-F1 PDF in under about 3 seconds, and QC accepts it as a replacement for the paper form.
@@ -267,8 +358,8 @@ Goal: the inspection is signed off and prints as the official check sheet.
 ---
 
 ## 5. Later (not scheduled)
-- Authentication and roles (inspector / checker / viewer), possibly reusing the existing `oauth_users` table
-- Dashboard: NG rate per supplier, item and month; Excel export
+- Dashboard drill-downs (NG rate per supplier, item and month); Excel export
+- AQL switching rules (ISO 2859-1): suggest N → T after 2 of 5 consecutive lots rejected, T → N after 5 accepted, N → R after 10 accepted, per supplier and item
 - Attachments (photos, COA scans) on an inspection
 - Audit log of changes
 - Deployment: Nginx serving the Angular build and proxying `/api`, PM2 for Node, database backups
@@ -277,10 +368,14 @@ Goal: the inspection is signed off and prints as the official check sheet.
 1. **Code maps:** are the values in §3 right for `inspectcategoryN`, `judgmentN` and `inspectstatus`? The two existing rows use `1` everywhere and look like test data — may they be deleted?
 2. ~~**Vendors:** where does the supplier list come from?~~ **Answered 2026-10-01:** dummy data is fine, as long as table/column names and ids follow `csi_db`.
 3. **Tolerance edge cases:** how should the ~700 STD standards with tolerance `' 0.0'` and both limits `0` be judged (exact match, or reference only / not judged)? Are qualitative texts in STD rows (`Tidak Terangkat`) really visual checks?
-4. What does `inventtable.inspectqty` mean (sample size? AQL?) and should it prefill *Total sample*?
-5. **NG / Total sample:** is the total sample entered per delivery column? If so, add `totalsample1..7` (the schema has only `notgood1..7`).
+4. ~~What does `inventtable.inspectqty` mean?~~ **Checked 2026-10-01:** `0` on all 1 685 items, so it is unused and ignored.
+5. ~~**NG / Total sample:** where does the total sample come from?~~ **Decided 2026-10-01:** from the AQL plan (§2.4), snapshot in `samplesize1..7`. NG = defective pieces.
 6. **Per-column sign-off:** the form has *QF No*, *Inspected by* and *Checked by* per delivery column, the schema has one each per inspection. Is one per form enough?
 7. ~~Is `csi_db` shared with another application?~~ **Answered 2026-10-01:** no, it's a development copy. The `docs/` files are references for the form's shape, content and columns. Inspection numbers use the app's own table (`inspectnumseq`).
 8. Should the PDF show the form revision as fixed `Rev. 01 / 24/10/23`, or from a setting?
 9. **Precision:** `standard`, `tolerance_*` and `actual_N` are `decimal(18,2)`. 91 standards look stored ×100 (`0.0012` printed, `0.12` stored). Should those be judged in the stored unit, or do the columns need more decimals (a migration to `decimal(18,4)`)?
 10. **Tolerance typos:** 9 standards have numbers that disagree with their tolerance text (see §3). Which is right, the text or the numbers? Judging uses the numbers.
+11. Should *Inspected by* / *Checked by* store the user's full name (as the form prints it) or the username? Default: full name in the existing `varchar(50)` columns, plus a later migration for the user ids if traceability is needed.
+12. **AQL plan (confirm with QC / Pak Fajar):** is the practice "ISO 2859-1 Special Level S-1 with zero defects (Ac 0 / Re 1)", as the filled example suggests, or a specific AQL value (and which)? One plan for all items, or per item / defect class (critical / major / minor)?
+13. **Tightened / Reduced** for the default plan: is "one code letter larger / smaller" acceptable, or does QC use the ISO tightened / reduced tables?
+14. **General Level II, AQL 2.5** values in §2.4 were entered from memory of the ISO tables: verify against the official standard before using that plan.

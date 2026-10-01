@@ -1,0 +1,29 @@
+/* users.css — features/users (Admin only) */
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.temp-pw {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.temp-pw code {
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+.row-inactive td {
+  color: var(--text-3);
+}

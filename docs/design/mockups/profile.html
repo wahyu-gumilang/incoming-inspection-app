@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Mockup only: Inter and Material Symbols from Google Fonts. The app bundles them from npm. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/profile.css" />
+    <title>Profile settings · Incoming Inspection</title>
+    <script src="js/theme.js"></script>
+  </head>
+  <body data-page="profile">
+    <div id="navbar"></div>
+
+    <main class="content">
+      <div class="page-head"><div><h1>Profile settings</h1><p>Your name as it appears on the check sheet, and your password.</p></div></div>
+
+      <div class="profile-grid">
+        <div class="card profile-card">
+          <span class="avatar lg">SR</span>
+          <div><h2>Siti Rahayu</h2><span class="subtle">@10234</span></div>
+          <span class="chip chip-brand">QC Checker</span>
+          <span class="subtle" style="font-size: 12px; margin-top: 6px">Signed in since 07:58 · session ends 15:58</span>
+        </div>
+
+        <div style="display: grid; gap: 16px">
+          <div class="card">
+            <div class="card-head"><h3>Personal information</h3><button class="btn btn-outline btn-sm" type="button" data-open="m-profile"><span class="icon" style="font-size: 18px">edit</span>Edit</button></div>
+            <div class="card-body info-list">
+              <div><span>Full name</span><b>Siti Rahayu</b></div>
+              <div><span>Email</span><b class="subtle">Not set</b></div>
+              <div><span>Username</span><b class="mono">10234</b></div>
+              <div><span>Role</span><b>Checker</b></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Password</h3><button class="btn btn-outline btn-sm" type="button" data-open="m-password"><span class="icon" style="font-size: 18px">key</span>Change password</button></div>
+            <div class="card-body"><span class="muted">Last changed 12 Sep 2026.</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal-backdrop" id="m-profile">
+      <form class="modal" role="dialog" aria-modal="true" aria-labelledby="m-profile-title" data-toast="Profile saved">
+        <div class="modal-head">
+          <div><h2 id="m-profile-title">Edit personal information</h2><p>Username and role are managed by an administrator.</p></div>
+          <button type="button" class="icon-btn" aria-label="Close" data-close><span class="icon">close</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="field"><label for="p-name">Full name</label><input id="p-name" class="input" value="Siti Rahayu" required /><span class="hint">Printed under "Checked by".</span></div>
+          <div class="field"><label for="p-email">Email (optional)</label><input id="p-email" class="input" type="email" placeholder="name@chubbsafes.co.id" /></div>
+        </div>
+        <div class="modal-foot"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
+      </form>
+    </div>
+
+    <div class="modal-backdrop" id="m-password">
+      <form class="modal" role="dialog" aria-modal="true" aria-labelledby="m-password-title" data-toast="Password changed">
+        <div class="modal-head">
+          <div><h2 id="m-password-title">Change password</h2><p>At least 8 characters.</p></div>
+          <button type="button" class="icon-btn" aria-label="Close" data-close><span class="icon">close</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="field"><label for="pw-cur">Current password</label><input id="pw-cur" class="input" type="password" autocomplete="current-password" required /></div>
+          <div class="field"><label for="pw-new">New password</label><input id="pw-new" class="input" type="password" autocomplete="new-password" minlength="8" required /></div>
+          <div class="field"><label for="pw-rep">Repeat new password</label><input id="pw-rep" class="input" type="password" autocomplete="new-password" minlength="8" required /></div>
+        </div>
+        <div class="modal-foot"><button type="button" class="btn btn-ghost" data-close>Cancel</button><button type="submit" class="btn btn-primary">Change password</button></div>
+      </form>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/forms.js"></script>
+  </body>
+</html>

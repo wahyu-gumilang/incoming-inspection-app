@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>INS-000128 · Incoming Inspection</title>
+    <!-- Mockup only: Inter and Material Symbols from Google Fonts. The app bundles them from npm. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/inspection-detail.css" />
+    <script src="js/theme.js"></script>
+  </head>
+  <body data-page="inspection-detail">
+    <div id="navbar"></div>
+
+    <main class="content">
+      <div class="page-head">
+        <div>
+          <a class="eyebrow" href="inspections.html">← Inspections · Form 7.4.3-F1</a>
+          <div class="title-row">
+            <h1 class="mono" id="insp-no">INS-000128</h1>
+            <span class="chip chip-neutral"><span class="dot"></span>Draft</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-ghost" type="button"><span class="icon">picture_as_pdf</span>Preview PDF</button>
+          <button class="btn btn-primary" type="button" id="submit-btn"><span class="icon">send</span>Submit for check</button>
+        </div>
+      </div>
+
+      <section class="card details" aria-label="Inspection details">
+        <div class="kv"><span>Part no.</span><b class="mono">000-228</b></div>
+        <div class="kv"><span>Part name</span><b>Handle Rhino Prima</b></div>
+        <div class="kv"><span>Supplier name</span><b>PT Sinar Logam Abadi</b></div>
+        <div class="kv"><span>Inspection date</span><b>01 Oct 2026</b></div>
+        <div class="kv"><span>Measuring instrument</span><b id="kv-inst">Digital caliper · Thread gauge M8</b></div>
+        <div class="kv"><span>AQL plan</span><b><a href="aql.html">S-1 · zero defects</a></b></div>
+        <div class="actions"><button class="btn btn-outline btn-sm" type="button" data-open="m-details"><span class="icon" style="font-size: 18px">edit</span>Edit details</button></div>
+      </section>
+
+      <section class="card sheet-card">
+        <div class="card-head">
+          <h3>Check sheet <span class="subtle" style="font-weight: 500" id="used-count"></span></h3>
+          <button class="btn btn-primary btn-sm" type="button" id="add-delivery"><span class="icon" style="font-size: 18px">add</span>Add delivery</button>
+        </div>
+        <div class="sheet-wrap">
+          <table class="sheet" aria-label="Check sheet">
+            <thead>
+              <tr id="sheet-head"></tr>
+              <tr id="sheet-subhead"></tr>
+            </thead>
+            <tbody id="sheet-body"></tbody>
+          </table>
+        </div>
+        <div class="sheet-legend">
+          <span><b>*)</b> T: Tightening · N: Normal · R: Reduce · — : 100 % inspection</span>
+          <span><b>**)</b> O: Accepted · X: Rejected · C: Concession</span>
+          <span>Click a delivery to open it.</span>
+        </div>
+      </section>
+    </main>
+
+    <!-- Delivery (features/inspections/delivery-dialog): add or edit one column of the check sheet -->
+    <div class="modal-backdrop" id="m-delivery">
+      <div class="modal lg" role="dialog" aria-modal="true" aria-labelledby="dlv-title">
+        <div class="modal-head">
+          <div><h2 id="dlv-title">Delivery 4</h2><p>000-228 · Handle Rhino Prima · PT Sinar Logam Abadi</p></div>
+          <button type="button" class="icon-btn" aria-label="Close" data-close><span class="icon">close</span></button>
+        </div>
+        <div class="steps" aria-label="Steps">
+          <div class="step" data-step="1"><span class="num">1</span><span class="label">Delivery &amp; sample</span></div>
+          <div class="step" data-step="2"><span class="num">2</span><span class="label">Measurements</span></div>
+          <div class="step" data-step="3"><span class="num">3</span><span class="label">Result</span></div>
+        </div>
+        <div class="modal-body">
+          <!-- Step 1 -->
+          <div class="step-panel" data-panel="1">
+            <div class="form-grid">
+              <div class="field"><label for="d-po">P/O No.</label><input id="d-po" class="input mono" placeholder="e.g. 34561" /></div>
+              <div class="field"><label for="d-date">Delivery date</label><input id="d-date" class="input" type="date" /></div>
+              <div class="field"><label for="d-qty">QTY received (lot size)</label><input id="d-qty" class="input mono" inputmode="numeric" placeholder="pcs" /></div>
+              <div class="field">
+                <label>Inspection category *)</label>
+                <div class="seg" id="d-cat" role="radiogroup" aria-label="Inspection category">
+                  <button type="button" data-cat="N">N</button><button type="button" data-cat="R">R</button><button type="button" data-cat="T">T</button><button type="button" data-cat="F">100 %</button>
+                </div>
+              </div>
+            </div>
+            <div class="aql-box" id="d-aql"></div>
+            <p class="aql-note" id="d-aql-note"></p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-panel" data-panel="2">
+            <table class="measure">
+              <thead><tr><th>No.</th><th>Item</th><th>Standard</th><th class="tol-col">Tolerance</th><th>Actual</th><th>OK / NG</th></tr></thead>
+              <tbody id="d-measure"></tbody>
+            </table>
+            <p class="aql-note">Enter moves to the next value. Values outside the tolerance turn red straight away.</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step-panel" data-panel="3">
+            <div class="field">
+              <label for="d-ng">NG / Total sample (defective pieces in the sample)</label>
+              <div class="ng-row"><input id="d-ng" class="input mono" inputmode="numeric" value="0" /><span class="of" id="d-of">/ 2</span></div>
+              <span class="hint" id="d-ng-hint"></span>
+            </div>
+            <div class="suggestion" id="d-suggest"></div>
+            <div class="field">
+              <label>Judgment **)</label>
+              <div class="judgment" id="d-judg">
+                <button type="button" class="o" data-j="o"><b>O</b><span>Accepted</span></button>
+                <button type="button" class="x" data-j="x"><b>X</b><span>Rejected</span></button>
+                <button type="button" class="c" data-j="c"><b>C</b><span>Concession</span></button>
+              </div>
+            </div>
+            <div class="field hidden" id="d-note-field"><label for="d-note">Concession note</label><textarea id="d-note" class="textarea" placeholder="Why is this delivery accepted under concession, and by whom?"></textarea></div>
+            <div class="field"><label for="d-qf">QF No. (optional)</label><input id="d-qf" class="input" placeholder="e.g. QF 01-05" /></div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" id="d-back"><span class="icon">arrow_back</span>Back</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+          <button type="button" class="btn btn-primary" id="d-next">Next<span class="icon">arrow_forward</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit details -->
+    <div class="modal-backdrop" id="m-details">
+      <form class="modal md" role="dialog" aria-modal="true" aria-labelledby="m-details-title" id="details-form">
+        <div class="modal-head">
+          <div><h2 id="m-details-title">Edit details</h2><p>The part can't be changed once deliveries exist.</p></div>
+          <button type="button" class="icon-btn" aria-label="Close" data-close><span class="icon">close</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field"><label for="e-part">Part no.</label><input id="e-part" class="input" value="000-228" disabled /></div>
+            <div class="field"><label for="e-name">Part name</label><input id="e-name" class="input" value="Handle Rhino Prima" disabled /></div>
+            <div class="field span-2"><label for="e-vendor">Supplier name</label><select id="e-vendor" class="select"><option selected>PT Sinar Logam Abadi</option><option>PT Baja Prima Nusantara</option><option>CV Maju Teknik Mandiri</option></select></div>
+            <div class="field"><label for="e-date">Inspection date</label><input id="e-date" class="input" type="date" value="2026-10-01" /></div>
+            <div class="field"><label for="e-inst">Measuring instrument</label><input id="e-inst" class="input" value="Digital caliper · Thread gauge M8" /></div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Submit for check -->
+    <div class="modal-backdrop" id="m-submit">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-submit-title">
+        <div class="modal-head">
+          <div><h2 id="m-submit-title">Submit for check?</h2><p id="submit-sub"></p></div>
+          <button type="button" class="icon-btn" aria-label="Close" data-close><span class="icon">close</span></button>
+        </div>
+        <div class="modal-body"><p class="muted" style="margin: 0">After submitting you can't edit the deliveries. A checker reviews it and either checks it or returns it to you with a reason.</p></div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+          <button type="button" class="btn btn-primary" id="submit-confirm"><span class="icon">send</span>Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/aql.js"></script>
+    <script src="js/inspection-detail.js"></script>
+  </body>
+</html>

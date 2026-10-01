@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in · Incoming Inspection</title>
+    <!-- Mockup only: Inter and Material Symbols from Google Fonts. The app bundles them from npm. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/login.css" />
+    <script src="js/theme.js"></script>
+  </head>
+  <body>
+    <main class="login">
+      <section class="login-brand" aria-hidden="true">
+        <img src="assets/logo-white.png" alt="" />
+        <div>
+          <h1>Incoming Inspection<br />Quality Control</h1>
+          <p class="lead">Record, judge and sign off supplier deliveries against every part's standard and tolerance — the digital Form 7.4.3-F1.</p>
+          <div class="features">
+            <div><span class="icon">fact_check</span>Live OK / NG judgement as you measure</div>
+            <div><span class="icon">table_chart</span>Sample size and accept limits from the AQL table</div>
+            <div><span class="icon">picture_as_pdf</span>Print the official check sheet in one click</div>
+          </div>
+        </div>
+        <footer>© 2026 PT. Chubb Safes Indonesia · Quality Department</footer>
+      </section>
+
+      <section class="login-form-wrap">
+        <form class="login-form" id="signin" aria-labelledby="signin-title">
+          <img class="logo-small light" src="assets/logo-original.png" alt="Chubbsafes" />
+          <img class="logo-small dark" src="assets/logo-white.png" alt="Chubbsafes" />
+          <div>
+            <h2 id="signin-title">Welcome back</h2>
+            <p class="muted" style="margin: 6px 0 0">Sign in with the account your administrator gave you.</p>
+          </div>
+          <div class="field">
+            <label for="username">Username</label>
+            <div class="input-icon">
+              <span class="icon">badge</span>
+              <input id="username" name="username" class="input" autocomplete="username" placeholder="Employee NIK" value="10234" required />
+            </div>
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="input-icon pw-wrap">
+              <span class="icon">lock</span>
+              <input id="password" name="password" class="input" type="password" autocomplete="current-password" value="password123" required />
+              <button type="button" class="icon-btn" id="toggle-pw" aria-label="Show password"><span class="icon">visibility</span></button>
+            </div>
+          </div>
+          <label class="remember"><input type="checkbox" checked /> Keep me signed in on this device</label>
+          <button class="btn btn-primary btn-signin" type="submit">Sign in <span class="icon">arrow_forward</span></button>
+          <p class="help">Forgot your password? Ask a QC administrator to reset it.</p>
+        </form>
+      </section>
+    </main>
+    <script>
+      // The app POSTs to /api/auth/login and gets an httpOnly cookie; the mockup just moves on.
+      document.getElementById('signin').addEventListener('submit', function (e) {
+        e.preventDefault();
+        location.href = 'dashboard.html';
+      });
+      document.getElementById('toggle-pw').addEventListener('click', function () {
+        var input = document.getElementById('password');
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        this.firstElementChild.textContent = show ? 'visibility_off' : 'visibility';
+        this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      });
+    </script>
+  </body>
+</html>

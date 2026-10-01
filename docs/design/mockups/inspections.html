@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inspections · Incoming Inspection</title>
+    <!-- Mockup only: Inter and Material Symbols from Google Fonts. The app bundles them from npm. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/inspections.css" />
+    <script src="js/theme.js"></script>
+  </head>
+  <body data-page="inspections">
+    <div id="navbar"></div>
+
+    <main class="content">
+      <div class="page-head">
+        <div>
+          <h1>Inspections</h1>
+          <p>Every incoming inspection, newest first. Open one to add deliveries.</p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-outline" type="button"><span class="icon">download</span>Export</button>
+          <button class="btn btn-primary" type="button" data-open="m-new"><span class="icon">add</span>New inspection</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <div class="grow input-icon"><span class="icon">search</span><input class="input" placeholder="Search inspection no, P/O no or part…" aria-label="Search" /></div>
+          <select class="select" style="width: 200px" aria-label="Supplier"><option>All suppliers</option><option>PT Sinar Logam Abadi</option><option>PT Baja Prima Nusantara</option><option>CV Maju Teknik Mandiri</option></select>
+          <button class="btn btn-outline" type="button"><span class="icon">date_range</span>01 – 31 Oct 2026</button>
+          <div class="filter-chips" role="group" aria-label="Status">
+            <button type="button" class="on">All</button><button type="button">Draft</button><button type="button">Waiting for check</button><button type="button">Checked</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Inspection no</th><th>Date</th><th>Part</th><th>Supplier</th><th>Deliveries</th><th>NG pcs</th><th>Status</th><th>Inspected by</th></tr></thead>
+            <tbody>
+              <tr class="clickable" onclick="location.href='inspection-detail.html'"><td class="cell-strong mono">INS-000128</td><td>01 Oct 2026</td><td>Handle Rhino Prima<span class="cell-sub">000-228</span></td><td>PT Sinar Logam Abadi</td><td><span class="cols-dots"><i class="ok"></i><i class="c"></i><i class="ok"></i><i></i><i></i><i></i><i></i></span> <span class="subtle">3 / 7</span></td><td><span class="chip chip-ng">1</span></td><td><span class="chip chip-neutral"><span class="dot"></span>Draft</span></td><td>Budi Santoso</td></tr>
+              <tr class="clickable" onclick="location.href='inspection-detail.html'"><td class="cell-strong mono">INS-000127</td><td>30 Sep 2026</td><td>Steel Fibre 0.4 x 16 mm<span class="cell-sub">1-1-14-39</span></td><td>PT Baja Prima Nusantara</td><td><span class="cols-dots"><i class="ok"></i><i class="ok"></i><i class="ok"></i><i></i><i></i><i></i><i></i></span> <span class="subtle">3 / 7</span></td><td><span class="chip chip-neutral">0</span></td><td><span class="chip chip-warn"><span class="dot"></span>Waiting for check</span></td><td>Budi Santoso</td></tr>
+              <tr class="clickable" onclick="location.href='inspection-detail.html'"><td class="cell-strong mono">INS-000126</td><td>30 Sep 2026</td><td>Pasir Galunggung (Sand)<span class="cell-sub">1-1-14-03</span></td><td>CV Maju Teknik Mandiri</td><td><span class="cols-dots"><i class="ok"></i><i class="ok"></i><i></i><i></i><i></i><i></i><i></i></span> <span class="subtle">2 / 7</span></td><td><span class="chip chip-neutral">0</span></td><td><span class="chip chip-ok"><span class="dot"></span>Checked</span></td><td>Dewi Lestari</td></tr>
+              <tr class="clickable" onclick="location.href='inspection-detail.html'"><td class="cell-strong mono">INS-000125</td><td>29 Sep 2026</td><td>Handle Rhino Prima<span class="cell-sub">000-228</span></td><td>PT Sinar Logam Abadi</td><td><span class="cols-dots"><i class="ok"></i><i class="ng"></i><i></i><i></i><i></i><i></i><i></i></span> <span class="subtle">2 / 7</span></td><td><span class="chip chip-ng">2</span></td><td><span class="chip chip-warn"><span class="dot"></span>Waiting for check</span></td><td>Andi Wijaya</td></tr>
+              <tr class="clickable" onclick="location.href='inspection-detail.html'"><td class="cell-strong mono">INS-000124</td><td>28 Sep 2026</td><td>Steel Fibre 0.4 x 16 mm<span class="cell-sub">1-1-14-39</span></td><td>PT Cahaya Plastindo</td><td><span class="cols-dots"><i class="ok"></i><i class="ok"></i><i class="ok"></i><i class="ok"></i><i></i><i></i><i></i></span> <span class="subtle">4 / 7</span></td><td><span class="chip chip-neutral">0</span></td><td><span class="chip chip-ok"><span class="dot"></span>Checked</span></td><td>Budi Santoso</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span>Showing 1–5 of 128</span>
+          <div class="pages">
+            <button type="button" aria-label="Previous page"><span class="icon" style="font-size: 18px">chevron_left</span></button>
+            <button type="button" class="on">1</button><button type="button">2</button><button type="button">3</button><button type="button">…</button><button type="button">26</button>
+            <button type="button" aria-label="Next page"><span class="icon" style="font-size: 18px">chevron_right</span></button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- New inspection (features/inspections/new-inspection-dialog) -->
+    <div class="modal-backdrop" id="m-new">
+      <form class="modal md" role="dialog" aria-modal="true" aria-labelledby="m-new-title" id="new-form">
+        <div class="modal-head">
+          <div><h2 id="m-new-title">New inspection</h2><p>Form 7.4.3-F1 · the inspection number is assigned when you create it.</p></div>
+          <button type="button" class="icon-btn" aria-label="Close" data-close><span class="icon">close</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field">
+              <label for="f-part">Part no.</label>
+              <div class="input-icon"><span class="icon">search</span><input id="f-part" class="input" list="parts" value="000-228" autocomplete="off" required /></div>
+              <datalist id="parts"><option value="000-228">Handle Rhino Prima</option><option value="1-1-14-39">Steel Fibre 0.4 x 16 mm</option><option value="1-1-14-03">Pasir Galunggung (Sand)</option></datalist>
+            </div>
+            <div class="field"><label for="f-name">Part name</label><input id="f-name" class="input" value="Handle Rhino Prima" disabled /></div>
+            <div class="field span-2">
+              <label for="f-vendor">Supplier name</label>
+              <select id="f-vendor" class="select" required><option value="">Choose a supplier…</option><option selected>PT Sinar Logam Abadi</option><option>PT Baja Prima Nusantara</option><option>CV Maju Teknik Mandiri</option></select>
+            </div>
+            <div class="field"><label for="f-date">Inspection date</label><input id="f-date" class="input" type="date" value="2026-10-01" required /></div>
+            <div class="field"><label for="f-inst">Measuring instrument</label><input id="f-inst" class="input" placeholder="e.g. Digital caliper Mitutoyo 500-196" /></div>
+          </div>
+          <div class="preview-std">
+            <span class="icon">checklist</span>Standards load from the item automatically
+            <span class="counts"><span class="chip chip-brand">3 dimensions</span><span class="chip chip-neutral">3 visual</span><span class="chip chip-neutral">1 fitting</span></span>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary">Create inspection</button>
+        </div>
+      </form>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+      const PARTS = { '000-228': 'Handle Rhino Prima', '1-1-14-39': 'Steel Fibre 0.4 x 16 mm', '1-1-14-03': 'Pasir Galunggung (Sand)' };
+      document.getElementById('f-part').addEventListener('input', (e) => {
+        document.getElementById('f-name').value = PARTS[e.target.value] || '';
+      });
+      document.getElementById('new-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        location.href = 'inspection-detail.html?new=1';
+      });
+    </script>
+  </body>
+</html>

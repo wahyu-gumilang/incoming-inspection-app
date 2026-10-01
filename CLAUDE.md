@@ -12,17 +12,18 @@ company check sheet **Form No 7.4.3-F1 "Incoming Inspection Check List"**.
 - **Backend (`backend/`):** Node.js, Express 5, MariaDB/MySQL via `mysql2/promise`, CommonJS.
 - **Frontend (`frontend/`):** Angular 22 (standalone components, signals, new control flow, zoneless), Angular Material, Vitest.
 - **Database:** `csi_db` on MariaDB 10.4 (already imported with production-like data).
-- **Docs (`docs/`):** DB dump, generated schema snapshot, and the reference paper forms.
+- **Docs (`docs/`):** DB dump, generated schema snapshot, the reference paper forms, and UI mockups (`docs/design/`).
 - **Roadmap:** `PLAN.md` is the source of truth. Work on the current phase and tick its checkboxes when a task is done.
 
 ### QC workflow the app implements
 
+0. Log in (username + password). Roles: `INSPECTOR`, `CHECKER` (also checks), `ADMIN` (also manages users and master data). Accounts are created by an Admin.
 1. Pick the item (`itemid`, Part no / Part name) and the supplier (`accountnum`).
 2. The standards load automatically from `inventinspectitem`: dimensions (`STD`), `VISUAL`, `FITTING`, `CERTIFIKAT` (COA).
 3. Enter the receipt header per delivery column: P/O No, delivery date, qty received, inspection category (Normal / Reduce / Tightening / no mark = 100 %), measuring instrument.
 4. Enter actual values `actual_1..7`. Each value is judged OK/NG in real time against `standard − tolerance_minus ≤ actual ≤ standard + tolerance_plus` (OK = `1`, NG = `0`).
 5. Final judgment per delivery column: Accepted / Rejected / Concession.
-6. Fill *Inspected by* / *Checked by*, save to `inspecttable` + `inspectline` (+ `inspectlineother`), and print the 7.4.3-F1 PDF.
+6. *Inspected by* / *Checked by* come from the logged-in users; save to `inspecttable` + `inspectline` (+ `inspectlineother`), and print the 7.4.3-F1 PDF.
 
 **Important:** on the paper form, the 7 `Actual | OK/NG` column pairs are the 7 **delivery
 columns**, not 7 samples of one delivery. Column N of `inspectline` (`actual_N`, `status_N`)
@@ -74,7 +75,8 @@ belongs to header column N of `inspecttable` (`purchordernumN`, `deliverydateN`,
 │   │   ├── index.js               # Mounts all routers under /api
 │   │   ├── item.routes.js         # /api/items, /api/items/:itemId/inspect-items
 │   │   ├── vendor.routes.js       # /api/vendors
-│   │   ├── setup.routes.js        # /api/setup/checkers (inspectsetup)
+│   │   ├── auth.routes.js         # /api/auth/login, logout, me
+│   │   ├── user.routes.js         # /api/users (Admin)
 │   │   ├── inspection.routes.js   # /api/inspections, /api/inspections/:inspectnum/...
 │   │   └── report.routes.js       # /api/reports/inspections/:inspectnum/pdf
 │   ├── controllers/               # HTTP only: read req, call a service, send the response
@@ -82,7 +84,7 @@ belongs to header column N of `inspecttable` (`purchordernumN`, `deliverydateN`,
 │   │   └── judgement.js           # Pure OK/NG functions, no DB access
 │   ├── repositories/              # All SQL. One file per table group.
 │   ├── validators/                # Request schemas per resource (Zod)
-│   ├── middlewares/               # validate, error-handler, not-found (*.middleware.js)
+│   ├── middlewares/               # validate, auth (requireAuth / requireRole), error-handler, not-found
 │   ├── constants/                 # Code ↔ meaning maps (inspect category, judgment, inspect type)
 │   ├── utils/                     # app-error.js, response.js, pagination.js
 │   ├── reports/
@@ -97,13 +99,16 @@ belongs to header column N of `inspecttable` (`purchordernumN`, `deliverydateN`,
 └── frontend/                      # Angular app (own package.json)
     └── src/app/
         ├── core/                  # ApiService, interceptors, models (API types)
-        ├── shared/                # Reusable components, pipes, judgement helper
-        └── features/              # items/, vendors/, inspections/, reports/
+        ├── core/layout/navbar/    # Top navbar + profile menu (no sidebar)
+        ├── shared/ui/             # Reusable components: modal, data-table, status-chip, ok-ng-pill, …
+        ├── shared/                # Pipes, judgement helper, AQL helper
+        └── features/              # One folder per menu: auth/login, dashboard, inspections, items, vendors, aql, users, profile
 ```
 
 - Request flow: `route → validate → controller → service → repository → db`. Each layer calls only the layer below it.
 - Backend file names are kebab-case with a role suffix: `vendor.controller.js`, `vendor.service.js`, `vendor.repository.js`, `error-handler.middleware.js`. Files in `utils/`, `constants/`, `scripts/` and `reports/` are plain kebab-case (`app-error.js`, `dump-schema.js`); the class inside can still be `AppError`.
 - Frontend follows the Angular 22 CLI naming style: no type suffix in file or class names (`inspection-form.ts` → `InspectionForm`, `vendor.service.ts` → `VendorService`, specs next to the file as `*.spec.ts`). Generate with `ng generate` so new files match.
+- **One folder per page and per reusable piece, each with its own files:** every component has a separate `.ts`, `.html` and `.scss` (`templateUrl` / `styleUrl`; no inline `template` or `styles`). Pages live in `features/<menu>/` (e.g. `features/dashboard/dashboard.ts|html|scss`); anything used on more than one page (modal, data table, status chip, OK/NG pill) lives in `shared/ui/<name>/`. Global design tokens live in `src/styles/` and are the only global styles.
 - Only create a folder when the first file needs it.
 
 ## Commands
@@ -175,7 +180,7 @@ feedback; the value saved by the server is authoritative.
   - Compare in integer hundredths (values are `decimal(18,2)`), never with raw float `<=`.
   - Empty actual → status `NULL` (not measured), never NG.
 - **Qualitative lines** (`VISUAL`, `FITTING`, `CERTIFIKAT`): the inspector sets OK/NG directly; `CERTIFIKAT` also records the COA number as the actual text.
-- **Per delivery column N:** `notgoodN` = number of NG values in column N (across all lines), shown as *NG / Total sample*. The final `judgmentN` is a human decision; the server rejects `Accepted` when `notgoodN > 0` (`422`), and requires a used column to have a judgment before submit.
+- **Per delivery column N (AQL, `PLAN.md` §2.4):** the AQL plan gives `samplesizeN`, `acceptnumN` (Ac) and `rejectnumN` (Re) from `qty_receivedN` and `inspectcategoryN`, recomputed by the server on every save and snapshotted on the inspection. `notgoodN` = defective **pieces** in the sample (not NG cells), entered by the inspector and never `0` while column N has an NG value; shown as *NG / Total sample*. The system suggests O (`notgoodN ≤ Ac`) or X (`notgoodN ≥ Re`); the final `judgmentN` is a human decision, but the server rejects `Accepted` when `notgoodN > Ac` and `Concession` without a note or below Re (`422`), and requires a used column to have a judgment before submit. AQL tables live in `aqlplan` / `aqlplanrow`, editable by Admins; never hard-code sample sizes.
 - **Code maps** live only in `backend/constants/` and are mirrored in `frontend/src/app/core/models/`. Never write magic numbers such as `judgment = 2` in services or components. The agreed values are recorded in `PLAN.md` §3.
 - **Snapshot:** a new inspection copies standard, tolerance texts and numbers from `inventinspectitem` into its lines. Editing the master never changes saved inspections.
 - A header and all its lines (`inspecttable` + `inspectline` + `inspectlineother`) are written in **one transaction**.
@@ -218,11 +223,15 @@ Rules:
   - `201`: create
   - `204`: delete, with no body
   - `400`: validation failed
+  - `401`: not logged in, or bad credentials on login
+  - `403`: logged in but the role isn't allowed
   - `404`: not found
   - `409`: duplicate key or wrong status for the action
   - `422`: business rule violation
+  - `429`: too many login attempts
   - `500`: unexpected error
-- **Error codes** are UPPER_SNAKE constants: `VALIDATION_ERROR`, `NOT_FOUND`, `DUPLICATE_KEY`, `INVALID_STATUS`, `BUSINESS_RULE`, `INTERNAL_ERROR`.
+- **Error codes** are UPPER_SNAKE constants: `VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOUND`, `DUPLICATE_KEY`, `INVALID_STATUS`, `BUSINESS_RULE`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`.
+- **Auth:** every `/api` route requires a login except `GET /api/health` and `POST /api/auth/login`. The session is a JWT in an `httpOnly` cookie; never put tokens in `localStorage` or in responses. Never return `password_hash`.
 - Never send stack traces or SQL errors to the client. Log them on the server and return `INTERNAL_ERROR`.
 - **Field names** in JSON match the `csi_db` column names (lowercase, e.g. `itemid`, `accountnum`, `inspectdate`, `deliverydate1`, `tolerance_plus`). Don't rename them to camelCase, so the frontend, API and DB all use the same names.
 - **Keys that aren't DB columns** (nested collections, computed values, query parameters) are camelCase: `inspectItems`, `lines`, `otherLines`, `totalReceived`, `?dateFrom=&dateTo=`. Never give a computed key the same name as a real column.
@@ -259,12 +268,17 @@ Rules:
 - Formatting: Prettier (same settings as the backend), angular-eslint.
 - Styling: Angular Material (M3) with its `--mat-sys-*` CSS variables; no other UI kit. Fonts and icons are bundled from npm (`@fontsource/roboto`, `material-symbols`), never loaded from a CDN, because the plant network may have no internet.
 - UI language is English, matching the labels on Form 7.4.3-F1 (*Part name*, *Supplier name*, *Inspected by*).
+- **Design:** follow the approved mockups in `docs/design/mockups/` (one HTML + CSS file per page, mirroring the Angular features) and the tokens from Phase 3.0. Brand blue `#004F9C`; extra accent colors are fine if they don't clash with it. The logo sits on a light surface (white negative version on dark/brand surfaces), never on a colored bar. Modern look, light and dark mode.
+  - **Navigation:** one top navbar (logo, menu, API status, profile menu). No sidebar. On narrow screens the menu folds into a ☰ panel.
+  - **One function, one place:** theme only in the profile menu; name, email and password only on Profile settings; "New inspection" only on the Inspections page. No icons without a function.
+  - **Every new entry or edit goes through a modal** (full-screen on phones): new inspection, add/edit delivery with its measurements, users, items, vendors, AQL rows. The Form 7.4.3-F1 check sheet is a read-only view of the inspection and keeps the form's structure.
+  - **Login** is a separate page without the navbar; Logout in the profile menu is the only way back to it.
 
 ### Both
 - Keep comments for the *why*. No commented-out code.
 - **Tests:**
   - Backend: Jest + Supertest. `judgement.js` and every service with business logic get unit tests (limits, `Min`/`Max`, empty values, decimal edges). Every endpoint gets an integration test for the success path and the main error paths, against `csi_db_test`.
-  - Frontend: unit tests for services and the judgement helper, component tests for the inspection grid, one Playwright E2E smoke test of the full flow.
+  - Frontend: unit tests for services and the judgement helper, component tests for the delivery modal (OK/NG, AQL, judgment rules), one Playwright E2E smoke test of the full flow.
 
 ## Git rules
 

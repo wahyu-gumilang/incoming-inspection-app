@@ -1,0 +1,48 @@
+/* inspections.css — features/inspections/inspection-list (+ new-inspection-dialog) */
+
+.cols-dots {
+  display: inline-flex;
+  gap: 3px;
+  vertical-align: middle;
+}
+
+.cols-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--border-strong);
+}
+
+.cols-dots i.ok {
+  background: var(--ok);
+}
+
+.cols-dots i.ng {
+  background: var(--ng);
+}
+
+.cols-dots i.c {
+  background: var(--amber);
+}
+
+.preview-std {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--brand-50);
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.preview-std .icon {
+  font-size: 20px;
+}
+
+.preview-std .counts {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
