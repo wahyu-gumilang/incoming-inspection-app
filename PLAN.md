@@ -265,17 +265,19 @@ Goal: a QC inspector can fill the whole check sheet in the browser as fast as on
 ### 3.0 UI/UX foundation (design first, then code)
 Agreed direction (2026-10-01): as modern as possible; brand colors from the Chubbsafes logo (`#004F9C` blue, `#1D1D1D` text) with extra accents that don't clash; the logo always sits on a light (or, in dark mode, dark) surface, never on a colored bar; tables follow Form 7.4.3-F1 and may be prettier but must not drift from it.
 
-- [~] **Mockups** in `docs/design/mockups/` (static HTML, opened in a browser), approved by the owner before any screen is coded:
-  - Login (brand panel with the white logo + sign-in form)
-  - App shell: header with logo, page title, API status, profile menu; collapsible sidebar
+- [~] **Mockups** in `docs/design/mockups/`, approved by the owner before any screen is coded. One HTML + CSS file per page (`login`, `dashboard`, `inspections`, `inspection-detail`, `items`, `vendors`, `aql`, `users`, `profile`), shared `css/base.css` (tokens), `css/components.css`, `css/navbar.css`, `js/app.js` (navbar, profile menu, theme, modal), mirroring the Angular folders:
+  - Login as its own page (brand panel with the white logo + sign-in form); Logout returns to it
+  - Top navbar only (logo, menu, API status, profile menu with Profile settings / Theme / Logout); no sidebar
   - Dashboard: KPI cards, NG chart, recent inspections, inspections waiting for check
-  - Inspection list, inspection form (check-sheet grid), user management with an add-user dialog, profile settings
+  - Inspections list with a "New inspection" modal; inspection detail = read-only Form 7.4.3-F1 check sheet, deliveries added and edited in a step-by-step modal (delivery + AQL → measurements → result)
+  - Items, Vendors, AQL table, Users (each with its own add/edit modal), Profile settings
   - Light and dark mode; desktop, tablet and phone widths
+  - Review 1 (2026-10-01): sidebar + header was two navigations → top navbar only; theme was in three places → profile menu only; typing into the big grid was hard → modals; login shared the app shell → separate page
 - [ ] Design tokens: palette (brand, neutrals, OK/NG/warning/info), Inter font bundled from npm, radius, elevation, spacing, motion; mapped onto Angular Material's `--mat-sys-*` variables
 - [ ] Light / dark / system theme, saved per user (`usertable.theme`)
 - [ ] Logos in `frontend/public/brand/` (original for light surfaces, white negative for dark/brand surfaces)
-- [ ] Layout: header (logo, page title, API status, profile menu with avatar initials → Profile settings, Change password, Theme, Logout); sidebar that collapses to an icon rail on desktop (state remembered) and becomes an overlay drawer below 960px; smooth open/close transitions
-- [ ] Dialogs: centered with a backdrop on desktop, full-screen below 600px, closable with Esc / ✕, focus trapped and restored
+- [ ] Layout: top navbar only (logo, main menu with a "Master data" dropdown, API status, profile menu → Profile settings, Theme, Logout); below 960px the menu folds into a ☰ panel; smooth open/close transitions. Every component in its own `.ts` / `.html` / `.scss`
+- [ ] Dialogs (`shared/ui/modal`): the only way to create or edit records; centered with a backdrop on desktop, full-screen below 600px, closable with Esc / ✕, focus trapped and restored
 - [ ] Shared look for tables, forms, buttons, OK/NG and status chips, empty / loading / error states, toasts
 - [ ] Login page, auth guard (redirect to login, then back), `must_change_password` flow, role-based menu
 - [ ] Profile settings page (name, email, theme, change password)
@@ -297,10 +299,11 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 ### 3.3 Inspection form (mirrors Form 7.4.3-F1)
 - [ ] **Header:** Part name / Part no (item lookup), Supplier (vendor lookup), inspect date, measuring instrument
 - [ ] Choosing the item loads `/api/inspections/template` and fills the lines; changing the item on a filled form asks for confirmation
-- [ ] **Grid:** rows = `STD` lines (No, Item, Standard, Tolerance), then Certificate No, Visual, Fitting; columns = 7 delivery columns of `Actual | OK/NG`
-  - Numeric input with 2 decimals; OK/NG cell updates as you type, NG highlighted red
-  - Qualitative rows: OK/NG toggle; Certificate row: COA number text + OK/NG
-  - Keyboard: Enter moves down within a column (the way QC measures one delivery), Tab moves right
+- [ ] **Check sheet (read-only view):** rows = `STD` lines (No, Item, Standard, Tolerance), then Certificate No, Visual, Fitting; columns = 7 delivery columns of `Actual | OK/NG`; NG highlighted red
+- [ ] **Delivery modal** (add, or click a filled column to edit), three steps:
+  1. P/O No, delivery date, QTY received, category → AQL sample / Ac / Re shown live
+  2. Measurements: one row per characteristic (Standard, Tolerance, Actual) with OK/NG as you type; Visual / Fitting OK/NG toggles; COA number + OK/NG. Enter moves to the next row
+  3. Result: NG pieces (prefilled from step 2), suggested judgment, O / X / C, concession note, QF No
 - [ ] **Footer rows per column:** P/O No, Delivery date, QTY received / Insp. category (N / R / T / 100 %), **Sample (AQL)** shown live (n, Ac, Re), NG / Total sample (NG pcs entered, prefilled from the grid; total from AQL), Judgment (O / X / C, with the system's suggestion highlighted), QF No
 - [ ] Validation mirrors the server: unused columns disabled until the previous one is used, required fields per used column, `Accepted` disabled when NG > Ac, `Concession` only when NG ≥ Re and with a note
 - [ ] Save draft (and autosave per column), unsaved-changes guard, server values replace local ones after each save
@@ -309,7 +312,7 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 
 ### 3.4 Frontend quality
 - [ ] Unit tests: services, `judgement.ts` (shared fixture), form validators
-- [ ] Component test for the grid: typing an out-of-tolerance value marks NG and increments NG / Total sample
+- [ ] Component test for the delivery modal: typing an out-of-tolerance value marks NG, prefills NG pieces and blocks Accepted above Ac
 - [ ] Responsive: phone, tablet on the receiving floor (landscape) and desktop
 
 **Phase 3 done when:** an inspector can log in, create, fill and save an inspection matching the filled example in `docs/chek sheet-qhse (cara isi).pdf`, with OK/NG identical to the server's result, in the approved design.

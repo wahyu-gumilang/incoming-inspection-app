@@ -99,13 +99,16 @@ belongs to header column N of `inspecttable` (`purchordernumN`, `deliverydateN`,
 └── frontend/                      # Angular app (own package.json)
     └── src/app/
         ├── core/                  # ApiService, interceptors, models (API types)
-        ├── shared/                # Reusable components, pipes, judgement helper
-        └── features/              # items/, vendors/, inspections/, reports/
+        ├── core/layout/navbar/    # Top navbar + profile menu (no sidebar)
+        ├── shared/ui/             # Reusable components: modal, data-table, status-chip, ok-ng-pill, …
+        ├── shared/                # Pipes, judgement helper, AQL helper
+        └── features/              # One folder per menu: auth/login, dashboard, inspections, items, vendors, aql, users, profile
 ```
 
 - Request flow: `route → validate → controller → service → repository → db`. Each layer calls only the layer below it.
 - Backend file names are kebab-case with a role suffix: `vendor.controller.js`, `vendor.service.js`, `vendor.repository.js`, `error-handler.middleware.js`. Files in `utils/`, `constants/`, `scripts/` and `reports/` are plain kebab-case (`app-error.js`, `dump-schema.js`); the class inside can still be `AppError`.
 - Frontend follows the Angular 22 CLI naming style: no type suffix in file or class names (`inspection-form.ts` → `InspectionForm`, `vendor.service.ts` → `VendorService`, specs next to the file as `*.spec.ts`). Generate with `ng generate` so new files match.
+- **One folder per page and per reusable piece, each with its own files:** every component has a separate `.ts`, `.html` and `.scss` (`templateUrl` / `styleUrl`; no inline `template` or `styles`). Pages live in `features/<menu>/` (e.g. `features/dashboard/dashboard.ts|html|scss`); anything used on more than one page (modal, data table, status chip, OK/NG pill) lives in `shared/ui/<name>/`. Global design tokens live in `src/styles/` and are the only global styles.
 - Only create a folder when the first file needs it.
 
 ## Commands
@@ -265,13 +268,17 @@ Rules:
 - Formatting: Prettier (same settings as the backend), angular-eslint.
 - Styling: Angular Material (M3) with its `--mat-sys-*` CSS variables; no other UI kit. Fonts and icons are bundled from npm (`@fontsource/roboto`, `material-symbols`), never loaded from a CDN, because the plant network may have no internet.
 - UI language is English, matching the labels on Form 7.4.3-F1 (*Part name*, *Supplier name*, *Inspected by*).
-- **Design:** follow the approved mockups in `docs/design/mockups/` and the tokens from Phase 3.0. Brand blue `#004F9C`; extra accent colors are fine if they don't clash with it. The logo sits on a light surface (white negative version on dark/brand surfaces), never on a colored bar. Modern look, light and dark mode, collapsible sidebar, dialogs full-screen on phones. Check-sheet tables keep the structure of Form 7.4.3-F1.
+- **Design:** follow the approved mockups in `docs/design/mockups/` (one HTML + CSS file per page, mirroring the Angular features) and the tokens from Phase 3.0. Brand blue `#004F9C`; extra accent colors are fine if they don't clash with it. The logo sits on a light surface (white negative version on dark/brand surfaces), never on a colored bar. Modern look, light and dark mode.
+  - **Navigation:** one top navbar (logo, menu, API status, profile menu). No sidebar. On narrow screens the menu folds into a ☰ panel.
+  - **One function, one place:** theme only in the profile menu; name, email and password only on Profile settings; "New inspection" only on the Inspections page. No icons without a function.
+  - **Every new entry or edit goes through a modal** (full-screen on phones): new inspection, add/edit delivery with its measurements, users, items, vendors, AQL rows. The Form 7.4.3-F1 check sheet is a read-only view of the inspection and keeps the form's structure.
+  - **Login** is a separate page without the navbar; Logout in the profile menu is the only way back to it.
 
 ### Both
 - Keep comments for the *why*. No commented-out code.
 - **Tests:**
   - Backend: Jest + Supertest. `judgement.js` and every service with business logic get unit tests (limits, `Min`/`Max`, empty values, decimal edges). Every endpoint gets an integration test for the success path and the main error paths, against `csi_db_test`.
-  - Frontend: unit tests for services and the judgement helper, component tests for the inspection grid, one Playwright E2E smoke test of the full flow.
+  - Frontend: unit tests for services and the judgement helper, component tests for the delivery modal (OK/NG, AQL, judgment rules), one Playwright E2E smoke test of the full flow.
 
 ## Git rules
 
