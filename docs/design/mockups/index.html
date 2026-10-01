@@ -1,0 +1,1112 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Incoming Inspection · UI Mockup</title>
+<!-- Mockup only: fonts/icons from Google Fonts. The real app bundles them from npm. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet" />
+<style>
+/* ============ Design tokens ============ */
+:root {
+  /* Brand (sampled from the Chubbsafes logo) */
+  --brand: #004f9c;
+  --brand-600: #003f7d;
+  --brand-700: #00325f;
+  --brand-50: #eaf2fb;
+  --brand-100: #d4e4f6;
+  --ink: #1d1d1d;
+
+  /* Accents that sit next to the brand blue without clashing */
+  --sky: #0ea5e9;
+  --teal: #0d9488;
+  --amber: #f59e0b;
+  --violet: #7c3aed;
+
+  /* Status */
+  --ok: #15803d;      --ok-bg: #dcfce7;
+  --ng: #dc2626;      --ng-bg: #fee2e2;
+  --warn: #b45309;    --warn-bg: #fef3c7;
+  --info: #0369a1;    --info-bg: #e0f2fe;
+
+  /* Neutrals (light) */
+  --bg: #f4f6fa;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --surface-sunk: #f1f4f8;   /* grey "Actual" cells, like the paper form */
+  --border: #e3e8ef;
+  --border-strong: #cfd7e3;
+  --text: #0f172a;
+  --text-2: #475569;
+  --text-3: #94a3b8;
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow-1: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .04);
+  --shadow-2: 0 8px 24px rgba(15, 23, 42, .08), 0 2px 6px rgba(15, 23, 42, .04);
+  --shadow-3: 0 24px 60px rgba(15, 23, 42, .22);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --sidebar: 264px;
+  --rail: 76px;
+  --header: 68px;
+}
+[data-theme="dark"] {
+  --brand: #4b93e6;          /* lighter brand blue for contrast on dark */
+  --brand-600: #6aa8f0;
+  --brand-700: #8dbdf5;
+  --brand-50: rgba(75, 147, 230, .14);
+  --brand-100: rgba(75, 147, 230, .24);
+  --ok: #4ade80;   --ok-bg: rgba(74, 222, 128, .14);
+  --ng: #f87171;   --ng-bg: rgba(248, 113, 113, .16);
+  --warn: #fbbf24; --warn-bg: rgba(251, 191, 36, .14);
+  --info: #38bdf8; --info-bg: rgba(56, 189, 248, .14);
+  --bg: #0b1220;
+  --surface: #111a2c;
+  --surface-2: #0f1727;
+  --surface-sunk: #17233a;
+  --border: #1f2c44;
+  --border-strong: #2b3b58;
+  --text: #e7ecf4;
+  --text-2: #a3b1c6;
+  --text-3: #6b7a93;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .3);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, .35);
+  --shadow-3: 0 24px 60px rgba(0, 0, 0, .55);
+}
+
+/* ============ Base ============ */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  transition: background .25s var(--ease), color .25s var(--ease);
+}
+.icon {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal; font-style: normal; font-size: 22px; line-height: 1;
+  display: inline-block; white-space: nowrap; direction: ltr;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  user-select: none;
+}
+.icon.fill { font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24; }
+button { font: inherit; color: inherit; }
+a { color: var(--brand); text-decoration: none; }
+h1, h2, h3 { margin: 0; letter-spacing: -.01em; }
+.muted { color: var(--text-2); }
+.subtle { color: var(--text-3); }
+.mono { font-variant-numeric: tabular-nums; }
+
+/* ============ Buttons & inputs ============ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid transparent;
+  font-weight: 600; cursor: pointer; white-space: nowrap;
+  transition: background .15s var(--ease), box-shadow .15s var(--ease), transform .08s, border-color .15s;
+}
+.btn:active { transform: translateY(1px); }
+.btn .icon { font-size: 20px; }
+.btn-primary { background: var(--brand); color: #fff; box-shadow: 0 1px 2px rgba(0, 79, 156, .25), inset 0 1px 0 rgba(255, 255, 255, .12); }
+.btn-primary:hover { background: var(--brand-600); }
+[data-theme="dark"] .btn-primary { color: #04162b; }
+.btn-ghost { background: transparent; color: var(--text-2); }
+.btn-ghost:hover { background: var(--surface-sunk); color: var(--text); }
+.btn-outline { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); }
+.btn-danger { background: var(--ng-bg); color: var(--ng); }
+.icon-btn {
+  width: 40px; height: 40px; display: inline-grid; place-items: center;
+  border-radius: 10px; border: 0; background: transparent; color: var(--text-2); cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.icon-btn:hover { background: var(--surface-sunk); color: var(--text); }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 2px; border-radius: 10px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; color: var(--text-2); }
+.input, .select {
+  height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--border-strong);
+  background: var(--surface); color: var(--text); font: inherit; width: 100%;
+  transition: border-color .15s, box-shadow .15s;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-50); }
+.input-icon { position: relative; }
+.input-icon .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-3); font-size: 20px; }
+.input-icon .input { padding-left: 42px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px;
+  border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.chip .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip-ok { background: var(--ok-bg); color: var(--ok); }
+.chip-ng { background: var(--ng-bg); color: var(--ng); }
+.chip-warn { background: var(--warn-bg); color: var(--warn); }
+.chip-info { background: var(--info-bg); color: var(--info); }
+.chip-brand { background: var(--brand-50); color: var(--brand); }
+.chip-neutral { background: var(--surface-sunk); color: var(--text-2); }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+}
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px 0; }
+.card-head h3 { font-size: 15px; font-weight: 600; }
+.card-body { padding: 16px 20px 20px; }
+
+/* ============ Login ============ */
+.login { display: none; min-height: 100vh; grid-template-columns: 1.05fr 1fr; }
+body[data-screen="login"] .login { display: grid; }
+body[data-screen="login"] .app { display: none; }
+.login-brand {
+  position: relative; overflow: hidden; color: #fff; padding: 48px 56px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  background:
+    radial-gradient(1200px 600px at -10% -20%, #1f6fc4 0%, transparent 60%),
+    radial-gradient(900px 500px at 120% 120%, #0ea5e9 0%, transparent 55%),
+    linear-gradient(160deg, #004f9c 0%, #003a74 60%, #00284f 100%);
+}
+.login-brand::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, .09) 1px, transparent 1px);
+  background-size: 22px 22px; mask-image: linear-gradient(to bottom, #000, transparent 85%);
+}
+.login-brand img { width: 240px; position: relative; z-index: 1; }
+.login-brand .hero { position: relative; z-index: 1; max-width: 460px; }
+.login-brand .hero h1 { font-size: 36px; line-height: 1.15; font-weight: 700; margin-bottom: 14px; }
+.login-brand .hero p { color: rgba(255, 255, 255, .78); font-size: 15px; margin: 0; }
+.login-brand .feature-list { position: relative; z-index: 1; display: grid; gap: 12px; margin-top: 32px; }
+.login-brand .feature { display: flex; gap: 12px; align-items: center; color: rgba(255, 255, 255, .9); }
+.login-brand .feature .icon { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: rgba(255, 255, 255, .12); font-size: 20px; }
+.login-brand footer { position: relative; z-index: 1; color: rgba(255, 255, 255, .6); font-size: 12px; }
+.login-form-wrap { display: grid; place-items: center; padding: 32px; background: var(--surface); }
+.login-form { width: 100%; max-width: 380px; display: grid; gap: 18px; }
+.login-form .logo-mobile { display: none; width: 180px; margin-bottom: 8px; }
+.login-form h2 { font-size: 26px; font-weight: 700; }
+.login-form .remember { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+.login-form .hint { font-size: 12px; color: var(--text-3); text-align: center; }
+.pw-wrap { position: relative; }
+.pw-wrap .icon-btn { position: absolute; right: 2px; top: 1px; }
+
+/* ============ App shell ============ */
+.app { display: grid; grid-template-columns: var(--sidebar) 1fr; min-height: 100vh; transition: grid-template-columns .28s var(--ease); }
+body.collapsed .app { grid-template-columns: var(--rail) 1fr; }
+
+.sidebar {
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; z-index: 30;
+  transition: transform .28s var(--ease), width .28s var(--ease);
+}
+.sidebar .brand { height: var(--header); display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
+.sidebar .brand img { height: 34px; transition: opacity .2s; }
+.sidebar .brand .logo-dark { display: none; }
+[data-theme="dark"] .sidebar .brand .logo-light { display: none; }
+[data-theme="dark"] .sidebar .brand .logo-dark { display: block; }
+.sidebar .brand .mark { display: none; width: 36px; height: 36px; border-radius: 10px; background: var(--brand); color: #fff; font-weight: 800; place-items: center; font-size: 18px; }
+body.collapsed .sidebar .brand { justify-content: center; padding: 0; }
+body.collapsed .sidebar .brand img { display: none !important; }
+body.collapsed .sidebar .brand .mark { display: grid; }
+
+.nav { flex: 1; overflow-y: auto; padding: 14px 12px; }
+.nav-section { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); padding: 14px 12px 6px; white-space: nowrap; }
+body.collapsed .nav-section { visibility: hidden; height: 14px; padding: 6px 0; }
+.nav a {
+  position: relative; display: flex; align-items: center; gap: 12px; height: 42px; padding: 0 12px; margin: 2px 0;
+  border-radius: 10px; color: var(--text-2); font-weight: 500; white-space: nowrap; transition: background .15s, color .15s;
+}
+.nav a:hover { background: var(--surface-sunk); color: var(--text); }
+.nav a.active { background: var(--brand-50); color: var(--brand); font-weight: 600; }
+.nav a.active::before { content: ""; position: absolute; left: -12px; top: 9px; bottom: 9px; width: 4px; border-radius: 0 4px 4px 0; background: var(--brand); }
+.nav a .badge { margin-left: auto; font-size: 11px; font-weight: 700; background: var(--amber); color: #3b2300; border-radius: 999px; padding: 1px 8px; }
+body.collapsed .nav a { justify-content: center; padding: 0; }
+body.collapsed .nav a .label, body.collapsed .nav a .badge { display: none; }
+body.collapsed .nav a .icon { font-size: 24px; }
+.sidebar-foot { padding: 12px; border-top: 1px solid var(--border); }
+.sidebar-foot .btn { width: 100%; justify-content: flex-start; color: var(--text-2); }
+body.collapsed .sidebar-foot .btn { justify-content: center; padding: 0; }
+body.collapsed .sidebar-foot .btn .label { display: none; }
+body.collapsed .sidebar-foot .btn .icon { transform: rotate(180deg); }
+
+.main { min-width: 0; display: flex; flex-direction: column; }
+.header {
+  position: sticky; top: 0; z-index: 20; height: var(--header);
+  display: flex; align-items: center; gap: 12px; padding: 0 24px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: saturate(1.4) blur(12px); border-bottom: 1px solid var(--border);
+}
+.header .menu-btn { display: none; }
+.crumbs { display: flex; flex-direction: column; min-width: 0; }
+.crumbs .path { font-size: 12px; color: var(--text-3); white-space: nowrap; }
+.crumbs .title { font-size: 18px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.header .spacer { flex: 1; }
+.api-chip { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px; border-radius: 999px; background: var(--ok-bg); color: var(--ok); font-weight: 600; font-size: 12px; }
+.api-chip .pulse { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 0 currentColor; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 50%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.notif { position: relative; }
+.notif::after { content: ""; position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--ng); border: 2px solid var(--surface); }
+
+.profile { position: relative; }
+.profile-btn { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 8px 0 4px; border: 1px solid var(--border); background: var(--surface); border-radius: 999px; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.profile-btn:hover { border-color: var(--border-strong); box-shadow: var(--shadow-1); }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; color: #fff; background: linear-gradient(135deg, var(--brand), var(--sky)); flex-shrink: 0; }
+.avatar.lg { width: 64px; height: 64px; font-size: 22px; }
+.profile-btn .who { display: flex; flex-direction: column; line-height: 1.15; text-align: left; }
+.profile-btn .who b { font-size: 13px; }
+.profile-btn .who span { font-size: 11px; color: var(--text-3); }
+.menu {
+  position: absolute; right: 0; top: calc(100% + 8px); width: 280px; padding: 8px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-2);
+  opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top right; pointer-events: none;
+  transition: opacity .16s var(--ease), transform .16s var(--ease);
+}
+.menu.open { opacity: 1; transform: none; pointer-events: auto; }
+.menu .menu-head { display: flex; gap: 12px; align-items: center; padding: 10px 10px 14px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+.menu .menu-head b { display: block; }
+.menu .item { display: flex; align-items: center; gap: 12px; width: 100%; height: 40px; padding: 0 10px; border: 0; background: transparent; border-radius: 8px; cursor: pointer; color: var(--text); text-align: left; }
+.menu .item:hover { background: var(--surface-sunk); }
+.menu .item .icon { color: var(--text-2); font-size: 20px; }
+.menu .item.danger, .menu .item.danger .icon { color: var(--ng); }
+.menu .sep { height: 1px; background: var(--border); margin: 6px 0; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; background: var(--surface-sunk); border-radius: 10px; margin: 4px 0; }
+.seg button { height: 32px; border: 0; border-radius: 7px; background: transparent; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-2); display: flex; gap: 4px; align-items: center; justify-content: center; }
+.seg button .icon { font-size: 16px; }
+.seg button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow-1); }
+
+.content { padding: 24px; max-width: 1440px; width: 100%; margin: 0 auto; }
+.page { display: none; animation: fadeUp .35s var(--ease); }
+.page.active { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+.page-head h1 { font-size: 24px; font-weight: 700; }
+.page-head p { margin: 4px 0 0; color: var(--text-2); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.scrim { position: fixed; inset: 0; background: rgba(2, 8, 23, .45); backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity .25s var(--ease); z-index: 25; }
+
+/* ============ Dashboard ============ */
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+.kpi { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
+.kpi .top { display: flex; align-items: center; justify-content: space-between; }
+.kpi .k-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; }
+.kpi .k-icon .icon { font-size: 22px; }
+.kpi .label { color: var(--text-2); font-weight: 500; }
+.kpi .value { font-size: 28px; font-weight: 700; letter-spacing: -.02em; }
+.kpi .delta { font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 2px; }
+.kpi .delta.up { color: var(--ok); } .kpi .delta.down { color: var(--ng); }
+.kpi .spark { position: absolute; right: 0; bottom: 0; opacity: .9; }
+.grid-2 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin-bottom: 16px; }
+.legend { display: flex; gap: 14px; font-size: 12px; color: var(--text-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.bar-row { display: grid; grid-template-columns: 150px 1fr 56px; gap: 12px; align-items: center; padding: 8px 0; }
+.bar-row .name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { height: 10px; border-radius: 999px; background: var(--surface-sunk); overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 999px; }
+.pending-item { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); }
+.pending-item:last-child { border-bottom: 0; }
+.pending-item .what { flex: 1; min-width: 0; }
+.pending-item .what b { display: block; }
+.pending-item .what span { font-size: 12px; color: var(--text-3); }
+
+/* ============ Tables ============ */
+.table-wrap { overflow: auto; border-radius: 0 0 var(--radius) var(--radius); }
+table.data { width: 100%; border-collapse: separate; border-spacing: 0; }
+table.data th {
+  position: sticky; top: 0; z-index: 1; text-align: left; font-size: 12px; font-weight: 600; color: var(--text-2);
+  background: var(--surface-2); padding: 12px 16px; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+table.data td { padding: 14px 16px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.data tbody tr { transition: background .12s; }
+table.data tbody tr:hover { background: var(--surface-2); }
+table.data tbody tr:last-child td { border-bottom: 0; }
+.cell-strong { font-weight: 600; }
+.cell-sub { display: block; font-size: 12px; color: var(--text-3); }
+.toolbar { display: flex; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+.toolbar .grow { flex: 1; min-width: 220px; }
+.filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-chips button { height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-2); }
+.filter-chips button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+[data-theme="dark"] .filter-chips button.on { color: #04162b; }
+.pager { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-top: 1px solid var(--border); color: var(--text-2); font-size: 13px; flex-wrap: wrap; gap: 8px; }
+.pager .pages { display: flex; gap: 4px; }
+.pager .pages button { min-width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-weight: 600; }
+.pager .pages button.on { background: var(--brand-50); color: var(--brand); border-color: var(--brand-100); }
+.cols-dots { display: inline-flex; gap: 3px; }
+.cols-dots i { width: 8px; height: 8px; border-radius: 2px; background: var(--border-strong); }
+.cols-dots i.ok { background: var(--ok); } .cols-dots i.ng { background: var(--ng); } .cols-dots i.c { background: var(--amber); }
+
+/* ============ Inspection form (Form 7.4.3-F1) ============ */
+.form-banner { display: grid; grid-template-columns: auto 1fr auto; gap: 20px; align-items: center; padding: 18px 20px; margin-bottom: 16px; }
+.form-banner .doc { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding-right: 20px; border-right: 1px solid var(--border); }
+.form-banner .doc .formno { font-size: 12px; color: var(--text-3); font-weight: 600; }
+.form-banner .doc b { font-size: 18px; }
+.meta-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 20px; }
+.meta-grid .field .input, .meta-grid .field .select { height: 40px; }
+.meta-ro { display: flex; flex-direction: column; gap: 2px; }
+.meta-ro span { font-size: 12px; font-weight: 600; color: var(--text-3); }
+.meta-ro b { font-weight: 600; }
+
+.sheet-card { margin-bottom: 96px; }
+.sheet-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-2); padding: 12px 20px; border-top: 1px solid var(--border); background: var(--surface-2); border-radius: 0 0 var(--radius) var(--radius); }
+.sheet-wrap { overflow: auto; max-height: 70vh; }
+table.sheet { border-collapse: separate; border-spacing: 0; min-width: 1240px; width: 100%; font-size: 13px; }
+table.sheet th, table.sheet td { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 0; height: 40px; text-align: center; }
+table.sheet thead th { position: sticky; z-index: 3; background: var(--surface-2); font-weight: 600; color: var(--text-2); font-size: 12px; }
+table.sheet thead tr:first-child th { top: 0; height: 36px; }
+table.sheet thead tr:nth-child(2) th { top: 36px; height: 34px; }
+table.sheet .group-dim { background: var(--brand-50); color: var(--brand); text-transform: uppercase; letter-spacing: .06em; font-size: 11px; }
+table.sheet .group-res { background: var(--brand-50); color: var(--brand); text-transform: uppercase; letter-spacing: .06em; font-size: 11px; }
+table.sheet .col-head { line-height: 1.2; }
+table.sheet .col-head small { display: block; font-weight: 500; color: var(--text-3); font-size: 11px; }
+/* sticky left columns: No, Item, Standard, Tolerance */
+.sx { position: sticky; z-index: 2; background: var(--surface); }
+thead .sx { z-index: 4; background: var(--surface-2); }
+.sx0 { left: 0; width: 48px; min-width: 48px; }
+.sx1 { left: 48px; width: 150px; min-width: 150px; text-align: left !important; padding: 0 12px !important; }
+.sx2 { left: 198px; width: 110px; min-width: 110px; }
+.sx3 { left: 308px; width: 110px; min-width: 110px; box-shadow: 6px 0 8px -6px rgba(15, 23, 42, .18); }
+td.sx1 { font-weight: 600; }
+.sxspan { left: 0; box-shadow: 6px 0 8px -6px rgba(15, 23, 42, .18); }
+td.sx2 { font-variant-numeric: tabular-nums; font-weight: 600; }
+td.sx3 { color: var(--text-2); font-variant-numeric: tabular-nums; }
+td.act { background: var(--surface-sunk); min-width: 92px; }
+td.act input {
+  width: 100%; height: 39px; border: 0; background: transparent; text-align: center; font: inherit; font-weight: 600;
+  font-variant-numeric: tabular-nums; color: var(--text);
+}
+td.act input:focus { outline: none; background: var(--surface); box-shadow: inset 0 0 0 2px var(--brand); }
+td.act.is-ng { background: var(--ng-bg); }
+td.act.is-ng input { color: var(--ng); }
+td.okng { min-width: 56px; }
+.okng-pill { display: inline-grid; place-items: center; min-width: 38px; height: 24px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: .04em; }
+.okng-pill.ok { background: var(--ok-bg); color: var(--ok); }
+.okng-pill.ng { background: var(--ng); color: #fff; }
+.okng-pill.none { color: var(--text-3); }
+.unused { opacity: .38; }
+tr.section td { background: var(--surface-2); font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .08em; text-align: left; padding: 0 12px; height: 30px; }
+tr.foot th { text-align: right !important; padding: 0 12px !important; font-size: 12px; font-weight: 600; color: var(--text-2); background: var(--surface-2); }
+tr.foot td { padding: 4px 6px; }
+tr.foot td input, tr.foot td select {
+  width: 100%; height: 30px; border: 1px solid transparent; border-radius: 6px; background: transparent; text-align: center; font: inherit; color: var(--text);
+}
+tr.foot td input:hover, tr.foot td select:hover { border-color: var(--border-strong); }
+tr.foot td input:focus, tr.foot td select:focus { outline: none; border-color: var(--brand); background: var(--surface); }
+tr.instrument td { background: color-mix(in srgb, var(--teal) 10%, var(--surface)); }
+.judg { display: inline-flex; gap: 3px; }
+.judg button { width: 30px; height: 26px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--surface); font-weight: 800; font-size: 12px; cursor: pointer; color: var(--text-2); }
+.judg button.on.o { background: var(--ok); border-color: var(--ok); color: #fff; }
+.judg button.on.x { background: var(--ng); border-color: var(--ng); color: #fff; }
+.judg button.on.c { background: var(--amber); border-color: var(--amber); color: #3b2300; }
+.judg button:disabled { opacity: .35; cursor: not-allowed; }
+.ngcount { font-weight: 700; font-variant-numeric: tabular-nums; }
+.ngcount.has { color: var(--ng); }
+.signer { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; }
+.signer .avatar { width: 22px; height: 22px; font-size: 10px; }
+
+.action-bar {
+  position: fixed; bottom: 16px; left: calc(var(--sidebar) + 24px); right: 24px; z-index: 15;
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(14px) saturate(1.4);
+  border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-2);
+  transition: left .28s var(--ease);
+}
+body.collapsed .action-bar { left: calc(var(--rail) + 24px); }
+.action-bar .save-state { display: flex; align-items: center; gap: 6px; color: var(--text-2); font-size: 13px; }
+.action-bar .save-state .icon { color: var(--ok); font-size: 18px; }
+.action-bar .spacer { flex: 1; }
+body:not([data-screen="inspection-form"]) .action-bar { display: none; }
+
+/* ============ Users & profile ============ */
+.user-cell { display: flex; align-items: center; gap: 12px; }
+.role { font-size: 12px; }
+.profile-grid { display: grid; grid-template-columns: 320px 1fr; gap: 16px; align-items: start; }
+.profile-card { padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.theme-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.theme-card { border: 2px solid var(--border); border-radius: 12px; padding: 10px; cursor: pointer; background: var(--surface); text-align: left; transition: border-color .15s; }
+.theme-card.on { border-color: var(--brand); }
+.theme-card .prev { height: 70px; border-radius: 8px; margin-bottom: 8px; display: grid; grid-template-columns: 28% 1fr; overflow: hidden; border: 1px solid var(--border); }
+.theme-card .prev.light { background: #f4f6fa; } .theme-card .prev.light i { background: #fff; }
+.theme-card .prev.dark { background: #0b1220; } .theme-card .prev.dark i { background: #111a2c; }
+.theme-card .prev.system { background: linear-gradient(90deg, #f4f6fa 50%, #0b1220 50%); }
+.theme-card .prev.system i { background: linear-gradient(90deg, #fff 50%, #111a2c 50%); }
+.theme-card b { font-size: 13px; }
+
+/* ============ Dialog ============ */
+.dialog-backdrop { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 24px; background: rgba(2, 8, 23, .5); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .2s var(--ease); }
+.dialog-backdrop.open { opacity: 1; pointer-events: auto; }
+.dialog { width: 100%; max-width: 520px; max-height: calc(100vh - 48px); overflow: auto; background: var(--surface); border-radius: 18px; box-shadow: var(--shadow-3); transform: translateY(12px) scale(.97); transition: transform .24s var(--ease); }
+.dialog-backdrop.open .dialog { transform: none; }
+.dialog-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 8px; }
+.dialog-head h2 { font-size: 18px; }
+.dialog-body { padding: 8px 24px 8px; display: grid; gap: 16px; }
+.dialog-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px 20px; }
+.temp-pw { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 10px; background: var(--warn-bg); color: var(--warn); font-weight: 600; }
+.temp-pw code { font-size: 15px; color: var(--text); letter-spacing: .05em; }
+
+/* ============ Mockup navigator (not part of the app) ============ */
+.mock-nav { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 60; display: flex; gap: 4px; padding: 6px; border-radius: 999px; background: #0f172a; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); max-width: calc(100vw - 24px); overflow-x: auto; }
+.mock-nav button { border: 0; background: transparent; color: #cbd5e1; height: 32px; padding: 0 12px; border-radius: 999px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.mock-nav button.on { background: #fff; color: #0f172a; }
+.mock-nav .sep { width: 1px; background: #334155; margin: 6px 4px; }
+body[data-screen="inspection-form"] .mock-nav { bottom: 92px; }
+
+/* ============ Responsive ============ */
+@media (max-width: 1200px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 959.98px) {
+  .app, body.collapsed .app { grid-template-columns: 1fr; }
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar); transform: translateX(-102%); box-shadow: var(--shadow-3); }
+  body.drawer-open .sidebar { transform: none; }
+  body.drawer-open .scrim { opacity: 1; pointer-events: auto; }
+  body.collapsed .sidebar .brand { justify-content: flex-start; padding: 0 20px; }
+  body.collapsed .sidebar .brand img.logo-light { display: block !important; }
+  body.collapsed .sidebar .brand .mark { display: none; }
+  body.collapsed .nav a { justify-content: flex-start; padding: 0 12px; }
+  body.collapsed .nav a .label, body.collapsed .nav a .badge { display: inline; }
+  body.collapsed .nav-section { visibility: visible; height: auto; padding: 14px 12px 6px; }
+  .sidebar-foot { display: none; }
+  .header .menu-btn { display: inline-grid; }
+  .header { padding: 0 16px; }
+  .content { padding: 16px; }
+  .action-bar, body.collapsed .action-bar { left: 16px; right: 16px; }
+  .profile-grid { grid-template-columns: 1fr; }
+  .form-banner { grid-template-columns: 1fr; }
+  .form-banner .doc { border-right: 0; border-bottom: 1px solid var(--border); padding: 0 0 14px; flex-direction: row; align-items: center; gap: 12px; }
+  .login { grid-template-columns: 1fr; }
+  .login-brand { display: none; }
+  .login-form .logo-mobile { display: block; }
+  .login-form-wrap { background: var(--bg); }
+  .login-form { background: var(--surface); padding: 28px; border-radius: 18px; box-shadow: var(--shadow-2); }
+}
+@media (max-width: 599.98px) {
+  .kpis { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi { padding: 14px; } .kpi .value { font-size: 22px; } .kpi .spark { display: none; }
+  .api-chip .txt, .profile-btn .who, .header .hide-sm { display: none; }
+  .profile-btn { padding: 0 4px; }
+  .crumbs .path { display: none; }
+  .meta-grid, .form-grid, .theme-cards { grid-template-columns: 1fr; }
+  .bar-row { grid-template-columns: 110px 1fr 48px; }
+  .dialog-backdrop { padding: 0; }
+  .dialog { max-width: none; height: 100vh; max-height: none; border-radius: 0; display: flex; flex-direction: column; transform: translateY(100%); }
+  .dialog-body { flex: 1; }
+  .action-bar .save-state .txt { display: none; }
+  .action-bar .btn .txt { display: none; }
+  .action-bar .btn { padding: 0 12px; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body data-screen="login">
+
+<!-- =================== LOGIN =================== -->
+<section class="login" aria-label="Sign in">
+  <div class="login-brand">
+    <img src="assets/logo-white.png" alt="Chubbsafes" />
+    <div>
+      <div class="hero">
+        <h1>Incoming Inspection<br />Quality Control</h1>
+        <p>Record, judge and sign off supplier deliveries against every part's standard and tolerance — the digital Form 7.4.3-F1.</p>
+      </div>
+      <div class="feature-list">
+        <div class="feature"><span class="icon">fact_check</span> Live OK / NG judgement as you measure</div>
+        <div class="feature"><span class="icon">verified_user</span> Inspector and checker sign-off in one flow</div>
+        <div class="feature"><span class="icon">picture_as_pdf</span> Print the official check sheet in one click</div>
+      </div>
+    </div>
+    <footer>© 2026 PT. Chubb Safes Indonesia · Quality Department</footer>
+  </div>
+  <div class="login-form-wrap">
+    <form class="login-form" onsubmit="event.preventDefault(); go('dashboard');">
+      <img class="logo-mobile" src="assets/logo-original.png" alt="Chubbsafes" />
+      <div>
+        <h2>Welcome back</h2>
+        <p class="muted" style="margin: 6px 0 0">Sign in with the account your administrator gave you.</p>
+      </div>
+      <div class="field">
+        <label for="u">Username</label>
+        <div class="input-icon"><span class="icon">badge</span><input id="u" class="input" value="10234" autocomplete="username" /></div>
+      </div>
+      <div class="field">
+        <label for="p">Password</label>
+        <div class="pw-wrap input-icon">
+          <span class="icon">lock</span>
+          <input id="p" class="input" type="password" value="password123" autocomplete="current-password" />
+          <button type="button" class="icon-btn" aria-label="Show password" onclick="const i=document.getElementById('p'); i.type=i.type==='password'?'text':'password'; this.firstElementChild.textContent=i.type==='password'?'visibility':'visibility_off'"><span class="icon">visibility</span></button>
+        </div>
+      </div>
+      <div class="remember">
+        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" checked /> Keep me signed in on this device</label>
+      </div>
+      <button class="btn btn-primary" style="height:46px" type="submit">Sign in <span class="icon">arrow_forward</span></button>
+      <p class="hint">Forgot your password? Ask a QC administrator to reset it.</p>
+    </form>
+  </div>
+</section>
+
+<!-- =================== APP =================== -->
+<div class="app">
+  <aside class="sidebar" aria-label="Main navigation">
+    <div class="brand">
+      <img class="logo-light" src="assets/logo-original.png" alt="Chubbsafes" />
+      <img class="logo-dark" src="assets/logo-white.png" alt="Chubbsafes" />
+      <span class="mark" aria-hidden="true">C</span>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Overview</div>
+      <a href="#dashboard" data-go="dashboard" title="Dashboard"><span class="icon">space_dashboard</span><span class="label">Dashboard</span></a>
+      <div class="nav-section">Quality</div>
+      <a href="#inspections" data-go="inspections" title="Inspections"><span class="icon">fact_check</span><span class="label">Inspections</span><span class="badge">7</span></a>
+      <a href="#inspection-form" data-go="inspection-form" title="New inspection"><span class="icon">add_task</span><span class="label">New inspection</span></a>
+      <div class="nav-section">Master data</div>
+      <a href="#items" data-go="inspections" title="Items &amp; standards"><span class="icon">inventory_2</span><span class="label">Items &amp; standards</span></a>
+      <a href="#vendors" data-go="inspections" title="Vendors"><span class="icon">local_shipping</span><span class="label">Vendors</span></a>
+      <div class="nav-section">Administration</div>
+      <a href="#users" data-go="users" title="Users"><span class="icon">group</span><span class="label">Users</span></a>
+    </nav>
+    <div class="sidebar-foot">
+      <button class="btn btn-ghost" onclick="toggleCollapse()" aria-label="Collapse sidebar"><span class="icon">left_panel_close</span><span class="label">Collapse</span></button>
+    </div>
+  </aside>
+  <div class="scrim" onclick="document.body.classList.remove('drawer-open')"></div>
+
+  <div class="main">
+    <header class="header">
+      <button class="icon-btn menu-btn" aria-label="Open menu" onclick="document.body.classList.add('drawer-open')"><span class="icon">menu</span></button>
+      <div class="crumbs">
+        <span class="path" id="crumb-path">Overview</span>
+        <span class="title" id="crumb-title">Dashboard</span>
+      </div>
+      <div class="spacer"></div>
+      <span class="api-chip" title="db: connected · checked 10:41:07"><span class="pulse"></span><span class="txt">All systems online</span></span>
+      <button class="icon-btn hide-sm" aria-label="Toggle dark mode" onclick="setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark')"><span class="icon" id="theme-icon">dark_mode</span></button>
+      <button class="icon-btn notif" aria-label="Notifications"><span class="icon">notifications</span></button>
+      <div class="profile">
+        <button class="profile-btn" onclick="toggleMenu(event)" aria-haspopup="menu" aria-expanded="false" id="profile-btn">
+          <span class="avatar">SR</span>
+          <span class="who"><b>Siti Rahayu</b><span>QC Checker</span></span>
+          <span class="icon subtle" style="font-size:20px">expand_more</span>
+        </button>
+        <div class="menu" id="profile-menu" role="menu">
+          <div class="menu-head">
+            <span class="avatar">SR</span>
+            <div><b>Siti Rahayu</b><span class="subtle" style="font-size:12px">@10234 · Checker</span></div>
+          </div>
+          <button class="item" role="menuitem" onclick="go('profile')"><span class="icon">person</span>Profile settings</button>
+          <button class="item" role="menuitem" onclick="go('profile')"><span class="icon">key</span>Change password</button>
+          <div class="sep"></div>
+          <div class="subtle" style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px">Theme</div>
+          <div class="seg" role="radiogroup" aria-label="Theme">
+            <button data-theme-btn="light" onclick="setTheme('light')"><span class="icon">light_mode</span>Light</button>
+            <button data-theme-btn="dark" onclick="setTheme('dark')"><span class="icon">dark_mode</span>Dark</button>
+            <button data-theme-btn="system" onclick="setTheme('system')"><span class="icon">computer</span>Auto</button>
+          </div>
+          <div class="sep"></div>
+          <button class="item danger" role="menuitem" onclick="go('login')"><span class="icon">logout</span>Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- =================== DASHBOARD =================== -->
+      <section class="page" id="page-dashboard">
+        <div class="page-head">
+          <div>
+            <h1>Good morning, Siti 👋</h1>
+            <p>Here's what's happening at incoming inspection this month.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-outline"><span class="icon">calendar_month</span>Oct 2026</button>
+            <button class="btn btn-primary" onclick="go('inspection-form')"><span class="icon">add</span>New inspection</button>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="card kpi">
+            <div class="top"><span class="label">Inspections</span><span class="k-icon" style="background:var(--brand-50);color:var(--brand)"><span class="icon">fact_check</span></span></div>
+            <div class="value mono">128</div>
+            <span class="delta up"><span class="icon" style="font-size:16px">trending_up</span>12% vs last month</span>
+            <svg class="spark" width="120" height="44" viewBox="0 0 120 44"><path d="M0 38 L15 32 L30 34 L45 24 L60 26 L75 18 L90 20 L105 10 L120 12" fill="none" stroke="var(--brand)" stroke-width="2" opacity=".35"/></svg>
+          </div>
+          <div class="card kpi">
+            <div class="top"><span class="label">NG rate</span><span class="k-icon" style="background:var(--ng-bg);color:var(--ng)"><span class="icon">report</span></span></div>
+            <div class="value mono">3.4%</div>
+            <span class="delta up"><span class="icon" style="font-size:16px">trending_down</span>0.8 pt better</span>
+            <svg class="spark" width="120" height="44" viewBox="0 0 120 44"><path d="M0 10 L15 14 L30 12 L45 20 L60 18 L75 26 L90 24 L105 30 L120 32" fill="none" stroke="var(--ng)" stroke-width="2" opacity=".35"/></svg>
+          </div>
+          <div class="card kpi">
+            <div class="top"><span class="label">Waiting for check</span><span class="k-icon" style="background:var(--warn-bg);color:var(--warn)"><span class="icon">pending_actions</span></span></div>
+            <div class="value mono">7</div>
+            <span class="delta" style="color:var(--text-3)">2 older than 24 h</span>
+          </div>
+          <div class="card kpi">
+            <div class="top"><span class="label">Deliveries accepted</span><span class="k-icon" style="background:var(--ok-bg);color:var(--ok)"><span class="icon">verified</span></span></div>
+            <div class="value mono">96.1%</div>
+            <span class="delta up"><span class="icon" style="font-size:16px">trending_up</span>1.3 pt vs last month</span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h3>Inspections & NG trend</h3>
+              <div class="legend"><span><i style="background:var(--brand)"></i>Inspections</span><span><i style="background:var(--ng)"></i>NG deliveries</span></div>
+            </div>
+            <div class="card-body">
+              <svg viewBox="0 0 640 240" width="100%" height="240" role="img" aria-label="Inspections per month with NG deliveries">
+                <defs><linearGradient id="g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--brand)" stop-opacity=".22"/><stop offset="1" stop-color="var(--brand)" stop-opacity="0"/></linearGradient></defs>
+                <g stroke="var(--border)" stroke-dasharray="3 4"><line x1="40" x2="630" y1="30" y2="30"/><line x1="40" x2="630" y1="80" y2="80"/><line x1="40" x2="630" y1="130" y2="130"/><line x1="40" x2="630" y1="180" y2="180"/></g>
+                <g fill="var(--text-3)" font-size="11"><text x="8" y="34">150</text><text x="8" y="84">100</text><text x="14" y="134">50</text><text x="20" y="184">0</text></g>
+                <path d="M60 120 L170 104 L280 110 L390 86 L500 72 L610 52 L610 180 L60 180 Z" fill="url(#g1)"/>
+                <path d="M60 120 L170 104 L280 110 L390 86 L500 72 L610 52" fill="none" stroke="var(--brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <g fill="var(--ng)" opacity=".85"><rect x="50" y="166" width="20" height="14" rx="4"/><rect x="160" y="160" width="20" height="20" rx="4"/><rect x="270" y="168" width="20" height="12" rx="4"/><rect x="380" y="162" width="20" height="18" rx="4"/><rect x="490" y="170" width="20" height="10" rx="4"/><rect x="600" y="171" width="20" height="9" rx="4"/></g>
+                <g fill="var(--surface)" stroke="var(--brand)" stroke-width="2.5"><circle cx="60" cy="120" r="4.5"/><circle cx="170" cy="104" r="4.5"/><circle cx="280" cy="110" r="4.5"/><circle cx="390" cy="86" r="4.5"/><circle cx="500" cy="72" r="4.5"/><circle cx="610" cy="52" r="5.5"/></g>
+                <g fill="var(--text-3)" font-size="11" text-anchor="middle"><text x="60" y="204">May</text><text x="170" y="204">Jun</text><text x="280" y="204">Jul</text><text x="390" y="204">Aug</text><text x="500" y="204">Sep</text><text x="610" y="204">Oct</text></g>
+                <g><rect x="548" y="18" width="84" height="26" rx="8" fill="var(--brand)"/><text x="590" y="35" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">128 · 5 NG</text></g>
+              </svg>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>NG rate by supplier</h3><a href="#" class="subtle" style="font-size:12px">This month</a></div>
+            <div class="card-body">
+              <div class="bar-row"><span class="name">PT Baja Prima Nusantara</span><div class="bar-track"><div class="bar-fill" style="width:72%;background:var(--ng)"></div></div><b class="mono" style="text-align:right">7.2%</b></div>
+              <div class="bar-row"><span class="name">CV Maju Teknik Mandiri</span><div class="bar-track"><div class="bar-fill" style="width:44%;background:var(--amber)"></div></div><b class="mono" style="text-align:right">4.4%</b></div>
+              <div class="bar-row"><span class="name">PT Sinar Logam Abadi</span><div class="bar-track"><div class="bar-fill" style="width:21%;background:var(--sky)"></div></div><b class="mono" style="text-align:right">2.1%</b></div>
+              <div class="bar-row"><span class="name">PT Cahaya Plastindo</span><div class="bar-track"><div class="bar-fill" style="width:12%;background:var(--teal)"></div></div><b class="mono" style="text-align:right">1.2%</b></div>
+              <div class="bar-row"><span class="name">PT Mitra Kemas Jaya</span><div class="bar-track"><div class="bar-fill" style="width:4%;background:var(--teal)"></div></div><b class="mono" style="text-align:right">0.4%</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><h3>Recent inspections</h3><a href="#inspections" data-go="inspections" style="font-size:13px;font-weight:600">View all</a></div>
+            <div class="table-wrap" style="margin-top:12px">
+              <table class="data">
+                <thead><tr><th>Inspection</th><th>Part</th><th>Supplier</th><th>Result</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="cell-strong mono">INS-000128</span><span class="cell-sub">01 Oct 2026</span></td><td>Handle Rhino Prima<span class="cell-sub">000-228</span></td><td>PT Sinar Logam Abadi</td><td><span class="chip chip-ng"><span class="dot"></span>1 NG</span></td><td><span class="chip chip-neutral">Draft</span></td></tr>
+                  <tr><td><span class="cell-strong mono">INS-000127</span><span class="cell-sub">30 Sep 2026</span></td><td>Steel Fibre 0.4 x 16 mm<span class="cell-sub">1-1-14-39</span></td><td>PT Baja Prima Nusantara</td><td><span class="chip chip-ok"><span class="dot"></span>All OK</span></td><td><span class="chip chip-warn">Waiting for check</span></td></tr>
+                  <tr><td><span class="cell-strong mono">INS-000126</span><span class="cell-sub">30 Sep 2026</span></td><td>Pasir Galunggung (Sand)<span class="cell-sub">1-1-14-03</span></td><td>CV Maju Teknik Mandiri</td><td><span class="chip chip-ok"><span class="dot"></span>All OK</span></td><td><span class="chip chip-ok">Checked</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Waiting for your check</h3><span class="chip chip-warn">7</span></div>
+            <div class="card-body">
+              <div class="pending-item"><span class="avatar" style="background:linear-gradient(135deg,var(--teal),var(--sky))">BS</span><div class="what"><b class="mono">INS-000127</b><span>Budi Santoso · Steel Fibre · 3 deliveries</span></div><button class="btn btn-outline" style="height:34px">Review</button></div>
+              <div class="pending-item"><span class="avatar" style="background:linear-gradient(135deg,var(--violet),var(--sky))">AW</span><div class="what"><b class="mono">INS-000125</b><span>Andi Wijaya · Handle Rhino Prima · 1 NG</span></div><button class="btn btn-outline" style="height:34px">Review</button></div>
+              <div class="pending-item"><span class="avatar" style="background:linear-gradient(135deg,var(--amber),var(--ng))">DL</span><div class="what"><b class="mono">INS-000122</b><span>Dewi Lestari · Pasir Galunggung · 26 h ago</span></div><button class="btn btn-outline" style="height:34px">Review</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== INSPECTION LIST =================== -->
+      <section class="page" id="page-inspections">
+        <div class="page-head">
+          <div><h1>Inspections</h1><p>All incoming inspections, newest first.</p></div>
+          <div class="actions">
+            <button class="btn btn-outline"><span class="icon">download</span>Export</button>
+            <button class="btn btn-primary" onclick="go('inspection-form')"><span class="icon">add</span>New inspection</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <div class="grow input-icon"><span class="icon">search</span><input class="input" placeholder="Search inspection no, P/O no, part…" /></div>
+            <select class="select" style="width:190px"><option>All suppliers</option><option>PT Sinar Logam Abadi</option></select>
+            <button class="btn btn-outline"><span class="icon">date_range</span>01 – 31 Oct 2026</button>
+            <div class="filter-chips" role="group" aria-label="Status">
+              <button class="on">All</button><button>Draft</button><button>Waiting for check</button><button>Checked</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Inspection no</th><th>Date</th><th>Part</th><th>Supplier</th><th>Deliveries</th><th>NG</th><th>Status</th><th>Inspected by</th><th></th></tr></thead>
+              <tbody>
+                <tr><td class="cell-strong mono">INS-000128</td><td>01 Oct 2026</td><td>Handle Rhino Prima<span class="cell-sub">000-228</span></td><td>PT Sinar Logam Abadi</td><td><span class="cols-dots"><i class="ok"></i><i class="ng"></i><i class="ok"></i><i></i><i></i><i></i><i></i></span> <span class="subtle">3/7</span></td><td><span class="chip chip-ng">1</span></td><td><span class="chip chip-neutral"><span class="dot"></span>Draft</span></td><td>Budi Santoso</td><td><button class="icon-btn" aria-label="Actions"><span class="icon">more_horiz</span></button></td></tr>
+                <tr><td class="cell-strong mono">INS-000127</td><td>30 Sep 2026</td><td>Steel Fibre 0.4 x 16 mm<span class="cell-sub">1-1-14-39</span></td><td>PT Baja Prima Nusantara</td><td><span class="cols-dots"><i class="ok"></i><i class="ok"></i><i class="ok"></i><i></i><i></i><i></i><i></i></span> <span class="subtle">3/7</span></td><td><span class="chip chip-neutral">0</span></td><td><span class="chip chip-warn"><span class="dot"></span>Waiting for check</span></td><td>Budi Santoso</td><td><button class="icon-btn" aria-label="Actions"><span class="icon">more_horiz</span></button></td></tr>
+                <tr><td class="cell-strong mono">INS-000126</td><td>30 Sep 2026</td><td>Pasir Galunggung (Sand)<span class="cell-sub">1-1-14-03</span></td><td>CV Maju Teknik Mandiri</td><td><span class="cols-dots"><i class="ok"></i><i class="ok"></i><i></i><i></i><i></i><i></i><i></i></span> <span class="subtle">2/7</span></td><td><span class="chip chip-neutral">0</span></td><td><span class="chip chip-ok"><span class="dot"></span>Checked</span></td><td>Dewi Lestari</td><td><button class="icon-btn" aria-label="Actions"><span class="icon">more_horiz</span></button></td></tr>
+                <tr><td class="cell-strong mono">INS-000125</td><td>29 Sep 2026</td><td>Handle Rhino Prima<span class="cell-sub">000-228</span></td><td>PT Sinar Logam Abadi</td><td><span class="cols-dots"><i class="ok"></i><i class="c"></i><i></i><i></i><i></i><i></i><i></i></span> <span class="subtle">2/7</span></td><td><span class="chip chip-ng">2</span></td><td><span class="chip chip-warn"><span class="dot"></span>Waiting for check</span></td><td>Andi Wijaya</td><td><button class="icon-btn" aria-label="Actions"><span class="icon">more_horiz</span></button></td></tr>
+                <tr><td class="cell-strong mono">INS-000124</td><td>28 Sep 2026</td><td>Steel Fibre 0.4 x 16 mm<span class="cell-sub">1-1-14-39</span></td><td>PT Cahaya Plastindo</td><td><span class="cols-dots"><i class="ok"></i><i class="ok"></i><i class="ok"></i><i class="ok"></i><i></i><i></i><i></i></span> <span class="subtle">4/7</span></td><td><span class="chip chip-neutral">0</span></td><td><span class="chip chip-ok"><span class="dot"></span>Checked</span></td><td>Budi Santoso</td><td><button class="icon-btn" aria-label="Actions"><span class="icon">more_horiz</span></button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pager"><span>Showing 1–5 of 128</span><div class="pages"><button aria-label="Previous"><span class="icon" style="font-size:18px">chevron_left</span></button><button class="on">1</button><button>2</button><button>3</button><button>…</button><button>26</button><button aria-label="Next"><span class="icon" style="font-size:18px">chevron_right</span></button></div></div>
+        </div>
+      </section>
+
+      <!-- =================== INSPECTION FORM =================== -->
+      <section class="page" id="page-inspection-form">
+        <div class="card form-banner">
+          <div class="doc">
+            <span class="formno">FORM NO 7.4.3-F1</span>
+            <b class="mono">INS-000128</b>
+            <span class="chip chip-neutral"><span class="dot"></span>Draft</span>
+          </div>
+          <div class="meta-grid">
+            <div class="field"><label>Part no.</label><div class="input-icon"><span class="icon">search</span><input class="input" value="000-228" /></div></div>
+            <div class="meta-ro"><span>Part name</span><b>Handle Rhino Prima</b></div>
+            <div class="field"><label>Supplier name</label><select class="select"><option>PT Sinar Logam Abadi</option></select></div>
+            <div class="field"><label>Inspection date</label><input class="input" type="date" value="2026-10-01" /></div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-ghost"><span class="icon">history</span></button>
+          </div>
+        </div>
+
+        <div class="card sheet-card">
+          <div class="card-head" style="padding-bottom:14px">
+            <h3>Measurement result</h3>
+            <div class="legend"><span><i style="background:var(--surface-sunk);border:1px solid var(--border-strong)"></i>Actual</span><span><i style="background:var(--ok)"></i>OK</span><span><i style="background:var(--ng)"></i>NG</span></div>
+          </div>
+          <div class="sheet-wrap">
+            <table class="sheet" id="sheet">
+              <thead>
+                <tr>
+                  <th class="sx sx0 group-dim" colspan="1" rowspan="2">No.</th>
+                  <th class="sx sx1 group-dim" rowspan="2">Item</th>
+                  <th class="sx sx2 group-dim" rowspan="2">Standard</th>
+                  <th class="sx sx3 group-dim" rowspan="2">Tolerance</th>
+                  <th class="group-res" colspan="14">Measurement result · delivery 1 – 7</th>
+                </tr>
+                <tr id="col-heads"></tr>
+              </thead>
+              <tbody id="sheet-body"></tbody>
+            </table>
+          </div>
+          <div class="sheet-legend">
+            <span><b>*)</b> T: Tightening · N: Normal · R: Reduce · — : 100 % inspection</span>
+            <span><b>**)</b> O: Accepted · X: Rejected · C: Concession</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== USERS =================== -->
+      <section class="page" id="page-users">
+        <div class="page-head">
+          <div><h1>Users</h1><p>Accounts, roles and password resets. Only administrators see this page.</p></div>
+          <div class="actions"><button class="btn btn-primary" onclick="openDialog()"><span class="icon">person_add</span>Add user</button></div>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <div class="grow input-icon"><span class="icon">search</span><input class="input" placeholder="Search name or username…" /></div>
+            <div class="filter-chips"><button class="on">All roles</button><button>Inspector</button><button>Checker</button><button>Admin</button></div>
+          </div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>User</th><th>Username</th><th>Role</th><th>Status</th><th>Last sign-in</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><div class="user-cell"><span class="avatar">SR</span><b>Siti Rahayu</b></div></td><td class="mono">10234</td><td><span class="chip chip-brand role">Checker</span></td><td><span class="chip chip-ok"><span class="dot"></span>Active</span></td><td>Today, 07:58</td><td><button class="icon-btn" aria-label="Actions"><span class="icon">more_horiz</span></button></td></tr>
+                <tr><td><div class="user-cell"><span class="avatar" style="background:linear-gradient(135deg,var(--teal),var(--sky))">BS</span><b>Budi Santoso</b></div></td><td class="mono">10187</td><td><span class="chip chip-info role">Inspector</span></td><td><span class="chip chip-ok"><span class="dot"></span>Active</span></td><td>Today, 07:31</td><td><button class="icon-btn" aria-label="Actions"><span class="icon">more_horiz</span></button></td></tr>
+                <tr><td><div class="user-cell"><span class="avatar" style="background:linear-gradient(135deg,var(--violet),var(--sky))">AW</span><b>Andi Wijaya</b></div></td><td class="mono">10305</td><td><span class="chip chip-info role">Inspector</span></td><td><span class="chip chip-warn"><span class="dot"></span>Must change password</span></td><td>—</td><td><button class="icon-btn" aria-label="Actions"><span class="icon">more_horiz</span></button></td></tr>
+                <tr><td><div class="user-cell"><span class="avatar" style="background:linear-gradient(135deg,#334155,#64748b)">QA</span><b>QC Administrator</b></div></td><td class="mono">admin</td><td><span class="chip role" style="background:color-mix(in srgb,var(--violet) 14%,transparent);color:var(--violet)">Admin</span></td><td><span class="chip chip-ok"><span class="dot"></span>Active</span></td><td>Yesterday, 16:20</td><td><button class="icon-btn" aria-label="Actions"><span class="icon">more_horiz</span></button></td></tr>
+                <tr><td><div class="user-cell"><span class="avatar" style="background:#94a3b8">RH</span><b class="subtle">Rudi Hartono</b></div></td><td class="mono subtle">10099</td><td><span class="chip chip-neutral role">Inspector</span></td><td><span class="chip chip-neutral"><span class="dot"></span>Inactive</span></td><td class="subtle">12 Aug 2026</td><td><button class="icon-btn" aria-label="Actions"><span class="icon">more_horiz</span></button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== PROFILE =================== -->
+      <section class="page" id="page-profile">
+        <div class="page-head"><div><h1>Profile settings</h1><p>Your name as it appears on the check sheet, your password and your theme.</p></div></div>
+        <div class="profile-grid">
+          <div class="card profile-card">
+            <span class="avatar lg">SR</span>
+            <div><h2 style="font-size:18px">Siti Rahayu</h2><span class="subtle">@10234</span></div>
+            <span class="chip chip-brand">QC Checker</span>
+            <div class="subtle" style="font-size:12px;margin-top:8px">Signed in since 07:58 · session ends 15:58</div>
+          </div>
+          <div style="display:grid;gap:16px">
+            <div class="card">
+              <div class="card-head"><h3>Personal information</h3></div>
+              <div class="card-body form-grid">
+                <div class="field"><label>Full name</label><input class="input" value="Siti Rahayu" /><span class="subtle" style="font-size:12px">Printed under "Checked by".</span></div>
+                <div class="field"><label>Email (optional)</label><input class="input" placeholder="name@chubbsafes.co.id" /></div>
+                <div class="field"><label>Username</label><input class="input" value="10234" disabled /></div>
+                <div class="field"><label>Role</label><input class="input" value="Checker" disabled /></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Appearance</h3></div>
+              <div class="card-body theme-cards">
+                <button class="theme-card" data-theme-btn="light" onclick="setTheme('light')"><div class="prev light"><i></i><span></span></div><b>Light</b></button>
+                <button class="theme-card" data-theme-btn="dark" onclick="setTheme('dark')"><div class="prev dark"><i></i><span></span></div><b>Dark</b></button>
+                <button class="theme-card" data-theme-btn="system" onclick="setTheme('system')"><div class="prev system"><i></i><span></span></div><b>Match device</b></button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Change password</h3></div>
+              <div class="card-body form-grid">
+                <div class="field"><label>Current password</label><input class="input" type="password" /></div>
+                <div></div>
+                <div class="field"><label>New password</label><input class="input" type="password" /><span class="subtle" style="font-size:12px">At least 8 characters.</span></div>
+                <div class="field"><label>Repeat new password</label><input class="input" type="password" /></div>
+              </div>
+              <div class="dialog-foot" style="padding-top:0"><button class="btn btn-ghost">Cancel</button><button class="btn btn-primary">Save changes</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Sticky action bar for the inspection form -->
+<div class="action-bar">
+  <span class="save-state"><span class="icon fill">cloud_done</span><span class="txt">All changes saved · 10:42</span></span>
+  <span class="chip chip-ng" id="ng-total">1 NG</span>
+  <div class="spacer"></div>
+  <button class="btn btn-ghost"><span class="icon">visibility</span><span class="txt">Preview PDF</span></button>
+  <button class="btn btn-outline"><span class="icon">save</span><span class="txt">Save draft</span></button>
+  <button class="btn btn-primary"><span class="icon">send</span><span class="txt">Submit for check</span></button>
+</div>
+
+<!-- Add user dialog -->
+<div class="dialog-backdrop" id="dialog" onclick="if(event.target===this) closeDialog()">
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+    <div class="dialog-head"><h2 id="dlg-title">Add user</h2><button class="icon-btn" aria-label="Close" onclick="closeDialog()"><span class="icon">close</span></button></div>
+    <div class="dialog-body">
+      <div class="field"><label>Full name</label><input class="input" placeholder="As printed on the check sheet" id="dlg-first" /></div>
+      <div class="field"><label>Username</label><input class="input" placeholder="Employee NIK, e.g. 10412" /></div>
+      <div class="field"><label>Role</label>
+        <select class="select"><option>Inspector</option><option>Checker</option><option>Admin</option></select>
+      </div>
+      <div class="field"><label>Temporary password</label>
+        <div class="temp-pw"><code>Qc-7mK4-tP</code><button class="btn btn-ghost" style="height:32px;color:inherit"><span class="icon" style="font-size:18px">content_copy</span>Copy</button></div>
+        <span class="subtle" style="font-size:12px">The user must change it at first sign-in.</span>
+      </div>
+    </div>
+    <div class="dialog-foot"><button class="btn btn-ghost" onclick="closeDialog()">Cancel</button><button class="btn btn-primary" onclick="closeDialog()">Create user</button></div>
+  </div>
+</div>
+
+<!-- Mockup navigator: jump between screens. Not part of the real app. -->
+<nav class="mock-nav" aria-label="Mockup screens">
+  <button data-mock="login">Login</button>
+  <button data-mock="dashboard">Dashboard</button>
+  <button data-mock="inspections">Inspections</button>
+  <button data-mock="inspection-form">Inspection form</button>
+  <button data-mock="users">Users</button>
+  <button data-mock="profile">Profile</button>
+  <span class="sep"></span>
+  <button onclick="setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark')">◐ Theme</button>
+</nav>
+
+<script>
+const SCREENS = {
+  dashboard: ['Overview', 'Dashboard'],
+  inspections: ['Quality', 'Inspections'],
+  'inspection-form': ['Quality · Inspections', 'INS-000128 · Handle Rhino Prima'],
+  users: ['Administration', 'Users'],
+  profile: ['Account', 'Profile settings'],
+};
+
+function go(screen) {
+  document.body.dataset.screen = screen;
+  document.body.classList.remove('drawer-open');
+  closeMenu();
+  document.querySelectorAll('.page').forEach((p) => p.classList.toggle('active', p.id === 'page-' + screen));
+  document.querySelectorAll('.nav a').forEach((a) => a.classList.toggle('active', a.dataset.go === screen && a.getAttribute('href') === '#' + screen));
+  document.querySelectorAll('[data-mock]').forEach((b) => b.classList.toggle('on', b.dataset.mock === screen));
+  if (SCREENS[screen]) {
+    document.getElementById('crumb-path').textContent = SCREENS[screen][0];
+    document.getElementById('crumb-title').textContent = SCREENS[screen][1];
+  }
+  history.replaceState(null, '', '#' + screen);
+  window.scrollTo({ top: 0 });
+}
+document.querySelectorAll('[data-go]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); go(a.dataset.go); }));
+document.querySelectorAll('[data-mock]').forEach((b) => b.addEventListener('click', () => go(b.dataset.mock)));
+
+/* Theme: light / dark / system, remembered like the real app will per user */
+const media = matchMedia('(prefers-color-scheme: dark)');
+function setTheme(mode) {
+  localStorage.setItem('mock-theme', mode);
+  const dark = mode === 'dark' || (mode === 'system' && media.matches);
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  document.getElementById('theme-icon').textContent = dark ? 'light_mode' : 'dark_mode';
+  document.querySelectorAll('[data-theme-btn]').forEach((b) => b.classList.toggle('on', b.dataset.themeBtn === mode));
+}
+media.addEventListener('change', () => localStorage.getItem('mock-theme') === 'system' && setTheme('system'));
+
+/* Sidebar collapse (desktop) is remembered */
+function toggleCollapse() {
+  document.body.classList.toggle('collapsed');
+  localStorage.setItem('mock-collapsed', document.body.classList.contains('collapsed') ? '1' : '');
+}
+
+/* Profile menu */
+function toggleMenu(e) {
+  e.stopPropagation();
+  const m = document.getElementById('profile-menu');
+  m.classList.toggle('open');
+  document.getElementById('profile-btn').setAttribute('aria-expanded', m.classList.contains('open'));
+}
+function closeMenu() { document.getElementById('profile-menu').classList.remove('open'); document.getElementById('profile-btn').setAttribute('aria-expanded', 'false'); }
+document.addEventListener('click', (e) => { if (!e.target.closest('.profile')) closeMenu(); });
+
+/* Dialog */
+let lastFocus = null;
+function openDialog() { lastFocus = document.activeElement; document.getElementById('dialog').classList.add('open'); setTimeout(() => document.getElementById('dlg-first').focus(), 120); }
+function closeDialog() { document.getElementById('dialog').classList.remove('open'); lastFocus && lastFocus.focus(); }
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  closeDialog(); closeMenu(); document.body.classList.remove('drawer-open');
+});
+
+/* ============ Check sheet grid (000-228 Handle Rhino Prima) ============ */
+const COLS = 7;
+const USED = 3;
+const LINES = [
+  { item: 'A', std: ' 12.5', s: 12.5, tol: '±0.4', plus: 0.4, minus: 0.4, actual: ['12.62', '12.48', '12.71'] },
+  { item: 'B', std: 'Ø16', s: 16.0, tol: '+0.3/-0', plus: 0.3, minus: 0, actual: ['16.12', '16.35', '16.20'] },
+  { item: 'D', std: ' 28.0', s: 28.0, tol: '±0.4', plus: 0.4, minus: 0.4, actual: ['27.88', '28.05', '28.21'] },
+];
+const OTHER = [
+  { section: 'Certificate No', rows: [{ item: '—', std: 'COA', tol: '', text: ['', '', ''] }] },
+  { section: 'Visual', rows: [
+    { item: 'Black', std: 'Black', tol: '', okng: ['OK', 'OK', 'OK'] },
+    { item: 'Cat Rata / Tidak Belang', std: 'Even paint', tol: '', okng: ['OK', 'OK', 'OK'] },
+    { item: 'Tidak Gores', std: 'No scratch', tol: '', okng: ['OK', 'OK', 'OK'] },
+  ] },
+  { section: 'Fitting', rows: [{ item: 'C', std: 'M8', tol: 'Fitting OK', okng: ['OK', 'OK', 'OK'] }] },
+];
+const DELIVERIES = [
+  { po: '33932', date: '2026-09-15', qty: 50, cat: 'N', sample: 2, j: 'o', qf: '' },
+  { po: '34071', date: '2026-09-24', qty: 20, cat: 'N', sample: 2, j: 'c', qf: 'QF 01-05' },
+  { po: '34561', date: '2026-10-01', qty: 50, cat: 'N', sample: 3, j: 'o', qf: '' },
+];
+
+const hundredths = (v) => Math.round(Number(v) * 100);
+function judge(line, raw) {
+  if (raw === '' || raw == null || isNaN(Number(raw))) return null;
+  const a = hundredths(raw), s = hundredths(line.s);
+  return a >= s - hundredths(line.minus) && a <= s + hundredths(line.plus) ? 'OK' : 'NG';
+}
+const pill = (r) => r ? `<span class="okng-pill ${r === 'OK' ? 'ok' : 'ng'}">${r}</span>` : '<span class="okng-pill none">–</span>';
+const fmtDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+
+function buildSheet() {
+  document.getElementById('col-heads').innerHTML = Array.from({ length: COLS }, (_, i) => {
+    const u = i < USED ? '' : ' unused';
+    return `<th class="col-head${u}">Actual<small>#${i + 1}</small></th><th class="col-head${u}">OK/<br>NG</th>`;
+  }).join('');
+
+  const rows = [];
+  LINES.forEach((l, li) => {
+    let cells = '';
+    for (let c = 0; c < COLS; c++) {
+      const used = c < USED;
+      const v = used ? l.actual[c] : '';
+      const r = used ? judge(l, v) : null;
+      cells += `<td class="act${r === 'NG' ? ' is-ng' : ''}${used ? '' : ' unused'}"><input inputmode="decimal" data-l="${li}" data-c="${c}" value="${v}" ${used ? '' : 'disabled'} aria-label="Item ${l.item}, delivery ${c + 1}"></td><td class="okng${used ? '' : ' unused'}" id="r-${li}-${c}">${pill(r)}</td>`;
+    }
+    rows.push(`<tr><td class="sx sx0 subtle">${li + 1}</td><td class="sx sx1">${l.item}</td><td class="sx sx2">${l.std.trim()}</td><td class="sx sx3">${l.tol}</td>${cells}</tr>`);
+  });
+
+  OTHER.forEach((g) => {
+    rows.push(`<tr class="section"><td class="sx sxspan" colspan="4">${g.section}</td><td colspan="14"></td></tr>`);
+    g.rows.forEach((r) => {
+      let cells = '';
+      for (let c = 0; c < COLS; c++) {
+        const used = c < USED;
+        if (r.text) {
+          cells += `<td class="act${used ? '' : ' unused'}"><input placeholder="${used ? 'COA no.' : ''}" ${used ? '' : 'disabled'} style="font-weight:500;font-size:12px"></td><td class="okng${used ? '' : ' unused'}">${pill(null)}</td>`;
+        } else {
+          cells += `<td class="act${used ? '' : ' unused'}"></td><td class="okng${used ? '' : ' unused'}">${used ? pill(r.okng[c]) : pill(null)}</td>`;
+        }
+      }
+      rows.push(`<tr><td class="sx sx0"></td><td class="sx sx1">${r.item}</td><td class="sx sx2">${r.std}</td><td class="sx sx3">${r.tol}</td>${cells}</tr>`);
+    });
+  });
+
+  const foot = (label, fn, extra = '') => {
+    let cells = '';
+    for (let c = 0; c < COLS; c++) {
+      const d = DELIVERIES[c];
+      cells += `<td colspan="2" class="${d ? '' : 'unused'}">${fn(d, c)}</td>`;
+    }
+    return `<tr class="foot ${extra}"><th class="sx sxspan" colspan="4">${label}</th>${cells}</tr>`;
+  };
+  rows.push(foot('P/O No.', (d) => `<input value="${d ? d.po : ''}" ${d ? '' : 'disabled placeholder="—"'}>`));
+  rows.push(foot('Delivery date', (d) => d ? `<input value="${fmtDate(d.date)}">` : `<input disabled placeholder="—">`));
+  rows.push(`<tr class="foot instrument"><th class="sx sxspan" colspan="4">Measuring Instrument</th><td colspan="14" style="text-align:left;padding-left:12px"><input style="text-align:left" value="Digital caliper Mitutoyo 500-196 · Thread gauge M8"></td></tr>`);
+  rows.push(foot('QTY received / Insp. category *)', (d) => d ? `<span class="mono" style="font-weight:600">${d.qty}</span> <span class="chip chip-brand" style="height:22px;margin-left:4px">${d.cat}</span>` : '<span class="subtle">—</span>'));
+  rows.push(foot('NG / Total sample', (d, c) => d ? `<span class="ngcount" id="ng-${c}">0</span><span class="subtle"> / ${d.sample}</span>` : '<span class="subtle">—</span>'));
+  rows.push(foot('Judgment **)', (d, c) => d ? `<span class="judg" data-c="${c}"><button class="o ${d.j === 'o' ? 'on' : ''}" title="Accepted">O</button><button class="x ${d.j === 'x' ? 'on' : ''}" title="Rejected">X</button><button class="c ${d.j === 'c' ? 'on' : ''}" title="Concession">C</button></span>` : '<span class="subtle">—</span>'));
+  rows.push(foot('QF No.', (d) => `<input value="${d ? d.qf : ''}" ${d ? 'placeholder="—"' : 'disabled placeholder="—"'}>`));
+  rows.push(foot('Inspected by', (d) => d ? '<span class="signer"><span class="avatar" style="background:linear-gradient(135deg,var(--teal),var(--sky))">BS</span>Budi S.</span>' : '<span class="subtle">—</span>'));
+  rows.push(foot('Checked by', (d) => d ? '<span class="subtle" style="font-size:12px">Waiting</span>' : '<span class="subtle">—</span>'));
+  document.getElementById('sheet-body').innerHTML = rows.join('');
+
+  document.querySelectorAll('#sheet td.act input[data-l]').forEach((inp) => inp.addEventListener('input', onActual));
+  document.querySelectorAll('.judg button').forEach((b) => b.addEventListener('click', () => {
+    if (b.disabled) return;
+    b.parentElement.querySelectorAll('button').forEach((x) => x.classList.remove('on'));
+    b.classList.add('on');
+  }));
+  recount();
+}
+
+function onActual(e) {
+  const li = +e.target.dataset.l, c = +e.target.dataset.c;
+  const r = judge(LINES[li], e.target.value);
+  e.target.parentElement.classList.toggle('is-ng', r === 'NG');
+  document.getElementById(`r-${li}-${c}`).innerHTML = pill(r);
+  recount();
+}
+
+/* NG per delivery column; "Accepted" is disabled while a column has NG (server enforces the same rule) */
+function recount() {
+  let total = 0;
+  for (let c = 0; c < USED; c++) {
+    let ng = 0;
+    LINES.forEach((l, li) => {
+      const v = document.querySelector(`input[data-l="${li}"][data-c="${c}"]`).value;
+      if (judge(l, v) === 'NG') ng++;
+    });
+    total += ng;
+    const el = document.getElementById('ng-' + c);
+    el.textContent = ng; el.classList.toggle('has', ng > 0);
+    const o = document.querySelector(`.judg[data-c="${c}"] .o`);
+    o.disabled = ng > 0;
+    if (ng > 0 && o.classList.contains('on')) o.classList.remove('on');
+  }
+  const chip = document.getElementById('ng-total');
+  chip.textContent = total ? `${total} NG` : 'All OK';
+  chip.className = 'chip ' + (total ? 'chip-ng' : 'chip-ok');
+}
+
+/* Enter moves down a column, like measuring one delivery top to bottom */
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' || !e.target.matches('#sheet input[data-l]')) return;
+  e.preventDefault();
+  const next = document.querySelector(`input[data-l="${+e.target.dataset.l + 1}"][data-c="${e.target.dataset.c}"]`);
+  if (next) { next.focus(); next.select(); }
+});
+
+buildSheet();
+// ?theme=dark|light|system and ?dialog=1 let a screen be opened directly (e.g. for screenshots).
+const params = new URLSearchParams(location.search);
+setTheme(params.get('theme') || localStorage.getItem('mock-theme') || 'light');
+if (params.get('dialog')) setTimeout(openDialog, 300);
+if (localStorage.getItem('mock-collapsed')) document.body.classList.add('collapsed');
+go((location.hash || '#login').slice(1) in SCREENS || location.hash === '#login' ? (location.hash || '#login').slice(1) : 'login');
+</script>
+</body>
+</html>
