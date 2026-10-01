@@ -1,32 +1,10 @@
 // Read-only data-quality report for csi_db. Nothing is fixed here: findings are
 // reviewed with QC first (PLAN.md §3).
-const { INSPECT_TYPE, INSPECT_STATUS, normalizeInspectType } = require('../constants/inspection');
+const { INSPECT_STATUS, normalizeInspectType } = require('../constants/inspection');
+
+const { WARNING, standardWarnings } = require('../services/standard-check');
 
 const EXAMPLES = 5;
-const EPSILON = 0.005;
-
-// '±0.4' -> {plus 0.4, minus 0.4}; '+0.3/-0' -> {plus 0.3, minus 0}; else null.
-function parseTolerance(text) {
-  const t = (text || '').trim();
-  let m = t.match(/^±\s*(\d+(?:\.\d+)?)$/);
-  if (m) return { plus: Number(m[1]), minus: Number(m[1]) };
-  m = t.match(/^\+\s*(\d+(?:\.\d+)?)\s*\/\s*-\s*(\d+(?:\.\d+)?)$/);
-  if (m) return { plus: Number(m[1]), minus: Number(m[2]) };
-  return null;
-}
-
-// Only standard_txt that is a single number (optionally Ø, a unit or %) is
-// compared; descriptive texts like 'SUS 201 and SUS 304' are skipped.
-function singleNumber(text) {
-  const m = (text || '')
-    .trim()
-    .replace(',', '.')
-    .match(/^[Ø⌀]?\s*(\d+(?:\.\d+)?)\s*(?:[a-zA-Z]{1,4}(?:\/[a-zA-Z]{1,4}²?)?|%)?$/);
-  return m ? Number(m[1]) : null;
-}
-
-const isOneSided = (text) => ['MIN', 'MAX'].includes((text || '').trim().toUpperCase());
-const isZeroText = (text) => /^0(\.0+)?$/.test((text || '').trim());
 const label = (r) =>
   `${r.itemid} / ${r.inspecttype.trim()} / ${r.inspectitem.trim()}: standard_txt=${JSON.stringify(r.standard_txt)} standard=${r.standard} tolerance=${JSON.stringify(r.tolerance)} +${r.tolerance_plus}/-${r.tolerance_minus}`;
 
@@ -70,48 +48,28 @@ async function main() {
       ([t, n]) => `${JSON.stringify(t)}: ${n} rows`,
     );
 
-    const std = standards.filter((r) => normalizeInspectType(r.inspecttype) === INSPECT_TYPE.STD);
-
+    // Same rules the app uses to flag standards (services/standard-check.js).
+    const flagged = standards.map((r) => ({ r, w: standardWarnings(r) }));
+    const withWarning = (code) => flagged.filter((f) => f.w.includes(code)).map((f) => f.r);
     add(
       'STD with a negative tolerance_plus or tolerance_minus',
-      std.filter((r) => r.tolerance_plus < 0 || r.tolerance_minus < 0),
+      withWarning(WARNING.NEGATIVE_TOLERANCE),
       label,
     );
-
     add(
       'STD whose tolerance text disagrees with tolerance_plus / tolerance_minus',
-      std.filter((r) => {
-        const parsed = parseTolerance(r.tolerance);
-        return (
-          parsed &&
-          (Math.abs(parsed.plus - r.tolerance_plus) > EPSILON ||
-            Math.abs(parsed.minus - Math.abs(r.tolerance_minus)) > EPSILON ||
-            r.tolerance_minus < 0)
-        );
-      }),
+      withWarning(WARNING.TOLERANCE_TEXT_MISMATCH),
       label,
     );
-
-    const zero = std.filter(
-      (r) => !isOneSided(r.tolerance) && r.tolerance_plus === 0 && r.tolerance_minus === 0,
-    );
+    add('STD with no tolerance at all (judged by hand)', withWarning(WARNING.NO_LIMITS), label);
     add(
-      'STD with no tolerance at all (judging rule unclear, PLAN.md Q3)',
-      zero.filter((r) => isZeroText(r.tolerance)),
+      'STD whose tolerance is qualitative text (judged by hand)',
+      withWarning(WARNING.QUALITATIVE_TOLERANCE),
       label,
     );
-    add(
-      'STD whose tolerance is qualitative text (e.g. "Tidak Terangkat")',
-      zero.filter((r) => !isZeroText(r.tolerance) && !parseTolerance(r.tolerance)),
-      label,
-    );
-
     add(
       'STD where the printed standard_txt number differs from standard',
-      std.filter((r) => {
-        const n = singleNumber(r.standard_txt);
-        return n !== null && r.standard !== null && Math.abs(n - r.standard) > EPSILON;
-      }),
+      withWarning(WARNING.STANDARD_TEXT_MISMATCH),
       label,
     );
 

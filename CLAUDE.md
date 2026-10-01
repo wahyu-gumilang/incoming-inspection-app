@@ -181,6 +181,7 @@ feedback; the value saved by the server is authoritative.
 - **OK/NG per value** (`services/judgement.js`), for `STD` lines:
   - `lower = standard − tolerance_minus`, `upper = standard + tolerance_plus`; OK when `lower ≤ actual ≤ upper`.
   - Tolerance text `Min`: OK when `actual ≥ standard`. `Max`: OK when `actual ≤ standard`.
+  - No usable limits (both tolerances 0, or qualitative text such as "Tidak Terangkat"): mode `MANUAL`, the inspector sets OK/NG like a visual check. A negative tolerance is used by its size. Doubtful standards are flagged by `services/standard-check.js`, never silently corrected.
   - Compare in integer hundredths (values are `decimal(18,2)`), never with raw float `<=`.
   - Empty actual → status `NULL` (not measured), never NG.
 - **Qualitative lines** (`VISUAL`, `FITTING`, `CERTIFIKAT`): the inspector sets OK/NG directly; `CERTIFIKAT` also records the COA number as the actual text.
