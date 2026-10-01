@@ -118,6 +118,20 @@ describe('csi_db_test after migrations', () => {
     expect(rows).toEqual([{ prefix: 'INS-', digits: 6, nextnum: 1 }]);
   });
 
+  it('creates usertable with a unique username and role/theme checks', async () => {
+    expect(await indexColumns('usertable', 'PRIMARY')).toEqual(['userid']);
+    expect(await indexColumns('usertable', 'uq_usertable_username')).toEqual(['username']);
+    // MariaDB reports a CHECK violation as errno 4025; mysql2 maps that number to a MySQL name.
+    await expect(
+      db.query(
+        "INSERT INTO usertable (username, fullname, role, password_hash) VALUES ('x.role', 'X', 'BOSS', 'h')",
+      ),
+    ).rejects.toMatchObject({
+      errno: 4025,
+      message: expect.stringContaining('chk_usertable_role'),
+    });
+  });
+
   it('keeps the trailing space in stored inspecttype values', async () => {
     const [[row]] = await db.query(
       "SELECT inspecttype FROM inventinspectitem WHERE itemid = '000-228' AND inspectitem = 'C'",
