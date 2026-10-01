@@ -88,9 +88,11 @@ belongs to header column N of `inspecttable` (`purchordernumN`, `deliverydateN`,
 │   ├── reports/
 │   │   ├── templates/             # Form 7.4.3-F1 template (EJS for Puppeteer)
 │   │   └── assets/                # Logo, fonts
-│   ├── scripts/                   # dump-schema.js, migrate.js, data checks
+│   ├── scripts/                   # dump-schema, migrate, check-data, backup-db, reset-test-db
 │   ├── db/
-│   │   └── migrations/            # Numbered SQL: 001_add_primary_keys.sql, ...
+│   │   ├── baseline.sql           # csi_db structure as imported; base for csi_db_test
+│   │   ├── migrations/            # Numbered SQL: 001_inventtable_primary_key.sql, ...
+│   │   └── seeds/                 # test-fixtures.sql for csi_db_test
 │   └── tests/                     # Mirrors source: tests/services/judgement.test.js
 └── frontend/                      # Angular app (own package.json)
     └── src/app/
@@ -106,8 +108,7 @@ belongs to header column N of `inspecttable` (`purchordernumN`, `deliverydateN`,
 
 ## Commands
 
-Add new commands as `package.json` scripts, not as ad-hoc instructions. Items marked
-*(Phase 1)* don't exist yet.
+Add new commands as `package.json` scripts, not as ad-hoc instructions.
 
 **Backend** (run from `backend/`):
 
@@ -115,12 +116,18 @@ Add new commands as `package.json` scripts, not as ad-hoc instructions. Items ma
 |---|---|---|
 | `npm run dev` | `nodemon server.js` | Dev server with auto-reload on `http://localhost:5000` |
 | `npm start` | `node server.js` | Production start |
-| `npm test` | `jest` | Unit + integration tests |
+| `npm test` | `jest` | All tests: `unit` (DB mocked) and `db` (rebuilds and uses `csi_db_test`) |
+| `npm run test:unit` | `jest --selectProjects unit` | Tests that don't need MariaDB |
+| `npm run test:db` | `jest --selectProjects db` | Tests against `csi_db_test` |
 | `npm run lint` | `eslint .` | Lint |
 | `npm run format` | `prettier --write .` | Format |
 | `npm run format:check` | `prettier --check .` | Check formatting without writing |
-| `npm run db:schema` | `node scripts/dump-schema.js` | Write the live `csi_db` table definitions to `../docs/schema.sql` *(Phase 1)* |
-| `npm run db:migrate` | `node scripts/migrate.js` | Apply pending files in `db/migrations/` *(Phase 1)* |
+| `npm run db:schema` | `node scripts/dump-schema.js` | Write the live table definitions (no rows) to `../docs/schema.sql` |
+| `npm run db:migrate:status` | `node scripts/migrate.js --status` | List pending migrations. Read-only. |
+| `npm run db:migrate` | `node scripts/migrate.js` | Apply pending files in `db/migrations/` to `DB_NAME` |
+| `npm run db:check` | `node scripts/check-data.js` | Read-only data-quality report |
+| `npm run db:backup` | `node scripts/backup-db.js` | `mysqldump` of `DB_NAME` into `DB_BACKUP_DIR` |
+| `npm run db:test:reset` | `node scripts/reset-test-db.js` | Drop and rebuild `csi_db_test` (baseline + migrations + fixtures) |
 
 **Frontend** (run from `frontend/`):
 
@@ -140,15 +147,17 @@ actually happened, including failures.
 
 ## Environment
 
-In `backend/`, copy `.env.example` to `.env`. Tests read `.env.test` (pointing at
-`csi_db_test`), copied from `.env.test.example` *(Phase 1)*. Neither `.env` nor `.env.test`
-is ever committed.
+In `backend/`, copy `.env.example` to `.env`, and `.env.test.example` to `.env.test`.
+`config/db.js` loads `.env.test` whenever `NODE_ENV=test` (Jest sets it), so tests can
+never reach `csi_db`. Neither `.env` nor `.env.test` is ever committed.
 
 | Variable | Meaning |
 |---|---|
 | `PORT` | API port (default `5000`) |
 | `DB_HOST` | `auto` tries `127.0.0.1`, then the WSL2 default gateway (the Windows host). An explicit host is tried first. |
-| `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` | MariaDB connection (`DB_NAME=csi_db`) |
+| `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` | MariaDB connection (`csi_db`; `csi_db_test` in `.env.test`, which must end in `_test`) |
+| `DB_BACKUP_DIR` | Folder for `npm run db:backup`, outside the repo (`/mnt/c/Apps/Doc_QC-incoming-inspection/backup`) |
+| `MYSQLDUMP` | Optional path to `mysqldump`; defaults to XAMPP's `mysqldump.exe` |
 
 Development runs on WSL2 with MariaDB (XAMPP) on the Windows host. `config/db.js` detects
 the host and rebuilds the pool after network errors. Don't replace it with a plain
@@ -233,13 +242,14 @@ Rules:
 - Validate `params`, `query` and `body` in the route with `validate({ params, query, body })` (Zod schemas), before the controller runs. Controllers read the parsed values from `req.validated`, not `req.query` / `req.body` (Express 5 doesn't allow overwriting `req.query`).
 - **SQL:**
   - Always use placeholders (`execute('... WHERE itemid = ?', [id])`). Never put request values into SQL strings. Sort columns come from a whitelist.
-  - SQL only lives in `repositories/`, and repositories return plain rows (not mysql2 `[rows, fields]` tuples).
+  - In the app, SQL only lives in `repositories/`, and repositories return plain rows (not mysql2 `[rows, fields]` tuples). Dev scripts in `scripts/` may query directly.
   - For transactions, get a connection with `getConnection()`, then `beginTransaction`, `commit` or `rollback`, and `release()` in `finally`. Repository functions accept an optional connection so services can run several of them in one transaction.
   - The `N` columns (`actual_1..7`, `purchordernum1..7`, …) are built from a fixed list in `constants/`, never from request input.
 - **Existing schema:**
   - Don't rename or drop columns, and don't touch the `oauth_*`, `orders`, `numseqtable` rows owned by other apps unless `PLAN.md` says so.
   - Schema changes (keys, indexes, new or nullable columns) go in a new numbered migration in `backend/db/migrations/`. Never change an applied migration. Regenerate `docs/schema.sql` after migrating.
-  - Each migration checks the data it depends on first (e.g. duplicates before adding a PK) and is written for MariaDB 10.4.
+  - MariaDB commits DDL immediately and can't roll it back. Keep each migration file to statements that are atomic on their own: one `ALTER TABLE` per table, `ADD COLUMN IF NOT EXISTS` / `ADD INDEX IF NOT EXISTS`, `CREATE TABLE IF NOT EXISTS`, `INSERT IGNORE`. Written for MariaDB 10.4.
+  - Before migrating `csi_db`: run `npm run db:backup`, prove the migration on `csi_db_test` (`npm run test:db`), check `npm run db:migrate:status`, and get the user's approval.
 
 ### Frontend (Angular)
 - Latest stable Angular: standalone components, signals for component state, `@if` / `@for` control flow, `inject()` instead of constructor injection, typed reactive forms.
