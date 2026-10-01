@@ -5,3 +5,8 @@ npm-debug.log*
 
 # Full DB dump: real data and oauth credentials. Only docs/schema.sql is committed.
 docs/csi_db.sql
+
+# Build and generated output
+frontend/dist/
+frontend/.angular/
+backend/reports/output/
