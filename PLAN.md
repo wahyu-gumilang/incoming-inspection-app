@@ -1,7 +1,7 @@
 # PLAN.md — Incoming Inspection QC System Roadmap
 
 Status: `[ ]` todo · `[~]` in progress · `[x]` done
-Last updated: 2026-09-30
+Last updated: 2026-10-01
 
 ## 1. Goal
 
@@ -9,13 +9,16 @@ A web app for the Quality team of **PT. Chubb Safes Indonesia** to record, evalu
 store the inspection of materials and parts received from suppliers, replacing the paper
 **Form No 7.4.3-F1 "Incoming Inspection Check List"** (`docs/chek sheet-qhse.pdf`).
 
+0. Log in with a username and password; what you can do depends on your role (Inspector, Checker, Admin).
 1. Pick an item and a supplier; the item's QC standards load automatically.
 2. Enter up to 7 delivery columns (P/O, delivery date, qty, inspection category) and the actual measurements.
 3. Get OK/NG per value in real time and an NG count per delivery.
-4. Decide Accepted / Rejected / Concession per delivery, sign off (*Inspected by*, *Checked by*).
+4. Decide Accepted / Rejected / Concession per delivery; *Inspected by* and *Checked by* come from the logged-in users.
 5. Print the result in the 7.4.3-F1 layout as PDF.
 
-**Stack:** Node.js · Express 5 · MariaDB 10.4 `csi_db` (`mysql2/promise`) · Puppeteer (PDF) · Angular (latest) + Angular Material.
+**Stack:** Node.js · Express 5 · MariaDB 10.4 `csi_db` (`mysql2/promise`) · Puppeteer (PDF) · Angular 22 + Angular Material.
+
+**Look and feel:** modern and branded (Phase 3.0): Chubbsafes blue `#004F9C` from the logo plus non-clashing accents, light and dark mode, responsive sidebar and dialogs, tables that follow Form 7.4.3-F1.
 
 **Repository layout:** `backend/`, `frontend/`, `docs/` (see `CLAUDE.md`).
 
@@ -50,7 +53,7 @@ inspectsetup                                      list of "Checked by" names
 | `inspecttable` | 2 (test data) | `inspectnum` (PK, `INS-000001`), `inspectdate`, `itemid`, `itemname`, `accountnum`, `name`, `inspectstatus` (varchar), `purchordernum1..7`, `deliverydate1..7` (default today), `qty_received1..7`, `inspectcategory1..7` (int), `notgood1..7` (int), `judgment1..7` (int), `qfnum`, `inspectby`, `checkedby`, `recid` | One row = one form = up to 7 delivery columns. |
 | `inspectline` | 0 | `inspectnum`, `linenum` (PK together), `inspectitem`, `standard`, `tolerance` (single dec), `actual_1..7`, `status_1..7` (int, default 0) | Column N ↔ delivery column N. |
 | `inspectlineother` | 0 | `inspectnum`, `linenum`, `inspecttype`, `inspectitem` | No PK and **no result columns** yet. |
-| `inspectsetup` | 0 | `id`, `checkedby` | No PK. |
+| `inspectsetup` | 0 | `id`, `checkedby` | No PK. Superseded by users with the Checker role (§2.0); left in place, unused. |
 | `numseqtable` | 1 | `processid`, `processname`, `formatstring`, `length_tag`, `nextid` | Unrelated leftover (`Sales Order`). Not used: the app has its own `inspectnumseq`. |
 | `oauth_*`, `password_reset_temp`, `orders` | — | — | Owned by another system. Not used until §5 auth. Never exposed or modified. |
 
@@ -138,9 +141,39 @@ Goal: both projects run, tooling is in place, and the schema can store everythin
 
 ---
 
-## Phase 2 — Backend API & OK/NG Logic
+## Phase 2 — Backend API: Auth, Master Data & OK/NG Logic
 
-Goal: the whole inspection can be created, measured and judged through the API alone.
+Goal: users can log in, and the whole inspection can be created, measured and judged through the API alone.
+
+### 2.0 Authentication and users
+Decisions (2026-10-01): username + password; accounts are created by an Admin (no self-signup, no email server); an Admin resets forgotten passwords. Usernames allow letters, digits, `.`, `_`, `-` (convention: employee NIK).
+
+| Role | Can do |
+|---|---|
+| `INSPECTOR` | Create and edit own draft inspections, submit them |
+| `CHECKER` | Everything an Inspector can, plus check/return submitted inspections (*Checked by*) |
+| `ADMIN` | Everything, plus users and master data (items, standards, vendors) |
+
+- [ ] Migration `010_create_usertable.sql`: `usertable` (`userid` PK auto, `username` unique, `fullname`, `email` NULL, `role`, `password_hash`, `active`, `must_change_password`, `theme` `light|dark|system`, `last_login_at`, `created_at`, `updated_at`)
+- [ ] Passwords hashed with bcrypt; minimum 8 characters; never returned by the API
+- [ ] Session: signed JWT in an `httpOnly`, `SameSite=Strict` cookie (`Secure` in production), expires after one shift (8 h); `JWT_SECRET` in `.env`
+- [ ] Login rate limit (e.g. 5 failed attempts per username per 15 minutes → `429`)
+- [ ] Middlewares: `requireAuth` (every `/api` route except `/api/health` and `/api/auth/login`), `requireRole(...roles)`
+- [ ] `npm run user:create-admin` script to create the first Admin from the terminal
+
+| Method | Path | Description |
+|---|---|---|
+| POST | `/api/auth/login` | `{ username, password }` → sets the cookie, returns the user; `401` on bad credentials (same message for unknown user and wrong password) |
+| POST | `/api/auth/logout` | Clears the cookie; `204` |
+| GET | `/api/auth/me` | Current user (`401` when not logged in) |
+| PUT | `/api/auth/me` | Update own `fullname`, `email`, `theme` |
+| PUT | `/api/auth/me/password` | `{ currentPassword, newPassword }`; clears `must_change_password` |
+| GET / POST / PUT | `/api/users[/:userid]` | Admin: list (paging, search, role filter), create, edit role/name/active |
+| POST | `/api/users/:userid/reset-password` | Admin: sets a temporary password and `must_change_password` |
+| GET | `/api/users/lookup?role=CHECKER` | `{ userid, fullname }` for dropdowns |
+
+- [ ] Users are deactivated, never deleted, so names on past inspections stay valid
+- [ ] Tests: login success/failure/rate limit, cookie flags, `401` without cookie, `403` for wrong role, password change, admin reset, inactive user can't log in
 
 ### 2.1 Judgement engine (`services/judgement.js`, pure functions)
 - [ ] `judgeValue(line, actual)` → `1 | 0 | null` (range, `Min`, `Max`, empty)
@@ -159,11 +192,12 @@ Goal: the whole inspection can be created, measured and judged through the API a
 | GET | `/api/items/:itemId/inspect-items` | Standards ordered by type (`STD` → `CERTIFIKAT` → `VISUAL` → `FITTING`) then `inspectitem` |
 | POST / PUT / DELETE | `/api/items/:itemId/inspect-items[/...]` | Maintain standards (validation: numeric `standard`, `tolerance_plus/minus ≥ 0`, unique key) |
 | GET / POST / PUT / DELETE | `/api/vendors[/:vendaccount]` | Vendor CRUD; `409` on duplicate, `409` on delete when referenced by `inspecttable.accountnum` |
-| POST | `/api/vendors/import` | Bulk load from CSV (vendor table is empty, Q2) |
+| POST | `/api/vendors/import` | Bulk load from CSV |
+| — | `npm run db:seed:dev` | Dummy vendors (and a few sample inspections) for the empty dev `vendtable` (Q2) |
 | GET | `/api/vendors/lookup?q=` | `{ vendaccount, name }` |
-| GET / POST / DELETE | `/api/setup/checkers` | `inspectsetup` names for the *Checked by* dropdown |
 
-- [ ] Repository, service, controller, routes and validator files for items, inspect items, vendors, checkers
+- Reads are open to every logged-in user; creating, editing and deleting master data needs `ADMIN`. The *Checked by* list comes from `/api/users/lookup?role=CHECKER` (§2.0).
+- [ ] Repository, service, controller, routes and validator files for items, inspect items, vendors
 - [ ] Integration tests: paging/search/sort whitelist, 404s, duplicates, delete-in-use
 
 ### 2.3 Inspection API
@@ -180,6 +214,7 @@ Goal: the whole inspection can be created, measured and judged through the API a
 Business rules (`services/inspection.service.js`):
 - [ ] `inspectnum` generated on the server, unique under concurrent saves (`SELECT … FOR UPDATE` on the sequence row)
 - [ ] Item and vendor must exist (`422`); `itemname` / `name` copied into the header at save time
+- [ ] `inspectby` is set from the logged-in user on create; the client can't choose it
 - [ ] Delivery columns: used columns are consecutive from 1; a used column needs P/O, delivery date, qty > 0 and a category; unused columns are stored empty (`NULL` P/O, qty `0`), their dates ignored
 - [ ] Line snapshot from the master on create; later master edits don't touch saved inspections
 - [ ] `status_N` and `notgoodN` always recomputed by the server; client-sent values are ignored
@@ -190,9 +225,29 @@ Business rules (`services/inspection.service.js`):
 
 ---
 
-## Phase 3 — Frontend: Inspection UI & Validation
+## Phase 3 — Frontend: UI/UX Foundation, Inspection UI & Validation
 
-Goal: a QC inspector can fill the whole check sheet in the browser as fast as on paper.
+Goal: a QC inspector can fill the whole check sheet in the browser as fast as on paper, in a modern, branded UI.
+
+### 3.0 UI/UX foundation (design first, then code)
+Agreed direction (2026-10-01): as modern as possible; brand colors from the Chubbsafes logo (`#004F9C` blue, `#1D1D1D` text) with extra accents that don't clash; the logo always sits on a light (or, in dark mode, dark) surface, never on a colored bar; tables follow Form 7.4.3-F1 and may be prettier but must not drift from it.
+
+- [~] **Mockups** in `docs/design/mockups/` (static HTML, opened in a browser), approved by the owner before any screen is coded:
+  - Login (brand panel with the white logo + sign-in form)
+  - App shell: header with logo, page title, API status, profile menu; collapsible sidebar
+  - Dashboard: KPI cards, NG chart, recent inspections, inspections waiting for check
+  - Inspection list, inspection form (check-sheet grid), user management with an add-user dialog, profile settings
+  - Light and dark mode; desktop, tablet and phone widths
+- [ ] Design tokens: palette (brand, neutrals, OK/NG/warning/info), Inter font bundled from npm, radius, elevation, spacing, motion; mapped onto Angular Material's `--mat-sys-*` variables
+- [ ] Light / dark / system theme, saved per user (`usertable.theme`)
+- [ ] Logos in `frontend/public/brand/` (original for light surfaces, white negative for dark/brand surfaces)
+- [ ] Layout: header (logo, page title, API status, profile menu with avatar initials → Profile settings, Change password, Theme, Logout); sidebar that collapses to an icon rail on desktop (state remembered) and becomes an overlay drawer below 960px; smooth open/close transitions
+- [ ] Dialogs: centered with a backdrop on desktop, full-screen below 600px, closable with Esc / ✕, focus trapped and restored
+- [ ] Shared look for tables, forms, buttons, OK/NG and status chips, empty / loading / error states, toasts
+- [ ] Login page, auth guard (redirect to login, then back), `must_change_password` flow, role-based menu
+- [ ] Profile settings page (name, email, theme, change password)
+- [ ] Dashboard page (data from the Phase 2 API)
+- [ ] Accessibility: WCAG AA contrast in both themes, visible focus, keyboard navigation
 
 ### 3.1 Core
 - [ ] `core/ApiService` unwrapping `{ success, data, meta }`; error interceptor → snackbar with `error.message`, field errors mapped from `error.details[]`
@@ -203,7 +258,7 @@ Goal: a QC inspector can fill the whole check sheet in the browser as fast as on
 ### 3.2 Master data screens
 - [ ] Items: list + detail with the standards grid (grouped STD / Certificate / Visual / Fitting), edit standards
 - [ ] Vendors: list, create/edit form, CSV import
-- [ ] Checkers (`inspectsetup`): simple list editor
+- [ ] Users (Admin only, replaces the former "Checkers" menu): list, create, edit role / active, reset password
 
 ### 3.3 Inspection form (mirrors Form 7.4.3-F1)
 - [ ] **Header:** Part name / Part no (item lookup), Supplier (vendor lookup), inspect date, measuring instrument
@@ -221,9 +276,9 @@ Goal: a QC inspector can fill the whole check sheet in the browser as fast as on
 ### 3.4 Frontend quality
 - [ ] Unit tests: services, `judgement.ts` (shared fixture), form validators
 - [ ] Component test for the grid: typing an out-of-tolerance value marks NG and increments NG / Total sample
-- [ ] Responsive enough for a tablet on the receiving floor (landscape)
+- [ ] Responsive: phone, tablet on the receiving floor (landscape) and desktop
 
-**Phase 3 done when:** an inspector can create, fill and save an inspection matching the filled example in `docs/chek sheet-qhse (cara isi).pdf`, with OK/NG identical to the server's result.
+**Phase 3 done when:** an inspector can log in, create, fill and save an inspection matching the filled example in `docs/chek sheet-qhse (cara isi).pdf`, with OK/NG identical to the server's result, in the approved design.
 
 ---
 
@@ -235,9 +290,8 @@ Goal: the inspection is signed off and prints as the official check sheet.
 - [ ] Migration `010_inspecttable_approval.sql`: `submitted_at`, `checked_at`, `return_reason`, `remarks` (only the columns Q6 leaves missing)
 - [ ] Status flow `DRAFT → SUBMITTED → CHECKED`, and `SUBMITTED → DRAFT` (returned with a reason)
 - [ ] `POST /api/inspections/:inspectnum/submit`: needs `inspectby`, all used columns judged; recomputes OK/NG; locks editing
-- [ ] `POST /api/inspections/:inspectnum/check`: `checkedby` must be a name from `inspectsetup`; final
+- [ ] `POST /api/inspections/:inspectnum/check`: only a `CHECKER` or `ADMIN`; `checkedby` is the logged-in user; final
 - [ ] `POST /api/inspections/:inspectnum/return`: `reason` required
-- [ ] Until auth exists (§5), names are chosen in the form; the API records them as sent
 - [ ] UI: Submit / Check / Return buttons shown only in the right status; status badge on list and form
 - [ ] Tests: full flow, every wrong-status action returns `409`, `Accepted` with NG returns `422`
 
@@ -259,7 +313,7 @@ Goal: the inspection is signed off and prints as the official check sheet.
 - [ ] Tests: `application/pdf` + filename header, `404` for unknown id, HTML snapshot of the template
 
 ### 4.3 Release checklist
-- [ ] Playwright E2E: create vendor → pick item → fill 2 delivery columns with one NG → judge → submit → check → open PDF
+- [ ] Playwright E2E: log in as inspector → pick item → fill 2 delivery columns with one NG → judge → submit → log in as checker → check → open PDF
 - [ ] QC walks through the app with the paper form side by side and signs off the layout
 
 **Phase 4 done when:** a checked inspection opens as a correctly paginated 7.4.3-F1 PDF in under about 3 seconds, and QC accepts it as a replacement for the paper form.
@@ -267,8 +321,7 @@ Goal: the inspection is signed off and prints as the official check sheet.
 ---
 
 ## 5. Later (not scheduled)
-- Authentication and roles (inspector / checker / viewer), possibly reusing the existing `oauth_users` table
-- Dashboard: NG rate per supplier, item and month; Excel export
+- Dashboard drill-downs (NG rate per supplier, item and month); Excel export
 - Attachments (photos, COA scans) on an inspection
 - Audit log of changes
 - Deployment: Nginx serving the Angular build and proxying `/api`, PM2 for Node, database backups
@@ -284,3 +337,4 @@ Goal: the inspection is signed off and prints as the official check sheet.
 8. Should the PDF show the form revision as fixed `Rev. 01 / 24/10/23`, or from a setting?
 9. **Precision:** `standard`, `tolerance_*` and `actual_N` are `decimal(18,2)`. 91 standards look stored ×100 (`0.0012` printed, `0.12` stored). Should those be judged in the stored unit, or do the columns need more decimals (a migration to `decimal(18,4)`)?
 10. **Tolerance typos:** 9 standards have numbers that disagree with their tolerance text (see §3). Which is right, the text or the numbers? Judging uses the numbers.
+11. Should *Inspected by* / *Checked by* store the user's full name (as the form prints it) or the username? Default: full name in the existing `varchar(50)` columns, plus a later migration for the user ids if traceability is needed.

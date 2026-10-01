@@ -12,17 +12,18 @@ company check sheet **Form No 7.4.3-F1 "Incoming Inspection Check List"**.
 - **Backend (`backend/`):** Node.js, Express 5, MariaDB/MySQL via `mysql2/promise`, CommonJS.
 - **Frontend (`frontend/`):** Angular 22 (standalone components, signals, new control flow, zoneless), Angular Material, Vitest.
 - **Database:** `csi_db` on MariaDB 10.4 (already imported with production-like data).
-- **Docs (`docs/`):** DB dump, generated schema snapshot, and the reference paper forms.
+- **Docs (`docs/`):** DB dump, generated schema snapshot, the reference paper forms, and UI mockups (`docs/design/`).
 - **Roadmap:** `PLAN.md` is the source of truth. Work on the current phase and tick its checkboxes when a task is done.
 
 ### QC workflow the app implements
 
+0. Log in (username + password). Roles: `INSPECTOR`, `CHECKER` (also checks), `ADMIN` (also manages users and master data). Accounts are created by an Admin.
 1. Pick the item (`itemid`, Part no / Part name) and the supplier (`accountnum`).
 2. The standards load automatically from `inventinspectitem`: dimensions (`STD`), `VISUAL`, `FITTING`, `CERTIFIKAT` (COA).
 3. Enter the receipt header per delivery column: P/O No, delivery date, qty received, inspection category (Normal / Reduce / Tightening / no mark = 100 %), measuring instrument.
 4. Enter actual values `actual_1..7`. Each value is judged OK/NG in real time against `standard − tolerance_minus ≤ actual ≤ standard + tolerance_plus` (OK = `1`, NG = `0`).
 5. Final judgment per delivery column: Accepted / Rejected / Concession.
-6. Fill *Inspected by* / *Checked by*, save to `inspecttable` + `inspectline` (+ `inspectlineother`), and print the 7.4.3-F1 PDF.
+6. *Inspected by* / *Checked by* come from the logged-in users; save to `inspecttable` + `inspectline` (+ `inspectlineother`), and print the 7.4.3-F1 PDF.
 
 **Important:** on the paper form, the 7 `Actual | OK/NG` column pairs are the 7 **delivery
 columns**, not 7 samples of one delivery. Column N of `inspectline` (`actual_N`, `status_N`)
@@ -74,7 +75,8 @@ belongs to header column N of `inspecttable` (`purchordernumN`, `deliverydateN`,
 │   │   ├── index.js               # Mounts all routers under /api
 │   │   ├── item.routes.js         # /api/items, /api/items/:itemId/inspect-items
 │   │   ├── vendor.routes.js       # /api/vendors
-│   │   ├── setup.routes.js        # /api/setup/checkers (inspectsetup)
+│   │   ├── auth.routes.js         # /api/auth/login, logout, me
+│   │   ├── user.routes.js         # /api/users (Admin)
 │   │   ├── inspection.routes.js   # /api/inspections, /api/inspections/:inspectnum/...
 │   │   └── report.routes.js       # /api/reports/inspections/:inspectnum/pdf
 │   ├── controllers/               # HTTP only: read req, call a service, send the response
@@ -82,7 +84,7 @@ belongs to header column N of `inspecttable` (`purchordernumN`, `deliverydateN`,
 │   │   └── judgement.js           # Pure OK/NG functions, no DB access
 │   ├── repositories/              # All SQL. One file per table group.
 │   ├── validators/                # Request schemas per resource (Zod)
-│   ├── middlewares/               # validate, error-handler, not-found (*.middleware.js)
+│   ├── middlewares/               # validate, auth (requireAuth / requireRole), error-handler, not-found
 │   ├── constants/                 # Code ↔ meaning maps (inspect category, judgment, inspect type)
 │   ├── utils/                     # app-error.js, response.js, pagination.js
 │   ├── reports/
@@ -218,11 +220,15 @@ Rules:
   - `201`: create
   - `204`: delete, with no body
   - `400`: validation failed
+  - `401`: not logged in, or bad credentials on login
+  - `403`: logged in but the role isn't allowed
   - `404`: not found
   - `409`: duplicate key or wrong status for the action
   - `422`: business rule violation
+  - `429`: too many login attempts
   - `500`: unexpected error
-- **Error codes** are UPPER_SNAKE constants: `VALIDATION_ERROR`, `NOT_FOUND`, `DUPLICATE_KEY`, `INVALID_STATUS`, `BUSINESS_RULE`, `INTERNAL_ERROR`.
+- **Error codes** are UPPER_SNAKE constants: `VALIDATION_ERROR`, `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOUND`, `DUPLICATE_KEY`, `INVALID_STATUS`, `BUSINESS_RULE`, `TOO_MANY_REQUESTS`, `INTERNAL_ERROR`.
+- **Auth:** every `/api` route requires a login except `GET /api/health` and `POST /api/auth/login`. The session is a JWT in an `httpOnly` cookie; never put tokens in `localStorage` or in responses. Never return `password_hash`.
 - Never send stack traces or SQL errors to the client. Log them on the server and return `INTERNAL_ERROR`.
 - **Field names** in JSON match the `csi_db` column names (lowercase, e.g. `itemid`, `accountnum`, `inspectdate`, `deliverydate1`, `tolerance_plus`). Don't rename them to camelCase, so the frontend, API and DB all use the same names.
 - **Keys that aren't DB columns** (nested collections, computed values, query parameters) are camelCase: `inspectItems`, `lines`, `otherLines`, `totalReceived`, `?dateFrom=&dateTo=`. Never give a computed key the same name as a real column.
@@ -259,6 +265,7 @@ Rules:
 - Formatting: Prettier (same settings as the backend), angular-eslint.
 - Styling: Angular Material (M3) with its `--mat-sys-*` CSS variables; no other UI kit. Fonts and icons are bundled from npm (`@fontsource/roboto`, `material-symbols`), never loaded from a CDN, because the plant network may have no internet.
 - UI language is English, matching the labels on Form 7.4.3-F1 (*Part name*, *Supplier name*, *Inspected by*).
+- **Design:** follow the approved mockups in `docs/design/mockups/` and the tokens from Phase 3.0. Brand blue `#004F9C`; extra accent colors are fine if they don't clash with it. The logo sits on a light surface (white negative version on dark/brand surfaces), never on a colored bar. Modern look, light and dark mode, collapsible sidebar, dialogs full-screen on phones. Check-sheet tables keep the structure of Form 7.4.3-F1.
 
 ### Both
 - Keep comments for the *why*. No commented-out code.
