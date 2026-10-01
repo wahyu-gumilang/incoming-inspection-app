@@ -19,6 +19,11 @@ const HEADER_COLUMNS = Object.freeze({
   inspectcategory: numbered('inspectcategory'),
   notgood: numbered('notgood'),
   judgment: numbered('judgment'),
+  // AQL snapshot per delivery (migration 012)
+  samplesize: numbered('samplesize'),
+  acceptnum: numbered('acceptnum'),
+  rejectnum: numbered('rejectnum'),
+  concessionnote: numbered('concessionnote'),
 });
 
 const LINE_COLUMNS = Object.freeze({
