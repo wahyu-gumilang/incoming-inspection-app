@@ -161,7 +161,7 @@ Decisions (2026-10-01): username + password; accounts are created by an Admin (n
 - [x] Login rate limit: 5 failed attempts per username per 15 minutes → `429` (in memory, single process); same `401` for unknown user and wrong password, with equal timing
 - [x] Middlewares: `requireAuth` (every `/api` route except `/api/health` and `/api/auth/login`), `requirePasswordChanged` (temporary password → only `/api/auth` until changed, `403 PASSWORD_CHANGE_REQUIRED`), `requireRole(...roles)`; CORS limited to `ALLOWED_ORIGINS`; writes from a foreign `Origin` → `403` (CSRF guard)
 - [x] `npm run user:create-admin` script: asks for the password at a hidden prompt (twice), never as an argument
-- [ ] First Admin on `csi_db`: **Gumilang** (`070203`), created by the owner with the script after migration 010
+- [x] First Admin on `csi_db`: **Gumilang** (`070203`), created by the owner with the script on 2026-10-01 (verified: ADMIN, active, bcrypt hash)
 
 | Method | Path | Description |
 |---|---|---|
@@ -178,12 +178,16 @@ Decisions (2026-10-01): username + password; accounts are created by an Admin (n
 - [x] Tests: login success/failure/rate limit, cookie flags, `401` without cookie, `403` for wrong role, password change, admin reset, inactive user can't log in (115 backend tests)
 
 ### 2.1 Judgement engine (`services/judgement.js`, pure functions)
-- [ ] `judgeValue(line, actual)` → `1 | 0 | null` (range, `Min`, `Max`, empty)
-- [ ] `judgeLines(lines)` → `status_N` for every line and column
-- [ ] `countNotGood(lines, otherLines)` → `notgood1..7`
-- [ ] `validateJudgments(header)`: `Accepted` not allowed with NG; used column without judgment blocks submit
-- [ ] Integer-hundredths arithmetic
-- [ ] Unit tests: exactly on each limit, 0.01 outside, `+x/-0` and `+0/-x`, `Min`/`Max`, zero tolerance, empty values, negative standard, qualitative lines, all 7 columns
+Decided 2026-10-01: STD rules without usable limits (both tolerances 0, or a text such as "Tidak Terangkat"; 712 rows) are **judged by the inspector** like a visual check; a negative tolerance is used by its size; the stored numbers are always used, and doubtful standards are flagged (`services/standard-check.js`) instead of fixed.
+
+- [x] `ruleMode(rule)` → `RANGE | MIN | MAX | MANUAL`; `limits(rule)` in hundredths
+- [x] `judgeValue(rule, actual)` → `1 | 0 | null` (range, `Min`, `Max`, empty = not measured, MANUAL = inspector's call); invalid input throws
+- [x] `judgeLine(rule, actuals, manual)` → `status_N` for one line over the 7 columns (client statuses ignored except on MANUAL rules)
+- [x] `countNgCells(rows, 7)` and `minimumDefects(ngCells)`: `notgoodN` counts pieces, at least 1 when a cell is NG
+- [x] `suggestJudgment(defects, plan)` and `judgmentProblems(...)`: Accepted only up to Ac, Concession only from Re with a note
+- [x] Integer-hundredths arithmetic (`toHundredths`, string-exact)
+- [x] `standardWarnings(row)` → `NO_LIMITS`, `QUALITATIVE_TOLERANCE`, `NEGATIVE_TOLERANCE`, `TOLERANCE_TEXT_MISMATCH`, `STANDARD_TEXT_MISMATCH` (shared with `npm run db:check`)
+- [x] Unit tests: exactly on each limit, 0.01 outside, `+x/-0` and `+0/-x`, `Min`/`Max`, zero tolerance, empty values, negative standard, floating-point edge (0.3 ± 0.1), qualitative lines, all 7 columns; plus a run over all 10,375 STD rules in `csi_db` (nominal value OK, ±0.01 beyond each limit NG, no errors)
 
 ### 2.2 Master data API (read-heavy; the item data already exists)
 | Method | Path | Description |
@@ -369,14 +373,14 @@ Goal: the inspection is signed off and prints as the official check sheet.
 ## 6. Open questions
 1. **Code maps:** are the values in §3 right for `inspectcategoryN`, `judgmentN` and `inspectstatus`? The two existing rows use `1` everywhere and look like test data — may they be deleted?
 2. ~~**Vendors:** where does the supplier list come from?~~ **Answered 2026-10-01:** dummy data is fine, as long as table/column names and ids follow `csi_db`.
-3. **Tolerance edge cases:** how should the ~700 STD standards with tolerance `' 0.0'` and both limits `0` be judged (exact match, or reference only / not judged)? Are qualitative texts in STD rows (`Tidak Terangkat`) really visual checks?
+3. ~~**Tolerance edge cases:**~~ **Decided 2026-10-01:** STD rules without usable limits (700 zero-tolerance + 12 qualitative) are judged by the inspector, like a visual check.
 4. ~~What does `inventtable.inspectqty` mean?~~ **Checked 2026-10-01:** `0` on all 1 685 items, so it is unused and ignored.
 5. ~~**NG / Total sample:** where does the total sample come from?~~ **Decided 2026-10-01:** from the AQL plan (§2.4), snapshot in `samplesize1..7`. NG = defective pieces.
 6. **Per-column sign-off:** the form has *QF No*, *Inspected by* and *Checked by* per delivery column, the schema has one each per inspection. Is one per form enough?
 7. ~~Is `csi_db` shared with another application?~~ **Answered 2026-10-01:** no, it's a development copy. The `docs/` files are references for the form's shape, content and columns. Inspection numbers use the app's own table (`inspectnumseq`).
 8. Should the PDF show the form revision as fixed `Rev. 01 / 24/10/23`, or from a setting?
 9. **Precision:** `standard`, `tolerance_*` and `actual_N` are `decimal(18,2)`. 91 standards look stored ×100 (`0.0012` printed, `0.12` stored). Should those be judged in the stored unit, or do the columns need more decimals (a migration to `decimal(18,4)`)?
-10. **Tolerance typos:** 9 standards have numbers that disagree with their tolerance text (see §3). Which is right, the text or the numbers? Judging uses the numbers.
+10. **Tolerance typos:** 9 standards have numbers that disagree with their tolerance text (see §3). **Decided 2026-10-01:** judging uses the stored numbers and the standard is flagged; QC still to say which is right.
 11. Should *Inspected by* / *Checked by* store the user's full name (as the form prints it) or the username? Default: full name in the existing `varchar(50)` columns, plus a later migration for the user ids if traceability is needed.
 12. **AQL plan (confirm with QC / Pak Fajar):** is the practice "ISO 2859-1 Special Level S-1 with zero defects (Ac 0 / Re 1)", as the filled example suggests, or a specific AQL value (and which)? One plan for all items, or per item / defect class (critical / major / minor)?
 13. **Tightened / Reduced** for the default plan: is "one code letter larger / smaller" acceptable, or does QC use the ISO tightened / reduced tables?
