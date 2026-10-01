@@ -1,5 +1,14 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const app = require('./app');
+const { jwtSecret } = require('./config/auth');
+
+// Fail at start-up rather than on the first sign-in.
+try {
+  jwtSecret();
+} catch (err) {
+  console.error(err.message);
+  process.exit(1);
+}
 
 const PORT = process.env.PORT || 5000;
 

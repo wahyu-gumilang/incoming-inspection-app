@@ -152,6 +152,25 @@ CREATE TABLE `schema_migrations` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE `usertable` (
+  `userid` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `fullname` varchar(50) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `role` varchar(20) NOT NULL,
+  `password_hash` varchar(100) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `must_change_password` tinyint(1) NOT NULL DEFAULT 0,
+  `theme` varchar(10) NOT NULL DEFAULT 'light',
+  `last_login_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`userid`),
+  UNIQUE KEY `uq_usertable_username` (`username`),
+  CONSTRAINT `chk_usertable_role` CHECK (`role` in ('INSPECTOR','CHECKER','ADMIN')),
+  CONSTRAINT `chk_usertable_theme` CHECK (`theme` in ('light','dark','system'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE `vendtable` (
   `vendaccount` varchar(30) NOT NULL,
   `name` varchar(100) DEFAULT NULL,

@@ -155,12 +155,13 @@ Decisions (2026-10-01): username + password; accounts are created by an Admin (n
 | `CHECKER` | Everything an Inspector can, plus check/return submitted inspections (*Checked by*) |
 | `ADMIN` | Everything, plus users and master data (items, standards, vendors) |
 
-- [ ] Migration `010_create_usertable.sql`: `usertable` (`userid` PK auto, `username` unique, `fullname`, `email` NULL, `role`, `password_hash`, `active`, `must_change_password`, `theme` `light|dark|system`, `last_login_at`, `created_at`, `updated_at`)
-- [ ] Passwords hashed with bcrypt; minimum 8 characters; never returned by the API
-- [ ] Session: signed JWT in an `httpOnly`, `SameSite=Strict` cookie (`Secure` in production), expires after one shift (8 h); `JWT_SECRET` in `.env`
-- [ ] Login rate limit (e.g. 5 failed attempts per username per 15 minutes → `429`)
-- [ ] Middlewares: `requireAuth` (every `/api` route except `/api/health` and `/api/auth/login`), `requireRole(...roles)`
-- [ ] `npm run user:create-admin` script to create the first Admin from the terminal
+- [x] Migration `010_create_usertable.sql` (applied to `csi_db` 2026-10-01 16:51 after a backup): `usertable` (`userid` PK auto, `username` unique, `fullname`, `email` NULL, `role`, `password_hash`, `active`, `must_change_password`, `theme` `light|dark|system`, `last_login_at`, `created_at`, `updated_at`)
+- [x] Passwords hashed with bcrypt (`bcryptjs`, cost 12); 8–72 characters; never returned by the API
+- [x] Session: signed JWT (HS256, user id only) in an `httpOnly`, `SameSite=Strict` cookie `iqc_session` (`Secure` in production), expires after one shift (8 h); role and active flag re-read from the database on every request; `JWT_SECRET` in `.env`, server refuses to start without it
+- [x] Login rate limit: 5 failed attempts per username per 15 minutes → `429` (in memory, single process); same `401` for unknown user and wrong password, with equal timing
+- [x] Middlewares: `requireAuth` (every `/api` route except `/api/health` and `/api/auth/login`), `requirePasswordChanged` (temporary password → only `/api/auth` until changed, `403 PASSWORD_CHANGE_REQUIRED`), `requireRole(...roles)`; CORS limited to `ALLOWED_ORIGINS`; writes from a foreign `Origin` → `403` (CSRF guard)
+- [x] `npm run user:create-admin` script: asks for the password at a hidden prompt (twice), never as an argument
+- [ ] First Admin on `csi_db`: **Gumilang** (`070203`), created by the owner with the script after migration 010
 
 | Method | Path | Description |
 |---|---|---|
@@ -173,8 +174,8 @@ Decisions (2026-10-01): username + password; accounts are created by an Admin (n
 | POST | `/api/users/:userid/reset-password` | Admin: sets a temporary password and `must_change_password` |
 | GET | `/api/users/lookup?role=CHECKER` | `{ userid, fullname }` for dropdowns |
 
-- [ ] Users are deactivated, never deleted, so names on past inspections stay valid
-- [ ] Tests: login success/failure/rate limit, cookie flags, `401` without cookie, `403` for wrong role, password change, admin reset, inactive user can't log in
+- [x] Users are deactivated, never deleted, so names on past inspections stay valid; an Admin can't demote, deactivate or reset themselves
+- [x] Tests: login success/failure/rate limit, cookie flags, `401` without cookie, `403` for wrong role, password change, admin reset, inactive user can't log in (115 backend tests)
 
 ### 2.1 Judgement engine (`services/judgement.js`, pure functions)
 - [ ] `judgeValue(line, actual)` → `1 | 0 | null` (range, `Min`, `Max`, empty)
@@ -243,7 +244,7 @@ General Level II, AQL 2.5, normal, arrows already resolved: 2–50 → 5 (0/1), 
 - [ ] Migration `012_inspecttable_aql_columns.sql`: `aqlplanid`, `samplesize1..7`, `acceptnum1..7`, `rejectnum1..7`, `concessionnote1..7` (snapshot per delivery, so editing the AQL table never changes saved inspections)
 - [ ] `services/aql.js` (pure): `findPlanRow(rows, lot, category)` → `{ codeletter, samplesize, acceptnum, rejectnum, fullInspection }`, `suggestJudgment(defects, row)`
 - [ ] Recomputed on every save from the server's own tables; values sent by the client are ignored (what the Laravel example called the "security guard")
-- [ ] CSRF: besides the `SameSite=Strict` cookie, state-changing requests must carry an allowed `Origin` header (the equivalent of Laravel's `@csrf`)
+- [x] CSRF: besides the `SameSite=Strict` cookie, state-changing requests must carry an allowed `Origin` header (the equivalent of Laravel's `@csrf`) — done in §2.0
 
 | Method | Path | Description |
 |---|---|---|
