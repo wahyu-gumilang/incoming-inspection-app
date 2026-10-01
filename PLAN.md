@@ -128,11 +128,13 @@ Goal: both projects run, tooling is in place, and the schema can store everythin
 - [x] Test database `csi_db_test`: `npm run db:test:reset` rebuilds it from `db/baseline.sql` + all migrations + `db/seeds/test-fixtures.sql` (real item ids, dummy vendors/checkers). The `db` Jest project does this before every run. `.env.test` (git-ignored) and `.env.test.example`.
 
 ### 1.4 Frontend scaffold
-- [ ] `npx @angular/cli@latest new frontend` (standalone, routing, SCSS, strict); Angular Material; angular-eslint; Prettier
-- [ ] `proxy.conf.json` sends `/api` to `http://localhost:5000`; API base URL from `environments/`
-- [ ] App shell: sidebar (Inspections, Master Data: Items, Vendors, Checkers) and top bar with the company name
+- [x] Angular 22.2 app in `frontend/` (`ng new --routing --style=scss --strict --ssr=false`; zoneless, Vitest); Angular Material; angular-eslint; Prettier with the backend's settings
+- [x] Roboto and Material Symbols bundled from npm (`@fontsource/roboto`, `material-symbols`), not Google Fonts, so the app works without internet
+- [x] `proxy.conf.json` sends `/api` to `http://localhost:5000`; API base URL from `environments/`
+- [x] App shell: top bar (app and company name, API status chip polling `/api/health`), sidebar (Inspections; Master Data: Items, Vendors, Checkers; overlay below 960px), lazy placeholder pages, not-found page, tab titles
+- [x] Minimal `core/api/ApiService` (`get`, unwraps `{ success, data }`); completed in Phase 3.1
 
-**Phase 1 done when:** `npm run lint && npm test` pass in `backend/` and `frontend/`, `npm run db:migrate` applies cleanly on a fresh copy of `csi_db`, and `/api/health` answers in the new shape.
+**Phase 1 done when:** `npm run lint && npm test` pass in `backend/` and `frontend/`, `npm run db:migrate` applies cleanly on a fresh copy of `csi_db`, and `/api/health` answers in the new shape. ✅ Done 2026-10-01.
 
 ---
 
