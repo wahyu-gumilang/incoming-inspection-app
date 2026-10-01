@@ -424,6 +424,45 @@ body.collapsed .action-bar { left: calc(var(--rail) + 24px); }
 .action-bar .spacer { flex: 1; }
 body:not([data-screen="inspection-form"]) .action-bar { display: none; }
 
+/* ============ AQL ============ */
+.notice { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; margin-bottom: 16px; border-radius: var(--radius); background: var(--warn-bg); color: var(--warn); }
+.notice .icon { font-size: 22px; }
+.notice p { margin: 2px 0 0; color: var(--text); font-size: 13px; }
+.plan-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.plan-card { text-align: left; padding: 16px 18px; border-radius: var(--radius); border: 2px solid var(--border); background: var(--surface); cursor: pointer; display: grid; gap: 6px; transition: border-color .15s, box-shadow .15s; }
+.plan-card:hover { box-shadow: var(--shadow-1); }
+.plan-card.on { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-50); }
+.plan-card .row1 { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.plan-card b { font-size: 15px; }
+.plan-card span { font-size: 13px; color: var(--text-2); }
+.aql-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; align-items: start; }
+.tabs { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface-sunk); border-radius: 10px; }
+.tabs button { height: 32px; padding: 0 14px; border: 0; border-radius: 7px; background: transparent; cursor: pointer; font-weight: 600; font-size: 12px; color: var(--text-2); }
+.tabs button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow-1); }
+table.data tr.hit td { background: var(--brand-50); }
+table.data tr.hit td:first-child { box-shadow: inset 4px 0 0 var(--brand); }
+.letter { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--surface-sunk); font-weight: 700; }
+.calc-result { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.calc-result div { padding: 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); text-align: center; }
+.calc-result b { display: block; font-size: 26px; letter-spacing: -.02em; }
+.calc-result span { font-size: 12px; color: var(--text-2); font-weight: 600; }
+.calc-result .ac b { color: var(--ok); } .calc-result .re b { color: var(--ng); }
+.empty { padding: 32px 20px; text-align: center; color: var(--text-2); }
+.empty .icon { font-size: 36px; color: var(--text-3); display: block; margin-bottom: 6px; }
+/* AQL cells on the check sheet */
+.qtycat { display: inline-flex; gap: 4px; align-items: center; }
+tr.foot td .qtycat input { width: 56px; font-weight: 700; }
+tr.foot td .qtycat select { width: 46px; font-weight: 700; color: var(--brand); }
+.aqlcell { display: inline-flex; flex-direction: column; line-height: 1.15; font-size: 12px; }
+.aqlcell b { font-size: 13px; }
+.aqlcell span { color: var(--text-3); font-size: 11px; }
+.aqlcell.full b { color: var(--warn); }
+tr.aql td { background: color-mix(in srgb, var(--brand) 5%, var(--surface)); }
+tr.foot td .ngin { width: 40px; display: inline-block; font-weight: 700; }
+tr.foot td .ngin.has { color: var(--ng); border-color: color-mix(in srgb, var(--ng) 40%, transparent); }
+.judg button.suggest:not(.on) { box-shadow: 0 0 0 2px var(--brand-100); border-color: var(--brand); color: var(--brand); }
+.judg-hint { display: block; font-size: 10px; font-weight: 600; color: var(--text-3); margin-top: 2px; }
+
 /* ============ Users & profile ============ */
 .user-cell { display: flex; align-items: center; gap: 12px; }
 .role { font-size: 12px; }
@@ -461,6 +500,7 @@ body[data-screen="inspection-form"] .mock-nav { bottom: 92px; }
 
 /* ============ Responsive ============ */
 @media (max-width: 1200px) {
+  .aql-grid { grid-template-columns: 1fr; }
   .kpis { grid-template-columns: repeat(2, 1fr); }
   .grid-2 { grid-template-columns: 1fr; }
   .meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -496,7 +536,7 @@ body[data-screen="inspection-form"] .mock-nav { bottom: 92px; }
   .api-chip .txt, .profile-btn .who, .header .hide-sm { display: none; }
   .profile-btn { padding: 0 4px; }
   .crumbs .path { display: none; }
-  .meta-grid, .form-grid, .theme-cards { grid-template-columns: 1fr; }
+  .meta-grid, .form-grid, .theme-cards, .plan-cards { grid-template-columns: 1fr; }
   .bar-row { grid-template-columns: 110px 1fr 48px; }
   .dialog-backdrop { padding: 0; }
   .dialog { max-width: none; height: 100vh; max-height: none; border-radius: 0; display: flex; flex-direction: column; transform: translateY(100%); }
@@ -572,6 +612,7 @@ body[data-screen="inspection-form"] .mock-nav { bottom: 92px; }
       <div class="nav-section">Master data</div>
       <a href="#items" data-go="inspections" title="Items &amp; standards"><span class="icon">inventory_2</span><span class="label">Items &amp; standards</span></a>
       <a href="#vendors" data-go="inspections" title="Vendors"><span class="icon">local_shipping</span><span class="label">Vendors</span></a>
+      <a href="#aql" data-go="aql" title="AQL table"><span class="icon">table_chart</span><span class="label">AQL table</span></a>
       <div class="nav-section">Administration</div>
       <a href="#users" data-go="users" title="Users"><span class="icon">group</span><span class="label">Users</span></a>
     </nav>
@@ -770,7 +811,7 @@ body[data-screen="inspection-form"] .mock-nav { bottom: 92px; }
 
         <div class="card sheet-card">
           <div class="card-head" style="padding-bottom:14px">
-            <h3>Measurement result</h3>
+            <h3>Measurement result <a href="#aql" data-go="aql" class="chip chip-brand" style="margin-left:8px;vertical-align:2px">AQL · S-1 · zero defects</a></h3>
             <div class="legend"><span><i style="background:var(--surface-sunk);border:1px solid var(--border-strong)"></i>Actual</span><span><i style="background:var(--ok)"></i>OK</span><span><i style="background:var(--ng)"></i>NG</span></div>
           </div>
           <div class="sheet-wrap">
@@ -791,6 +832,42 @@ body[data-screen="inspection-form"] .mock-nav { bottom: 92px; }
           <div class="sheet-legend">
             <span><b>*)</b> T: Tightening · N: Normal · R: Reduce · — : 100 % inspection</span>
             <span><b>**)</b> O: Accepted · X: Rejected · C: Concession</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== AQL TABLE =================== -->
+      <section class="page" id="page-aql">
+        <div class="page-head">
+          <div><h1>AQL table</h1><p>Sample size and accept / reject numbers for each delivery, looked up from its lot size (ISO 2859-1).</p></div>
+          <div class="actions"><button class="btn btn-outline"><span class="icon">edit</span>Edit rows</button></div>
+        </div>
+        <div class="notice">
+          <span class="icon">info</span>
+          <div><b>Provisional plan, to confirm with QC</b>
+            <p>"S-1 · zero defects" matches the filled check sheet (lot 20 and 50 → 2 pcs, lot 100 → 3 pcs). General Level II AQL 2.5 is available as an alternative. Only administrators can edit rows or change the default.</p></div>
+        </div>
+        <div class="plan-cards" id="plan-cards"></div>
+        <div class="aql-grid">
+          <div class="card">
+            <div class="card-head" style="padding-bottom:14px">
+              <h3 id="aql-title">Sampling plan</h3>
+              <div class="tabs" role="tablist" aria-label="Inspection category">
+                <button data-cat="N" class="on" role="tab">Normal</button><button data-cat="T" role="tab">Tightened</button><button data-cat="R" role="tab">Reduced</button>
+              </div>
+            </div>
+            <div class="table-wrap" id="aql-table"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Try a lot size</h3></div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="field"><label for="calc-lot">Lot size (QTY received)</label><input id="calc-lot" class="input" inputmode="numeric" value="100" /></div>
+                <div class="field"><label for="calc-cat">Category</label><select id="calc-cat" class="select"><option value="N">N · Normal</option><option value="T">T · Tightened</option><option value="R">R · Reduced</option></select></div>
+              </div>
+              <div class="calc-result" id="calc-result"></div>
+              <p class="subtle" style="font-size:12px;margin:12px 0 0" id="calc-note"></p>
+            </div>
           </div>
         </div>
       </section>
@@ -901,6 +978,7 @@ body[data-screen="inspection-form"] .mock-nav { bottom: 92px; }
   <button data-mock="dashboard">Dashboard</button>
   <button data-mock="inspections">Inspections</button>
   <button data-mock="inspection-form">Inspection form</button>
+  <button data-mock="aql">AQL table</button>
   <button data-mock="users">Users</button>
   <button data-mock="profile">Profile</button>
   <span class="sep"></span>
@@ -912,6 +990,7 @@ const SCREENS = {
   dashboard: ['Overview', 'Dashboard'],
   inspections: ['Quality', 'Inspections'],
   'inspection-form': ['Quality · Inspections', 'INS-000128 · Handle Rhino Prima'],
+  aql: ['Master data', 'AQL table'],
   users: ['Administration', 'Users'],
   profile: ['Account', 'Profile settings'],
 };
@@ -987,10 +1066,43 @@ const OTHER = [
   { section: 'Fitting', rows: [{ item: 'C', std: 'M8', tol: 'Fitting OK', okng: ['OK', 'OK', 'OK'] }] },
 ];
 const DELIVERIES = [
-  { po: '33932', date: '2026-09-15', qty: 50, cat: 'N', sample: 2, j: 'o', qf: '' },
-  { po: '34071', date: '2026-09-24', qty: 20, cat: 'N', sample: 2, j: 'c', qf: 'QF 01-05' },
-  { po: '34561', date: '2026-10-01', qty: 50, cat: 'N', sample: 3, j: 'o', qf: '' },
+  { po: '33932', date: '2026-09-15', qty: 50, cat: 'N', j: 'o', qf: '', note: '' },
+  { po: '34071', date: '2026-09-24', qty: 20, cat: 'N', j: 'c', qf: 'QF 01-05', note: 'Burr on B, accepted by PPIC' },
+  { po: '34561', date: '2026-10-01', qty: 100, cat: 'N', j: 'o', qf: '', note: '' },
 ];
+
+/* AQL plans: [lotMin, lotMax (null = no limit), code letter, sample size, Ac, Re] */
+const AQL_PLANS = {
+  s1: {
+    name: 'Current practice', sub: 'ISO 2859-1 Special Level S-1 · zero defects (Ac 0 / Re 1)', badge: 'Default',
+    rows: {
+      N: [[1, 1, '—', 1, 0, 1], [2, 50, 'A', 2, 0, 1], [51, 500, 'B', 3, 0, 1], [501, 35000, 'C', 5, 0, 1], [35001, null, 'D', 8, 0, 1]],
+      T: [[1, 1, '—', 1, 0, 1], [2, 50, 'B', 3, 0, 1], [51, 500, 'C', 5, 0, 1], [501, 35000, 'D', 8, 0, 1], [35001, null, 'E', 13, 0, 1]],
+      R: [[1, 1, '—', 1, 0, 1], [2, 50, 'A', 2, 0, 1], [51, 500, 'A', 2, 0, 1], [501, 35000, 'B', 3, 0, 1], [35001, null, 'C', 5, 0, 1]],
+    },
+  },
+  g2: {
+    name: 'ISO General Level II · AQL 2.5', sub: 'From Pak Fajar\'s request · normal only · verify against the official standard', badge: 'Alternative',
+    rows: {
+      N: [[2, 50, 'C', 5, 0, 1], [51, 150, 'F', 20, 1, 2], [151, 280, 'G', 32, 2, 3], [281, 500, 'H', 50, 3, 4], [501, 1200, 'J', 80, 5, 6],
+          [1201, 3200, 'K', 125, 7, 8], [3201, 10000, 'L', 200, 10, 11], [10001, 35000, 'M', 315, 14, 15], [35001, null, 'N', 500, 21, 22]],
+      T: null, R: null,
+    },
+  },
+};
+const ACTIVE_PLAN = 's1';
+
+// Same lookup the server will run: a lot smaller than the sample means 100 % inspection.
+function aqlLookup(planKey, cat, lot) {
+  lot = Number(lot);
+  if (!Number.isInteger(lot) || lot < 1) return null;
+  if (cat === 'F') return { letter: '—', n: lot, ac: 0, re: 1, full: true };
+  const rows = AQL_PLANS[planKey].rows[cat];
+  if (!rows) return null;
+  const r = rows.find(([min, max]) => lot >= min && (max === null || lot <= max));
+  if (!r) return { letter: '—', n: lot, ac: 0, re: 1, full: true };
+  return { letter: r[2], n: Math.min(r[3], lot), ac: r[4], re: r[5], full: r[3] >= lot, row: r };
+}
 
 const hundredths = (v) => Math.round(Number(v) * 100);
 function judge(line, raw) {
@@ -1046,9 +1158,13 @@ function buildSheet() {
   rows.push(foot('P/O No.', (d) => `<input value="${d ? d.po : ''}" ${d ? '' : 'disabled placeholder="—"'}>`));
   rows.push(foot('Delivery date', (d) => d ? `<input value="${fmtDate(d.date)}">` : `<input disabled placeholder="—">`));
   rows.push(`<tr class="foot instrument"><th class="sx sxspan" colspan="4">Measuring Instrument</th><td colspan="14" style="text-align:left;padding-left:12px"><input style="text-align:left" value="Digital caliper Mitutoyo 500-196 · Thread gauge M8"></td></tr>`);
-  rows.push(foot('QTY received / Insp. category *)', (d) => d ? `<span class="mono" style="font-weight:600">${d.qty}</span> <span class="chip chip-brand" style="height:22px;margin-left:4px">${d.cat}</span>` : '<span class="subtle">—</span>'));
-  rows.push(foot('NG / Total sample', (d, c) => d ? `<span class="ngcount" id="ng-${c}">0</span><span class="subtle"> / ${d.sample}</span>` : '<span class="subtle">—</span>'));
-  rows.push(foot('Judgment **)', (d, c) => d ? `<span class="judg" data-c="${c}"><button class="o ${d.j === 'o' ? 'on' : ''}" title="Accepted">O</button><button class="x ${d.j === 'x' ? 'on' : ''}" title="Rejected">X</button><button class="c ${d.j === 'c' ? 'on' : ''}" title="Concession">C</button></span>` : '<span class="subtle">—</span>'));
+  rows.push(foot('QTY received / Insp. category *)', (d, c) => d
+    ? `<span class="qtycat"><input class="qty mono" data-c="${c}" inputmode="numeric" value="${d.qty}" aria-label="QTY received, delivery ${c + 1}"><select class="cat" data-c="${c}" aria-label="Inspection category, delivery ${c + 1}">${['N', 'R', 'T', 'F'].map((k) => `<option value="${k}" ${k === d.cat ? 'selected' : ''}>${k === 'F' ? '—' : k}</option>`).join('')}</select></span>`
+    : '<span class="subtle">—</span>'));
+  rows.push(foot('Sample size (AQL)', (d, c) => d ? `<span class="aqlcell" id="aql-${c}"></span>` : '<span class="subtle">—</span>', 'aql'));
+  rows.push(foot('NG / Total sample', (d, c) => d ? `<input class="ngin mono" data-c="${c}" inputmode="numeric" value="0" aria-label="Defective pieces, delivery ${c + 1}"><span class="subtle"> / <span id="n-${c}"></span></span>` : '<span class="subtle">—</span>'));
+  rows.push(foot('Judgment **)', (d, c) => d ? `<span class="judg" data-c="${c}"><button class="o ${d.j === 'o' ? 'on' : ''}" title="Accepted">O</button><button class="x ${d.j === 'x' ? 'on' : ''}" title="Rejected">X</button><button class="c ${d.j === 'c' ? 'on' : ''}" title="Concession">C</button></span><span class="judg-hint" id="hint-${c}"></span>` : '<span class="subtle">—</span>'));
+  rows.push(foot('Concession note', (d, c) => d ? `<input class="cnote" data-c="${c}" value="${d.note}" placeholder="—" aria-label="Concession note, delivery ${c + 1}">` : '<span class="subtle">—</span>'));
   rows.push(foot('QF No.', (d) => `<input value="${d ? d.qf : ''}" ${d ? 'placeholder="—"' : 'disabled placeholder="—"'}>`));
   rows.push(foot('Inspected by', (d) => d ? '<span class="signer"><span class="avatar" style="background:linear-gradient(135deg,var(--teal),var(--sky))">BS</span>Budi S.</span>' : '<span class="subtle">—</span>'));
   rows.push(foot('Checked by', (d) => d ? '<span class="subtle" style="font-size:12px">Waiting</span>' : '<span class="subtle">—</span>'));
@@ -1059,7 +1175,9 @@ function buildSheet() {
     if (b.disabled) return;
     b.parentElement.querySelectorAll('button').forEach((x) => x.classList.remove('on'));
     b.classList.add('on');
+    recount();
   }));
+  document.querySelectorAll('#sheet .qty, #sheet .cat, #sheet .ngin').forEach((el) => el.addEventListener('input', recount));
   recount();
 }
 
@@ -1071,26 +1189,75 @@ function onActual(e) {
   recount();
 }
 
-/* NG per delivery column; "Accepted" is disabled while a column has NG (server enforces the same rule) */
+/* Per delivery: AQL sample / Ac / Re from QTY + category, NG pieces (at least 1 when the grid has an NG),
+   suggested judgment, O blocked above Ac, C only at or above Re. The server enforces the same rules. */
 function recount() {
   let total = 0;
   for (let c = 0; c < USED; c++) {
-    let ng = 0;
+    const qty = document.querySelector(`#sheet .qty[data-c="${c}"]`).value;
+    const cat = document.querySelector(`#sheet .cat[data-c="${c}"]`).value;
+    const plan = aqlLookup(ACTIVE_PLAN, cat, qty);
+    const cell = document.getElementById('aql-' + c);
+    cell.classList.toggle('full', !!(plan && plan.full));
+    cell.innerHTML = plan
+      ? `<b>${plan.n} pcs${plan.full ? ' · 100 %' : ''}</b><span>Ac ${plan.ac} · Re ${plan.re}${plan.letter !== '—' ? ' · ' + plan.letter : ''}</span>`
+      : '<span>Enter QTY</span>';
+    document.getElementById('n-' + c).textContent = plan ? plan.n : '–';
+
+    let gridNg = 0;
     LINES.forEach((l, li) => {
-      const v = document.querySelector(`input[data-l="${li}"][data-c="${c}"]`).value;
-      if (judge(l, v) === 'NG') ng++;
+      if (judge(l, document.querySelector(`input[data-l="${li}"][data-c="${c}"]`).value) === 'NG') gridNg++;
     });
-    total += ng;
-    const el = document.getElementById('ng-' + c);
-    el.textContent = ng; el.classList.toggle('has', ng > 0);
-    const o = document.querySelector(`.judg[data-c="${c}"] .o`);
-    o.disabled = ng > 0;
-    if (ng > 0 && o.classList.contains('on')) o.classList.remove('on');
+    const ngIn = document.querySelector(`#sheet .ngin[data-c="${c}"]`);
+    if (gridNg > 0 && !(Number(ngIn.value) >= 1)) ngIn.value = 1;
+    const defects = Number(ngIn.value) || 0;
+    ngIn.classList.toggle('has', defects > 0);
+    total += defects;
+
+    const judg = document.querySelector(`.judg[data-c="${c}"]`);
+    const [o, x, cBtn] = judg.querySelectorAll('button');
+    const suggest = plan ? (defects <= plan.ac ? 'o' : 'x') : null;
+    [o, x, cBtn].forEach((b) => b.classList.remove('suggest'));
+    if (suggest) judg.querySelector('.' + suggest).classList.add('suggest');
+    o.disabled = !plan || defects > plan.ac;
+    cBtn.disabled = !plan || defects < plan.re;
+    [o, cBtn].forEach((b) => b.disabled && b.classList.remove('on'));
+    document.getElementById('hint-' + c).textContent = suggest ? `Suggested: ${suggest === 'o' ? 'Accept' : 'Reject'}` : '';
+    const note = document.querySelector(`#sheet .cnote[data-c="${c}"]`);
+    note.disabled = !cBtn.classList.contains('on');
   }
   const chip = document.getElementById('ng-total');
-  chip.textContent = total ? `${total} NG` : 'All OK';
+  chip.textContent = total ? `${total} NG pcs` : 'All OK';
   chip.className = 'chip ' + (total ? 'chip-ng' : 'chip-ok');
 }
+
+/* ============ AQL table page ============ */
+let aqlPlan = ACTIVE_PLAN, aqlCat = 'N';
+const fmtLot = (min, max) => max === null ? `${min.toLocaleString('en')}+` : min === max ? `${min}` : `${min.toLocaleString('en')} – ${max.toLocaleString('en')}`;
+function renderAql() {
+  document.getElementById('plan-cards').innerHTML = Object.entries(AQL_PLANS).map(([k, p]) =>
+    `<button class="plan-card ${k === aqlPlan ? 'on' : ''}" data-plan="${k}"><span class="row1"><b>${p.name}</b><span class="chip ${k === ACTIVE_PLAN ? 'chip-brand' : 'chip-neutral'}">${p.badge}</span></span><span>${p.sub}</span></button>`).join('');
+  document.querySelectorAll('.plan-card').forEach((b) => b.addEventListener('click', () => { aqlPlan = b.dataset.plan; renderAql(); }));
+  document.querySelectorAll('.tabs [data-cat]').forEach((b) => b.classList.toggle('on', b.dataset.cat === aqlCat));
+  document.getElementById('aql-title').textContent = AQL_PLANS[aqlPlan].name;
+
+  const calc = aqlLookup(aqlPlan, aqlCat, document.getElementById('calc-lot').value);
+  const rows = AQL_PLANS[aqlPlan].rows[aqlCat];
+  document.getElementById('aql-table').innerHTML = rows
+    ? `<table class="data"><thead><tr><th>Lot size</th><th>Code</th><th>Sample size</th><th>Ac</th><th>Re</th></tr></thead><tbody>${rows.map((r) =>
+        `<tr class="${calc && calc.row === r ? 'hit' : ''}"><td class="mono cell-strong">${fmtLot(r[0], r[1])}</td><td><span class="letter">${r[2]}</span></td><td class="mono">${r[3]} pcs</td><td><span class="chip chip-ok">${r[4]}</span></td><td><span class="chip chip-ng">${r[5]}</span></td></tr>`).join('')}</tbody></table>`
+    : `<div class="empty"><span class="icon">table_rows</span>Tightened / reduced rows for this plan aren't entered yet.<br>Fill them from the official ISO 2859-1 tables.</div>`;
+
+  document.getElementById('calc-result').innerHTML = calc
+    ? `<div><b>${calc.n}</b><span>Sample (pcs)</span></div><div class="ac"><b>${calc.ac}</b><span>Accept ≤</span></div><div class="re"><b>${calc.re}</b><span>Reject ≥</span></div>`
+    : `<div style="grid-column:1/-1"><span>No plan for this lot size / category</span></div>`;
+  document.getElementById('calc-note').textContent = calc
+    ? (calc.full ? 'The lot is smaller than the sample: inspect every piece (100 %).' : `Code letter ${calc.letter}. Accept the delivery with up to ${calc.ac} defective piece${calc.ac === 1 ? '' : 's'}, reject from ${calc.re}.`)
+    : '';
+}
+document.querySelectorAll('.tabs [data-cat]').forEach((b) => b.addEventListener('click', () => { aqlCat = b.dataset.cat; document.getElementById('calc-cat').value = aqlCat; renderAql(); }));
+document.getElementById('calc-lot').addEventListener('input', renderAql);
+document.getElementById('calc-cat').addEventListener('change', (e) => { aqlCat = e.target.value; renderAql(); });
 
 /* Enter moves down a column, like measuring one delivery top to bottom */
 document.addEventListener('keydown', (e) => {
@@ -1101,6 +1268,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 buildSheet();
+renderAql();
 // ?theme=dark|light|system and ?dialog=1 let a screen be opened directly (e.g. for screenshots).
 const params = new URLSearchParams(location.search);
 setTheme(params.get('theme') || localStorage.getItem('mock-theme') || 'light');
