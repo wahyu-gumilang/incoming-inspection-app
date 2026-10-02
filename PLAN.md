@@ -231,20 +231,21 @@ S-1 code letters (ISO 2859-1 Table 1): 2–50 A (2 pcs), 51–500 B (3), 501–3
 
 General Level II, AQL 2.5, normal, arrows already resolved: 2–50 → 5 (0/1), 51–150 → 20 (1/2), 151–280 → 32 (2/3), 281–500 → 50 (3/4), 501–1 200 → 80 (5/6), 1 201–3 200 → 125 (7/8), 3 201–10 000 → 200 (10/11), 10 001–35 000 → 315 (14/15), 35 001+ → 500 (21/22). (Pak Fajar's seeder skipped the ISO arrows for lots 1–8, 26–50 and 51–90 and used 315 above 35 000.)
 
-- [ ] Migration `011_create_aql_tables.sql`: `aqlplan` (`planid` PK, `name`, `inspectlevel`, `aql`, `isdefault`, `active`, `note`) and `aqlplanrow` (`planid`, `inspectcategory`, `lotmin`, `lotmax`, `codeletter`, `samplesize`, `acceptnum`, `rejectnum`; PK `planid, inspectcategory, lotmin`), seeded with the two plans above
-- [ ] Migration `012_inspecttable_aql_columns.sql`: `aqlplanid`, `samplesize1..7`, `acceptnum1..7`, `rejectnum1..7`, `concessionnote1..7` (snapshot per delivery, so editing the AQL table never changes saved inspections)
-- [ ] `services/aql.js` (pure): `findPlanRow(rows, lot, category)` → `{ codeletter, samplesize, acceptnum, rejectnum, fullInspection }`, `suggestJudgment(defects, row)`
-- [ ] Recomputed on every save from the server's own tables; values sent by the client are ignored (what the Laravel example called the "security guard")
+- [x] Migration `011_create_aql_tables.sql` (applied to `csi_db` 2026-10-01 19:45 after a backup): `aqlplan` (`planid` PK, `name`, `inspectlevel`, `aql`, `isdefault`, `note`, `updated_at`) and `aqlplanrow` (`planid` FK, `inspectcategory` 1/2/3, `lotmin`, `lotmax`, `codeletter`, `samplesize`, `acceptnum`, `rejectnum`; PK `planid, inspectcategory, lotmin`; CHECKs on ranges and Ac < Re), seeded with the two plans above (rows start at lot 2; smaller lots are inspected 100 %)
+- [x] Migration `012_inspecttable_aql_columns.sql` (applied to `csi_db` 2026-10-01 19:45): `aqlplanid`, `samplesize1..7`, `acceptnum1..7`, `rejectnum1..7`, `concessionnote1..7` (snapshot per delivery, so editing the AQL table never changes saved inspections)
+- [x] `services/aql.js` (pure): `findPlanRow(rows, lot, category)` → `{ codeletter, samplesize, acceptnum, rejectnum, fullInspection }` (category 0, a lot below the first range or not bigger than the sample → 100 %); `rowProblems(rows)` for gaps, overlaps, open ranges, Ac/Re. `suggestJudgment` lives in `judgement.js` (§2.1)
+- [ ] Recomputed on every save from the server's own tables; values sent by the client are ignored (what the Laravel example called the "security guard") — done with the inspection API (§2.4)
 - [x] CSRF: besides the `SameSite=Strict` cookie, state-changing requests must carry an allowed `Origin` header (the equivalent of Laravel's `@csrf`) — done in §2.0
 
 | Method | Path | Description |
 |---|---|---|
-| GET | `/api/aql/lookup?lot=&category=&planId=` | Real-time sample size / Ac / Re while typing the lot size |
-| GET | `/api/aql/plans` · `/api/aql/plans/:planId` | Plans and their rows (all logged-in users) |
-| PUT | `/api/aql/plans/:planId/rows` | Admin: replace a plan's rows in one transaction (ranges must not overlap or leave gaps) |
+| GET | `/api/aql/lookup?lot=&category=&planId=` | Real-time sample size / Ac / Re while typing the lot size; `category` uses the `inspectcategory` codes (0 = 100 %, 1 = N, 2 = R, 3 = T); `planId` defaults to the default plan |
+| GET | `/api/aql/plans` · `/api/aql/plans/:planId` | Plans (with the categories each covers) and their rows (all logged-in users) |
+| PUT | `/api/aql/plans/:planId/rows` | Admin: `{ inspectcategory, rows }` replaces one category's rows in one transaction (`422` with per-row details on gaps / overlaps) |
 | PUT | `/api/aql/plans/:planId/default` | Admin: choose the plan new inspections use |
 
-- [ ] Tests: every range boundary of both plans, lot below sample size, N/R/T, overlapping/gapped rows rejected, `Accepted` with `notgoodN > Ac` → `422`, `Concession` without note or below Re → `422`, saved snapshot unchanged after editing a plan
+- [x] Tests: every range boundary of both plans, lot below sample size, N/R/T, 100 %, overlapping/gapped rows rejected, Admin-only edits, default switch (269 backend tests)
+- [ ] Tests with saved inspections: `Accepted` with `notgoodN > Ac` → `422`, `Concession` without note or below Re → `422`, saved snapshot unchanged after editing a plan — with §2.4
 
 ### 2.4 Inspection API
 | Method | Path | Description |

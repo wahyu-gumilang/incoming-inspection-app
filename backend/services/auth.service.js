@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const AppError = require('../utils/app-error');
 const userRepository = require('../repositories/user.repository');
 const { hashPassword, verifyPassword } = require('../utils/password');
@@ -8,7 +9,9 @@ const limiter = createLoginLimiter();
 
 // Compared against when the username doesn't exist, so a wrong username takes
 // as long as a wrong password and response times don't reveal which accounts exist.
-const DUMMY_HASH = '$2b$12$kqw5W0VJgGs9dPHZzQNHO.Hc8aP5pJjiM/dwe01lKgCiSPooP8UBW';
+// Hashed once with the configured cost, so it matches real hashes (12 in production).
+let dummyHash;
+const getDummyHash = () => (dummyHash ??= hashPassword(crypto.randomBytes(18).toString('hex')));
 
 const badCredentials = () =>
   new AppError(401, 'UNAUTHENTICATED', 'Username or password is incorrect');
@@ -25,7 +28,7 @@ async function login(username, password) {
   }
 
   const found = await userRepository.findAuthByUsername(username);
-  const valid = await verifyPassword(password, found ? found.passwordHash : DUMMY_HASH);
+  const valid = await verifyPassword(password, found ? found.passwordHash : await getDummyHash());
   if (!found || !valid) {
     limiter.fail(username);
     throw badCredentials();

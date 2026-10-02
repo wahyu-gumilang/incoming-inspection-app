@@ -132,6 +132,37 @@ describe('csi_db_test after migrations', () => {
     });
   });
 
+  it('creates the AQL tables with the two seeded plans', async () => {
+    const [plans] = await db.query(
+      'SELECT planid, inspectlevel, isdefault FROM aqlplan ORDER BY planid',
+    );
+    expect(plans).toEqual([
+      { planid: 1, inspectlevel: 'S-1', isdefault: 1 },
+      { planid: 2, inspectlevel: 'II', isdefault: 0 },
+    ]);
+    // aql.test edits plan 2's Tightened rows in parallel, so only untouched rows are counted.
+    const [counts] = await db.query(
+      'SELECT planid, COUNT(*) AS n FROM aqlplanrow WHERE planid = 1 OR inspectcategory = 1 GROUP BY planid ORDER BY planid',
+    );
+    expect(counts).toEqual([
+      { planid: 1, n: 12 },
+      { planid: 2, n: 9 },
+    ]);
+  });
+
+  it('adds the AQL snapshot columns to inspecttable', async () => {
+    const cols = await columns('inspecttable');
+    for (const name of [
+      'aqlplanid',
+      'samplesize1',
+      'acceptnum7',
+      'rejectnum4',
+      'concessionnote7',
+    ]) {
+      expect(cols).toHaveProperty(name);
+    }
+  });
+
   it('keeps the trailing space in stored inspecttype values', async () => {
     const [[row]] = await db.query(
       "SELECT inspecttype FROM inventinspectitem WHERE itemid = '000-228' AND inspectitem = 'C'",

@@ -4,6 +4,7 @@ const authRoutes = require('./auth.routes');
 const userRoutes = require('./user.routes');
 const itemRoutes = require('./item.routes');
 const vendorRoutes = require('./vendor.routes');
+const aqlRoutes = require('./aql.routes');
 const { requireAuth, requirePasswordChanged } = require('../middlewares/auth.middleware');
 
 const router = Router();
@@ -17,5 +18,6 @@ const signedIn = [requireAuth, requirePasswordChanged];
 router.use('/users', ...signedIn, userRoutes);
 router.use('/items', ...signedIn, itemRoutes);
 router.use('/vendors', ...signedIn, vendorRoutes);
+router.use('/aql', ...signedIn, aqlRoutes);
 
 module.exports = router;
