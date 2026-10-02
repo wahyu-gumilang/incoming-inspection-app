@@ -1,0 +1,37 @@
+// Angular Material (M3) themed from the Chubbsafes blue. theme-type: color-scheme makes
+// every --mat-sys-* value a light-dark() pair, so switching color-scheme on <html>
+// (done by ThemeService through data-theme) switches Material and our tokens together.
+@use '@angular/material' as mat;
+@use './theme-colors' as brand;
+
+html {
+  color-scheme: light;
+  @include mat.theme(
+    (
+      color: (
+        primary: brand.$primary-palette,
+        tertiary: brand.$tertiary-palette,
+        theme-type: color-scheme,
+      ),
+      typography: (
+        plain-family: 'Inter',
+        brand-family: 'Inter',
+      ),
+      density: 0,
+    )
+  );
+  // The generated palette's main tone (#205eab) is lighter than the logo; pin it.
+  @include mat.theme-overrides(
+    (
+      primary: light-dark(#004f9c, #4b93e6),
+      on-primary: light-dark(#ffffff, #04162b),
+      primary-container: light-dark(#d6e3ff, #003063),
+      surface: light-dark(#ffffff, #111a2c),
+      background: light-dark(#f4f6fa, #0b1220),
+    )
+  );
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
