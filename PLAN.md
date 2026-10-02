@@ -271,7 +271,7 @@ Business rules (`services/inspection.service.js`):
 - [x] Not a draft → `409 INVALID_STATUS`; not the creator or an Admin → `403`
 - [x] Integration tests: create, parallel numbering, unknown item/vendor/no standards, delivery save and AQL snapshot (incl. 600/T and lot 1), every judgment rule, order of deliveries, bad measurements, remove last delivery, permissions, legacy read-only, header edit, delete, snapshot after a master change, MANUAL lines, list filters (297 backend tests)
 - [x] db test files run one at a time (`--runInBand`, 20 s timeout): they share `csi_db_test`, and in parallel they changed each other's data
-- [ ] Migration `013` applied to `csi_db` (waiting for approval)
+- [x] Migration `013` applied to `csi_db` (2026-10-02 11:06 after a backup; legacy rows keep `NULL` owner/timestamps; next number `INS-000003`)
 
 **Phase 2 done when:** an inspection for a real item (e.g. `000-228`) can be created from the template, measured in several delivery columns and read back with correct OK/NG, sample sizes and accept/reject numbers, using only `curl`. ✅ Met 2026-10-02 on `csi_db_test` (000-228, 3 deliveries: 50 N → 2 pcs, 20 N with B NG → Concession, 100 T → 5 pcs).
 
