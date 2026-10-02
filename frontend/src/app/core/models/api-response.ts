@@ -11,3 +11,13 @@ export interface PageMeta {
   total: number;
   totalPages: number;
 }
+
+export interface ApiErrorDetail {
+  field: string;
+  message: string;
+}
+
+export interface ApiErrorBody {
+  success: false;
+  error: { code: string; message: string; details?: ApiErrorDetail[] };
+}
