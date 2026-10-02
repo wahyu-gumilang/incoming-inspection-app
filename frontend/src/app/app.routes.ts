@@ -1,37 +1,80 @@
 import { Routes } from '@angular/router';
+import { adminGuard, authGuard, guestGuard, sessionGuard } from './core/auth/auth.guards';
 
-// Placeholders until each feature's phase replaces them with real routes.
-const placeholder = () => import('./shared/placeholder-page').then((m) => m.PlaceholderPage);
+// Placeholders until each Phase 3 stage replaces them with the real page.
+const placeholder = () =>
+  import('./shared/ui/placeholder-page/placeholder-page').then((m) => m.PlaceholderPage);
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'inspections' },
   {
-    path: 'inspections',
-    title: 'Inspections',
-    loadComponent: placeholder,
-    data: { title: 'Inspections', phase: 'Phase 3' },
+    path: 'login',
+    title: 'Sign in',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
   },
   {
-    path: 'items',
-    title: 'Items',
-    loadComponent: placeholder,
-    data: { title: 'Items', phase: 'Phase 3' },
+    path: 'change-password',
+    title: 'Set your password',
+    canActivate: [sessionGuard],
+    loadComponent: () =>
+      import('./features/auth/change-password/change-password').then((m) => m.ChangePassword),
   },
   {
-    path: 'vendors',
-    title: 'Vendors',
-    loadComponent: placeholder,
-    data: { title: 'Vendors', phase: 'Phase 3' },
-  },
-  {
-    path: 'checkers',
-    title: 'Checkers',
-    loadComponent: placeholder,
-    data: { title: 'Checkers', phase: 'Phase 3' },
-  },
-  {
-    path: '**',
-    title: 'Page not found',
-    loadComponent: () => import('./shared/not-found-page').then((m) => m.NotFoundPage),
+    path: '',
+    canActivate: [authGuard],
+    canActivateChild: [authGuard],
+    loadComponent: () => import('./core/layout/app-shell/app-shell').then((m) => m.AppShell),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      {
+        path: 'dashboard',
+        title: 'Dashboard',
+        loadComponent: placeholder,
+        data: { title: 'Dashboard', icon: 'space_dashboard', stage: 'Stage 5' },
+      },
+      {
+        path: 'inspections',
+        title: 'Inspections',
+        loadComponent: placeholder,
+        data: { title: 'Inspections', icon: 'fact_check', stage: 'Stage 4' },
+      },
+      {
+        path: 'items',
+        title: 'Items & standards',
+        loadComponent: placeholder,
+        data: { title: 'Items & standards', icon: 'inventory_2', stage: 'Stage 3' },
+      },
+      {
+        path: 'vendors',
+        title: 'Vendors',
+        loadComponent: placeholder,
+        data: { title: 'Vendors', icon: 'local_shipping', stage: 'Stage 3' },
+      },
+      {
+        path: 'aql',
+        title: 'AQL table',
+        loadComponent: placeholder,
+        data: { title: 'AQL table', icon: 'table_chart', stage: 'Stage 3' },
+      },
+      {
+        path: 'users',
+        title: 'Users',
+        canActivate: [adminGuard],
+        loadComponent: placeholder,
+        data: { title: 'Users', icon: 'group', stage: 'Stage 2' },
+      },
+      {
+        path: 'profile',
+        title: 'Profile settings',
+        loadComponent: placeholder,
+        data: { title: 'Profile settings', icon: 'manage_accounts', stage: 'Stage 2' },
+      },
+      {
+        path: '**',
+        title: 'Page not found',
+        loadComponent: () =>
+          import('./shared/ui/not-found-page/not-found-page').then((m) => m.NotFoundPage),
+      },
+    ],
   },
 ];

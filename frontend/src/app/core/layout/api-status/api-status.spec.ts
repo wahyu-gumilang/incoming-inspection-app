@@ -39,7 +39,7 @@ describe('ApiStatus', () => {
     const el = await render((h) => h.expectOne('/api/health').flush(health('connected')));
 
     expect(el.classList).toContain('ok');
-    expect(el.textContent).toContain('API connected');
+    expect(el.textContent).toContain('All systems online');
   });
 
   it('reports a database outage reported by the API', async () => {
@@ -48,7 +48,7 @@ describe('ApiStatus', () => {
     );
 
     expect(el.classList).toContain('db-down');
-    expect(el.textContent).toContain('Database disconnected');
+    expect(el.textContent).toContain('Database offline');
   });
 
   it('reports an unreachable API', async () => {
@@ -57,6 +57,6 @@ describe('ApiStatus', () => {
     );
 
     expect(el.classList).toContain('api-down');
-    expect(el.textContent).toContain('API unreachable');
+    expect(el.textContent).toContain('Server offline');
   });
 });
