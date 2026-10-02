@@ -114,8 +114,10 @@ describe('csi_db_test after migrations', () => {
   });
 
   it('starts the inspection number sequence', async () => {
+    // inspections.test takes numbers too, so only the row and its shape are fixed here.
     const [rows] = await db.query('SELECT prefix, digits, nextnum FROM inspectnumseq');
-    expect(rows).toEqual([{ prefix: 'INS-', digits: 6, nextnum: 1 }]);
+    expect(rows).toEqual([{ prefix: 'INS-', digits: 6, nextnum: expect.any(Number) }]);
+    expect(rows[0].nextnum).toBeGreaterThanOrEqual(1);
   });
 
   it('creates usertable with a unique username and role/theme checks', async () => {
@@ -160,6 +162,13 @@ describe('csi_db_test after migrations', () => {
       'concessionnote7',
     ]) {
       expect(cols).toHaveProperty(name);
+    }
+  });
+
+  it('adds the owner and timestamp columns to inspecttable', async () => {
+    const cols = await columns('inspecttable');
+    for (const name of ['inspectbyid', 'created_at', 'updated_at']) {
+      expect(cols[name]).toMatchObject({ nullable: 'YES', def: 'NULL' });
     }
   });
 
