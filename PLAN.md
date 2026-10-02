@@ -133,7 +133,7 @@ Goal: both projects run, tooling is in place, and the schema can store everythin
 
 ### 1.4 Frontend scaffold
 - [x] Angular 22.2 app in `frontend/` (`ng new --routing --style=scss --strict --ssr=false`; zoneless, Vitest); Angular Material; angular-eslint; Prettier with the backend's settings
-- [x] Roboto and Material Symbols bundled from npm (`@fontsource/roboto`, `material-symbols`), not Google Fonts, so the app works without internet
+- [x] Fonts and Material Symbols bundled from npm (`@fontsource/*`, `material-symbols`), not Google Fonts, so the app works without internet (Roboto replaced by Inter and Rounded symbols in Phase 3.0)
 - [x] `proxy.conf.json` sends `/api` to `http://localhost:5000`; API base URL from `environments/`
 - [x] App shell: top bar (app and company name, API status chip polling `/api/health`), sidebar (Inspections; Master Data: Items, Vendors, Checkers; overlay below 960px), lazy placeholder pages, not-found page, tab titles
 - [x] Minimal `core/api/ApiService` (`get`, unwraps `{ success, data }`); completed in Phase 3.1
@@ -294,13 +294,13 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
   - Review 1 (2026-10-01): sidebar + header was two navigations → top navbar only; theme was in three places → profile menu only; typing into the big grid was hard → modals; login shared the app shell → separate page
   - Review 2 (2026-10-01): dummy data must look real → login checks the user list (`js/users.js`) and every page shows the signed-in user (name, initials, role); Users menu, add/edit buttons and the edit-rows action only for Admins; first admin is Gumilang (`070203`)
   - Requests of 2026-10-02 (all screens): modern icons (Material Symbols **Rounded**, filled when active), smooth transitions everywhere (route changes, dropdowns, ☰ panel, modals, hovers; ~150–250 ms, one easing, reduced-motion respected), and a thin vertical divider between the logo and the navbar menu
-- [ ] Design tokens: palette (brand, neutrals, OK/NG/warning/info), Inter font bundled from npm, radius, elevation, spacing, motion; mapped onto Angular Material's `--mat-sys-*` variables
-- [ ] Light / dark / system theme, saved per user (`usertable.theme`)
-- [ ] Logos in `frontend/public/brand/` (original for light surfaces, white negative for dark/brand surfaces)
-- [ ] Layout: top navbar only (logo, main menu with a "Master data" dropdown, API status, profile menu → Profile settings, Theme, Logout); below 960px the menu folds into a ☰ panel; smooth open/close transitions. Every component in its own `.ts` / `.html` / `.scss`
+- [x] Design tokens: palette (brand, neutrals, OK/NG/warning/info), Inter font bundled from npm, radius, elevation, spacing, motion; mapped onto Angular Material's `--mat-sys-*` variables
+- [x] Light / dark / system theme, saved per user (`usertable.theme`)
+- [x] Logos in `frontend/public/brand/` (original for light surfaces, white negative for dark/brand surfaces)
+- [x] Layout: top navbar only (logo, main menu with a "Master data" dropdown, API status, profile menu → Profile settings, Theme, Logout); below 960px the menu folds into a ☰ panel; smooth open/close transitions. Every component in its own `.ts` / `.html` / `.scss`
 - [ ] Dialogs (`shared/ui/modal`): the only way to create or edit records; centered with a backdrop on desktop, full-screen below 600px, closable with Esc / ✕, focus trapped and restored
 - [ ] Shared look for tables, forms, buttons, OK/NG and status chips, empty / loading / error states, toasts
-- [ ] Login page, auth guard (redirect to login, then back), `must_change_password` flow, role-based menu
+- [x] Login page, auth guard (redirect to login, then back), `must_change_password` flow, role-based menu; an expired session (any `401`) returns to the login page
 - [ ] Profile settings page (name, email, theme, change password)
 - [ ] Dashboard page (data from the Phase 2 API)
 - [ ] Accessibility: WCAG AA contrast in both themes, visible focus, keyboard navigation

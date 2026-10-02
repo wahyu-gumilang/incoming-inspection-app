@@ -272,7 +272,7 @@ Rules:
 - Components never call `HttpClient` directly: go through feature services built on `core/ApiService`, which unwraps `{ success, data, meta }`.
 - TypeScript interfaces in `core/models/` use the API field names exactly (`itemid`, `actual_1`, …). `strict` mode stays on; no `any`.
 - Formatting: Prettier (same settings as the backend), angular-eslint.
-- Styling: Angular Material (M3) with its `--mat-sys-*` CSS variables; no other UI kit. Fonts and icons are bundled from npm (`@fontsource/roboto`, `material-symbols`), never loaded from a CDN, because the plant network may have no internet.
+- Styling: Angular Material (M3) with its `--mat-sys-*` CSS variables; no other UI kit. Fonts and icons are bundled from npm (`@fontsource/inter`, `material-symbols` **Rounded**, filled for the active state), never loaded from a CDN, because the plant network may have no internet.
 - UI language is English, matching the labels on Form 7.4.3-F1 (*Part name*, *Supplier name*, *Inspected by*).
 - **Design:** follow the approved mockups in `docs/design/mockups/` (one HTML + CSS file per page, mirroring the Angular features) and the tokens from Phase 3.0. Brand blue `#004F9C`; extra accent colors are fine if they don't clash with it. The logo sits on a light surface (white negative version on dark/brand surfaces), never on a colored bar. Modern look, light and dark mode.
   - **Navigation:** one top navbar (logo, menu, API status, profile menu). No sidebar. On narrow screens the menu folds into a ☰ panel.
