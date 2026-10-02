@@ -61,6 +61,7 @@ function renderNavbar(me) {
         <img class="logo-light" src="assets/logo-original.png" alt="Chubbsafes" />
         <img class="logo-dark" src="assets/logo-white.png" alt="Chubbsafes" />
       </a>
+      <span class="brand-divider" aria-hidden="true"></span>
       <nav class="mainnav" aria-label="Main">${desktop}</nav>
       <span class="spacer"></span>
       <span class="api-chip" title="db: connected · checked 10:41"><span class="pulse"></span><span class="txt">All systems online</span></span>

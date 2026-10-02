@@ -293,6 +293,7 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
   - Light and dark mode; desktop, tablet and phone widths
   - Review 1 (2026-10-01): sidebar + header was two navigations → top navbar only; theme was in three places → profile menu only; typing into the big grid was hard → modals; login shared the app shell → separate page
   - Review 2 (2026-10-01): dummy data must look real → login checks the user list (`js/users.js`) and every page shows the signed-in user (name, initials, role); Users menu, add/edit buttons and the edit-rows action only for Admins; first admin is Gumilang (`070203`)
+  - Requests of 2026-10-02 (all screens): modern icons (Material Symbols **Rounded**, filled when active), smooth transitions everywhere (route changes, dropdowns, ☰ panel, modals, hovers; ~150–250 ms, one easing, reduced-motion respected), and a thin vertical divider between the logo and the navbar menu
 - [ ] Design tokens: palette (brand, neutrals, OK/NG/warning/info), Inter font bundled from npm, radius, elevation, spacing, motion; mapped onto Angular Material's `--mat-sys-*` variables
 - [ ] Light / dark / system theme, saved per user (`usertable.theme`)
 - [ ] Logos in `frontend/public/brand/` (original for light surfaces, white negative for dark/brand surfaces)

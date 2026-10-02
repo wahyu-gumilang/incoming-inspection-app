@@ -24,7 +24,7 @@
   display: flex;
   align-items: center;
   height: 100%;
-  margin-right: 20px;
+  margin-right: 16px;
   flex-shrink: 0;
 }
 
@@ -42,6 +42,15 @@
 
 [data-theme='dark'] .navbar .brand .logo-dark {
   display: block;
+}
+
+/* Thin divider between the logo and the menu */
+.brand-divider {
+  width: 1px;
+  height: 24px;
+  margin-right: 12px;
+  background: var(--border-strong);
+  flex-shrink: 0;
 }
 
 .navbar .menu-btn {
@@ -409,6 +418,10 @@ body.mobile-open .nav-scrim {
 
   .navbar .brand {
     margin-right: 0;
+  }
+
+  .brand-divider {
+    display: none;
   }
 
   .profile-btn .who,
