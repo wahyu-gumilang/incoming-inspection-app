@@ -29,7 +29,11 @@ const HEADER_COLUMNS = Object.freeze({
 const LINE_COLUMNS = Object.freeze({
   actual: numbered('actual_'),
   status: numbered('status_'),
+  // inspectlineother: the text result (e.g. the COA number) per delivery
+  actualText: numbered('actual_txt_'),
 });
+
+const INSPECTION_PREFIX = 'INS-';
 
 // Stored values in inventinspectitem.inspecttype sometimes carry a trailing
 // space ('FITTING ', 'VISUAL '). They are part of the PK, so they're
@@ -103,6 +107,7 @@ module.exports = {
   COLUMN_NUMBERS,
   HEADER_COLUMNS,
   LINE_COLUMNS,
+  INSPECTION_PREFIX,
   INSPECT_TYPE,
   INSPECT_TYPE_ORDER,
   normalizeInspectType,

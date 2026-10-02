@@ -121,9 +121,9 @@ Add new commands as `package.json` scripts, not as ad-hoc instructions.
 |---|---|---|
 | `npm run dev` | `nodemon server.js` | Dev server with auto-reload on `http://localhost:5000` |
 | `npm start` | `node server.js` | Production start |
-| `npm test` | `jest` | All tests: `unit` (DB mocked) and `db` (rebuilds and uses `csi_db_test`) |
+| `npm test` | `jest --runInBand` | All tests: `unit` (DB mocked) and `db` (rebuilds and uses `csi_db_test`). One file at a time, because the db files share one database |
 | `npm run test:unit` | `jest --selectProjects unit` | Tests that don't need MariaDB |
-| `npm run test:db` | `jest --selectProjects db` | Tests against `csi_db_test` |
+| `npm run test:db` | `jest --selectProjects db --runInBand` | Tests against `csi_db_test` |
 | `npm run lint` | `eslint .` | Lint |
 | `npm run format` | `prettier --write .` | Format |
 | `npm run format:check` | `prettier --check .` | Check formatting without writing |
@@ -283,7 +283,7 @@ Rules:
 ### Both
 - Keep comments for the *why*. No commented-out code.
 - **Tests:**
-  - Backend: Jest + Supertest. `judgement.js` and every service with business logic get unit tests (limits, `Min`/`Max`, empty values, decimal edges). Every endpoint gets an integration test for the success path and the main error paths, against `csi_db_test`.
+  - Backend: Jest + Supertest. `judgement.js` and every service with business logic get unit tests (limits, `Min`/`Max`, empty values, decimal edges). Every endpoint gets an integration test for the success path and the main error paths, against `csi_db_test`. A db test must not depend on shared rows another file changes (default AQL plan, numbering, fixture users and vendors): create its own data, or assert the shape only.
   - Frontend: unit tests for services and the judgement helper, component tests for the delivery modal (OK/NG, AQL, judgment rules), one Playwright E2E smoke test of the full flow.
 
 ## Git rules

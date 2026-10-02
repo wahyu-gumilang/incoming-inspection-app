@@ -234,7 +234,7 @@ General Level II, AQL 2.5, normal, arrows already resolved: 2–50 → 5 (0/1), 
 - [x] Migration `011_create_aql_tables.sql` (applied to `csi_db` 2026-10-01 19:45 after a backup): `aqlplan` (`planid` PK, `name`, `inspectlevel`, `aql`, `isdefault`, `note`, `updated_at`) and `aqlplanrow` (`planid` FK, `inspectcategory` 1/2/3, `lotmin`, `lotmax`, `codeletter`, `samplesize`, `acceptnum`, `rejectnum`; PK `planid, inspectcategory, lotmin`; CHECKs on ranges and Ac < Re), seeded with the two plans above (rows start at lot 2; smaller lots are inspected 100 %)
 - [x] Migration `012_inspecttable_aql_columns.sql` (applied to `csi_db` 2026-10-01 19:45): `aqlplanid`, `samplesize1..7`, `acceptnum1..7`, `rejectnum1..7`, `concessionnote1..7` (snapshot per delivery, so editing the AQL table never changes saved inspections)
 - [x] `services/aql.js` (pure): `findPlanRow(rows, lot, category)` → `{ codeletter, samplesize, acceptnum, rejectnum, fullInspection }` (category 0, a lot below the first range or not bigger than the sample → 100 %); `rowProblems(rows)` for gaps, overlaps, open ranges, Ac/Re. `suggestJudgment` lives in `judgement.js` (§2.1)
-- [ ] Recomputed on every save from the server's own tables; values sent by the client are ignored (what the Laravel example called the "security guard") — done with the inspection API (§2.4)
+- [x] Recomputed on every save from the server's own tables; values sent by the client are ignored (what the Laravel example called the "security guard") — done with the inspection API (§2.4)
 - [x] CSRF: besides the `SameSite=Strict` cookie, state-changing requests must carry an allowed `Origin` header (the equivalent of Laravel's `@csrf`) — done in §2.0
 
 | Method | Path | Description |
@@ -245,30 +245,35 @@ General Level II, AQL 2.5, normal, arrows already resolved: 2–50 → 5 (0/1), 
 | PUT | `/api/aql/plans/:planId/default` | Admin: choose the plan new inspections use |
 
 - [x] Tests: every range boundary of both plans, lot below sample size, N/R/T, 100 %, overlapping/gapped rows rejected, Admin-only edits, default switch (269 backend tests)
-- [ ] Tests with saved inspections: `Accepted` with `notgoodN > Ac` → `422`, `Concession` without note or below Re → `422`, saved snapshot unchanged after editing a plan — with §2.4
+- [x] Tests with saved inspections: `Accepted` with `notgoodN > Ac` → `422`, `Concession` without note → `422`, AQL snapshot stored per delivery — with §2.4
 
 ### 2.4 Inspection API
+Decided 2026-10-01/02: a draft is changed only by its creator or an Admin (others read it); the two legacy inspections (`INS-000001/2` in `csi_db`, status `'1'`) stay read-only; only the last delivery column can be removed. Deliveries are saved one column at a time, matching the delivery modal (replaces the earlier "PUT whole inspection / PATCH columns" idea).
+
 | Method | Path | Description |
 |---|---|---|
-| GET | `/api/inspections` | List. Filters: `dateFrom`, `dateTo` (`inspectdate`), `item`, `vendor`, `status`, `judgment`, `q` (inspectnum / P/O) |
-| GET | `/api/inspections/template?itemId=` | Empty header + `lines[]` / `otherLines[]` snapshotted from `inventinspectitem` |
-| GET | `/api/inspections/:inspectnum` | Header + `lines[]` + `otherLines[]` + computed `columns[]` (used flag, `totalReceived`) |
-| POST | `/api/inspections` | Create header + lines in **one transaction**; server assigns `inspectnum`, computes `status_N` and `notgoodN`; `201` |
-| PUT | `/api/inspections/:inspectnum` | Replace header + lines in one transaction (only in `DRAFT`) |
-| PATCH | `/api/inspections/:inspectnum/columns/:n` | Save one delivery column (header fields + that column's actuals) for autosave |
-| DELETE | `/api/inspections/:inspectnum` | Only in `DRAFT`; `204` |
+| GET | `/api/inspections` | List, newest first. Filters: `q` (inspection no / any P/O), `dateFrom`, `dateTo` (`inspectdate`), `item`, `vendor`, `status`, `judgment` (any column); computed `deliveryCount`, `ngPieces`, `judgments[]` |
+| POST | `/api/inspections` | New inspection modal: `itemid`, `accountnum`, `inspectdate`, `instrument`, `qfnum`. Server assigns `inspectnum`, copies the item's standards into `inspectline` / `inspectlineother`, takes the default AQL plan, sets `inspectby` / `inspectbyid` from the login; `201` |
+| GET | `/api/inspections/:inspectnum` | Header (DB columns) + `lines[]` (with `mode`) + `otherLines[]` + computed `deliveryCount`, `totalReceived`, `editable`, `deliveries[]` (`used`, `ngCells`, `suggestedJudgment`) |
+| PUT | `/api/inspections/:inspectnum` | Edit details modal: supplier (name copied), date, instrument, QF no. The part can't change |
+| DELETE | `/api/inspections/:inspectnum` | Draft only; `204` |
+| PUT | `/api/inspections/:inspectnum/deliveries/:n` | Delivery modal: P/O, date, QTY, category, actuals per line, OK/NG for visual/fitting/COA and MANUAL lines, NG pieces, judgment, concession note. One transaction; the row is locked while saving |
+| DELETE | `/api/inspections/:inspectnum/deliveries/:n` | Remove the last delivery only |
 
 Business rules (`services/inspection.service.js`):
-- [ ] `inspectnum` generated on the server, unique under concurrent saves (`SELECT … FOR UPDATE` on the sequence row)
-- [ ] Item and vendor must exist (`422`); `itemname` / `name` copied into the header at save time
-- [ ] `inspectby` is set from the logged-in user on create; the client can't choose it
-- [ ] Delivery columns: used columns are consecutive from 1; a used column needs P/O, delivery date, qty > 0 and a category; unused columns are stored empty (`NULL` P/O, qty `0`), their dates ignored
-- [ ] Line snapshot from the master on create; later master edits don't touch saved inspections
-- [ ] `status_N` and `notgoodN` always recomputed by the server; client-sent values are ignored
-- [ ] Wrong status for an action → `409 INVALID_STATUS`
-- [ ] Integration tests: create from template, rollback when one line fails, update blocked outside `DRAFT`, number uniqueness under parallel creates, filters
+- [x] `inspectnum` generated on the server from `inspectnumseq` under a row lock (6 parallel creates → 6 different numbers); numbers already taken are skipped
+- [x] Item, vendor and a default AQL plan must exist, and the item must have standards (`422`); `itemname` / `name` copied into the header at save time
+- [x] `inspectby` / `inspectbyid` set from the logged-in user on create; the client can't choose them (migration `013`: `inspectbyid`, `created_at`, `updated_at`)
+- [x] Delivery columns: filled in order (`n` ≤ used + 1); a used column has P/O, date, qty ≥ 1 and a category; unused columns stored empty (`NULL` P/O and date, qty `0`)
+- [x] Line snapshot from the master on create; later master edits don't touch saved inspections
+- [x] `status_N` recomputed by the server (client OK/NG kept only for MANUAL, visual, fitting and COA lines); AQL `samplesize/acceptnum/rejectnum N` taken from the inspection's plan, never from the client
+- [x] Judgment rules: NG pieces ≥ 1 when a cell is NG and ≤ sample size; Accepted only up to Ac; Concession only from Re and with a note (`422` with field details)
+- [x] Not a draft → `409 INVALID_STATUS`; not the creator or an Admin → `403`
+- [x] Integration tests: create, parallel numbering, unknown item/vendor/no standards, delivery save and AQL snapshot (incl. 600/T and lot 1), every judgment rule, order of deliveries, bad measurements, remove last delivery, permissions, legacy read-only, header edit, delete, snapshot after a master change, MANUAL lines, list filters (297 backend tests)
+- [x] db test files run one at a time (`--runInBand`, 20 s timeout): they share `csi_db_test`, and in parallel they changed each other's data
+- [x] Migration `013` applied to `csi_db` (2026-10-02 11:06 after a backup; legacy rows keep `NULL` owner/timestamps; next number `INS-000003`)
 
-**Phase 2 done when:** an inspection for a real item (e.g. `000-228`) can be created from the template, measured in several delivery columns and read back with correct OK/NG, sample sizes and accept/reject numbers, using only `curl`.
+**Phase 2 done when:** an inspection for a real item (e.g. `000-228`) can be created from the template, measured in several delivery columns and read back with correct OK/NG, sample sizes and accept/reject numbers, using only `curl`. ✅ Met 2026-10-02 on `csi_db_test` (000-228, 3 deliveries: 50 N → 2 pcs, 20 N with B NG → Concession, 100 T → 5 pcs).
 
 ---
 
@@ -339,7 +344,7 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 Goal: the inspection is signed off and prints as the official check sheet.
 
 ### 4.1 Approval workflow
-- [ ] Migration `013_inspecttable_approval.sql`: `submitted_at`, `checked_at`, `return_reason`, `remarks` (only the columns Q6 leaves missing)
+- [ ] Migration `014_inspecttable_approval.sql`: `submitted_at`, `checked_at`, `return_reason`, `remarks` (only the columns Q6 leaves missing)
 - [ ] Status flow `DRAFT → SUBMITTED → CHECKED`, and `SUBMITTED → DRAFT` (returned with a reason)
 - [ ] `POST /api/inspections/:inspectnum/submit`: needs `inspectby`, all used columns judged; recomputes OK/NG; locks editing
 - [ ] `POST /api/inspections/:inspectnum/check`: only a `CHECKER` or `ADMIN`; `checkedby` is the logged-in user; final

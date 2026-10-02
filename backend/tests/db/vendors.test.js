@@ -28,10 +28,12 @@ describe('reading vendors (any signed-in user)', () => {
       .set('Cookie', inspector);
 
     expect(res.status).toBe(200);
+    // inspections.test creates inspections for V-0001, so only the shape is fixed here;
+    // the exact count is checked on V-T1 below, which no other file uses.
     expect(res.body.data[0]).toEqual({
       vendaccount: 'V-0001',
       name: 'PT Sinar Logam Abadi',
-      inspectionCount: 0,
+      inspectionCount: expect.any(Number),
     });
     expect(res.body.meta.limit).toBe(3);
   });
