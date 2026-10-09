@@ -10,7 +10,9 @@ import { sessionExpiredInterceptor } from './core/auth/session-expired.intercept
 import { PageTitleStrategy } from './core/layout/page-title-strategy';
 import { fakeUser, signIn } from './testing/users';
 
-describe('App routes', () => {
+// Each test lazy-loads routes through the whole shell; that takes ~6 s on a cold run,
+// over Vitest's 5 s default.
+describe('App routes', { timeout: 20_000 }, () => {
   let http: HttpTestingController;
   let auth: AuthService;
 
