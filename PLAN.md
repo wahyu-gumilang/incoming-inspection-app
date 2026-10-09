@@ -298,7 +298,7 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 - [x] Light / dark / system theme, saved per user (`usertable.theme`)
 - [x] Logos in `frontend/public/brand/` (original for light surfaces, white negative for dark/brand surfaces)
 - [x] Layout: top navbar only (logo, main menu with a "Master data" dropdown, API status, profile menu → Profile settings, Theme, Logout); below 960px the menu folds into a ☰ panel; smooth open/close transitions. Every component in its own `.ts` / `.html` / `.scss`
-- [ ] Dialogs (`shared/ui/modal`): the only way to create or edit records; centered with a backdrop on desktop, full-screen below 600px, closable with Esc / ✕, focus trapped and restored
+- [x] Dialogs (`shared/ui/modal`): the only way to create or edit records; centered with a backdrop on desktop, full-screen below 600px, closable with Esc / ✕, focus trapped and restored
 - [ ] Shared look for tables, forms, buttons, OK/NG and status chips, empty / loading / error states, toasts
 - [x] Login page, auth guard (redirect to login, then back), `must_change_password` flow, role-based menu; an expired session (any `401`) returns to the login page
 - [ ] Profile settings page (name, email, theme, change password)
