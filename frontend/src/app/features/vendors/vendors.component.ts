@@ -5,8 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -15,7 +13,6 @@ import { Vendor } from './vendor';
 import { VendorFormDialog } from './vendor-form-dialog/vendor-form-dialog.component';
 import { VendorImportDialog } from './vendor-import-dialog/vendor-import-dialog.component';
 import { ConfirmDialog } from '../../shared/ui/confirm-dialog/confirm-dialog';
-import { DataTable } from '../../shared/ui/data-table/data-table';
 import { LoadingIndicator } from '../../shared/ui/loading-indicator/loading-indicator';
 
 @Component({
@@ -28,12 +25,9 @@ import { LoadingIndicator } from '../../shared/ui/loading-indicator/loading-indi
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule,
-    MatMenuModule,
     MatTooltipModule,
     MatDialogModule,
     MatSnackBarModule,
-    DataTable,
     LoadingIndicator,
   ],
   templateUrl: './vendors.component.html',
@@ -53,12 +47,6 @@ export class Vendors implements OnInit {
   order = signal<'asc' | 'desc'>('asc');
   search = signal('');
   loading = signal(false);
-
-  readonly columns = [
-    { key: 'vendaccount', label: 'Vendor Code', sortable: true },
-    { key: 'name', label: 'Vendor Name', sortable: true },
-    { key: 'inspectionCount', label: 'Inspections', sortable: true },
-  ];
 
   ngOnInit(): void {
     this.loadVendors();
@@ -91,7 +79,7 @@ export class Vendors implements OnInit {
     this.loadVendors();
   }
 
-  onSortChange(column: string): void {
+  onSort(column: string): void {
     if (this.sort() === column) {
       this.order.set(this.order() === 'asc' ? 'desc' : 'asc');
     } else {
@@ -101,8 +89,8 @@ export class Vendors implements OnInit {
     this.loadVendors();
   }
 
-  onPageChange(page: number): void {
-    this.page.set(page);
+  onPageChange(newPage: number): void {
+    this.page.set(newPage);
     this.loadVendors();
   }
 
