@@ -39,16 +39,17 @@ export const routes: Routes = [
         data: { title: 'Inspections', icon: 'fact_check', stage: 'Stage 4' },
       },
       {
+        path: 'vendors',
+        title: 'Vendors',
+        loadComponent: () =>
+          import('./features/vendors/vendors.component').then((m) => m.Vendors),
+        data: { title: 'Vendors', icon: 'local_shipping' },
+      },
+      {
         path: 'items',
         title: 'Items & standards',
         loadComponent: placeholder,
         data: { title: 'Items & standards', icon: 'inventory_2', stage: 'Stage 3' },
-      },
-      {
-        path: 'vendors',
-        title: 'Vendors',
-        loadComponent: placeholder,
-        data: { title: 'Vendors', icon: 'local_shipping', stage: 'Stage 3' },
       },
       {
         path: 'aql',

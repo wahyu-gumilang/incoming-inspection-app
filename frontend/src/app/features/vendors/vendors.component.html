@@ -1,0 +1,78 @@
+<div class="vendors-page">
+  <div class="page-header">
+    <h1>Vendors</h1>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="openImportDialog()" matTooltip="Import from CSV">
+        <mat-icon>upload_file</mat-icon>
+        Import
+      </button>
+      <button mat-flat-button color="primary" (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        New vendor
+      </button>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Search vendors</mat-label>
+      <input
+        matInput
+        [ngModel]="search()"
+        (ngModelChange)="onSearch($event)"
+        placeholder="Code or name"
+      />
+      <mat-icon matPrefix>search</mat-icon>
+      @if (search()) {
+        <button matSuffix mat-icon-button (click)="onSearch('')" aria-label="Clear">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+  </div>
+
+  @if (loading()) {
+    <loading-indicator />
+  } @else {
+    <data-table
+      [columns]="columns"
+      [data]="vendors()"
+      [sort]="sort()"
+      [order]="order()"
+      [page]="page()"
+      [total]="total()"
+      [totalPages]="totalPages()"
+      (sortChange)="onSortChange($event)"
+      (pageChange)="onPageChange($event)"
+    >
+      <ng-template let-row>
+        <td>
+          <span class="vendor-code">{{ row.vendaccount }}</span>
+        </td>
+        <td>{{ row.name }}</td>
+        <td>
+          @if (row.inspectionCount !== undefined) {
+            {{ row.inspectionCount }}
+          }
+        </td>
+        <td class="actions-cell">
+          <button
+            mat-icon-button
+            matTooltip="Edit"
+            (click)="openEditDialog(row)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            matTooltip="Delete"
+            color="warn"
+            (click)="confirmDelete(row)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-template>
+    </data-table>
+  }
+</div>
