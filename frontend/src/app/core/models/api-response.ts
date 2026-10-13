@@ -1,15 +1,16 @@
-// Envelope every backend response uses (see CLAUDE.md, "JSON response conventions").
 export interface ApiSuccess<T> {
   success: true;
   data: T;
   meta?: PageMeta;
 }
 
-export interface PageMeta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
+export interface ApiErrorBody {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    details?: ApiErrorDetail[];
+  };
 }
 
 export interface ApiErrorDetail {
@@ -17,7 +18,9 @@ export interface ApiErrorDetail {
   message: string;
 }
 
-export interface ApiErrorBody {
-  success: false;
-  error: { code: string; message: string; details?: ApiErrorDetail[] };
+export interface PageMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }

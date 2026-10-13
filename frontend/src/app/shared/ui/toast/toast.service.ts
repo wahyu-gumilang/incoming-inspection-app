@@ -1,9 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Toast, ToastData, ToastKind } from './toast';
-
-// Errors stay longer than confirmations so the message can be read.
-const DURATION: Record<ToastKind, number> = { success: 3000, info: 4000, error: 6000 };
+import { ToastKind } from './toast';
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
@@ -22,10 +19,11 @@ export class ToastService {
   }
 
   private show(kind: ToastKind, message: string): void {
-    this.snackBar.openFromComponent<Toast, ToastData>(Toast, {
-      data: { kind, message },
-      duration: DURATION[kind],
-      politeness: kind === 'error' ? 'assertive' : 'polite',
+    this.snackBar.open(message, 'Tutup', {
+      duration: kind === 'error' ? 6000 : 4000,
+      panelClass: [`toast-${kind}`],
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
     });
   }
 }

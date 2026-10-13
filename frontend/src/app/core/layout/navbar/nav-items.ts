@@ -1,41 +1,43 @@
-import { Role } from '../../models/user';
-
 export interface NavLink {
-  path: string;
+  type: 'link';
   label: string;
+  route: string;
   icon: string;
-  hint?: string;
-  roles?: Role[];
+  roles?: string[]; // empty or undefined = all roles
 }
 
 export interface NavGroup {
+  type: 'group';
   label: string;
   icon: string;
   children: NavLink[];
+  roles?: string[];
 }
 
 export type NavEntry = NavLink | NavGroup;
 
-export const isGroup = (e: NavEntry): e is NavGroup => 'children' in e;
-
-// The main menu, as in the approved mockups. `roles` hides an entry from other roles;
-// the routes are guarded too.
-export const NAV: NavEntry[] = [
-  { path: '/dashboard', label: 'Dashboard', icon: 'space_dashboard' },
-  { path: '/inspections', label: 'Inspections', icon: 'fact_check' },
+export const NAV_ITEMS: NavEntry[] = [
   {
-    label: 'Master data',
+    type: 'link',
+    label: 'Dashboard',
+    route: '/dashboard',
+    icon: 'dashboard',
+  },
+  {
+    type: 'link',
+    label: 'Inspections',
+    route: '/inspections',
+    icon: 'fact_check',
+  },
+  {
+    type: 'group',
+    label: 'Master Data',
     icon: 'database',
     children: [
-      {
-        path: '/items',
-        label: 'Items & standards',
-        hint: 'Parts and their QC standards',
-        icon: 'inventory_2',
-      },
-      { path: '/vendors', label: 'Vendors', hint: 'Suppliers', icon: 'local_shipping' },
-      { path: '/aql', label: 'AQL table', hint: 'Sample size and Ac / Re', icon: 'table_chart' },
+      { type: 'link', label: 'Items', route: '/items', icon: 'inventory_2' },
+      { type: 'link', label: 'Vendors', route: '/vendors', icon: 'business' },
+      { type: 'link', label: 'AQL Table', route: '/aql', icon: 'table_chart' },
+      { type: 'link', label: 'Users', route: '/users', icon: 'people', roles: ['ADMIN'] },
     ],
   },
-  { path: '/users', label: 'Users', icon: 'group', roles: ['ADMIN'] },
 ];
