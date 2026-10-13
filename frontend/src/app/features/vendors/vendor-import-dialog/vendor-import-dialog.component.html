@@ -29,13 +29,13 @@
     }
   </div>
 
-  @if (result; as r) {
+  @if (result) {
     <div class="import-result">
-      @if (r.errors.length > 0) {
+      @if (result!.errors.length > 0) {
         <div class="result-errors">
           <h3>Errors</h3>
           <ul>
-            @for (err of r.errors; track err) {
+            @for (err of result!.errors; track err) {
               <li>{{ err }}</li>
             }
           </ul>
