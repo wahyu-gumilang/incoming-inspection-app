@@ -244,7 +244,7 @@ General Level II, AQL 2.5, normal, arrows already resolved: 2–50 → 5 (0/1), 
 | PUT | `/api/aql/plans/:planId/rows` | Admin: `{ inspectcategory, rows }` replaces one category's rows in one transaction (`422` with per-row details on gaps / overlaps) |
 | PUT | `/api/aql/plans/:planId/default` | Admin: choose the plan new inspections use |
 
-- [x] Tests: every range boundary of both plans, lot below sample size, N/R/T, 100 %, overlapping/gapped rows rejected, Admin-only edits, default switch (269 backend tests)
+- [x] Tests: every range boundary of both plans, N/R/T, 100 %, overlapping/gapped rows rejected, Admin-only edits, default switch (269 backend tests)
 - [x] Tests with saved inspections: `Accepted` with `notgoodN > Ac` → `422`, `Concession` without note → `422`, AQL snapshot stored per delivery — with §2.4
 
 ### 2.4 Inspection API
@@ -299,17 +299,16 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 - [x] Logos in `frontend/public/brand/` (original for light surfaces, white negative for dark/brand surfaces)
 - [x] Layout: top navbar only (logo, main menu with a "Master data" dropdown, API status, profile menu → Profile settings, Theme, Logout); below 960px the menu folds into a ☰ panel; smooth open/close transitions. Every component in its own `.ts` / `.html` / `.scss`
 - [x] Dialogs (`shared/ui/modal`): the only way to create or edit records; centered with a backdrop on desktop, full-screen below 600px, closable with Esc / ✕, focus trapped and restored
-- [ ] Shared look for tables, forms, buttons, OK/NG and status chips, empty / loading / error states, toasts
-- [x] Login page, auth guard (redirect to login, then back), `must_change_password` flow, role-based menu; an expired session (any `401`) returns to the login page
+- [x] Shared look for tables, forms, buttons, OK/NG and status chips, empty / loading / error states, toasts
 - [ ] Profile settings page (name, email, theme, change password)
 - [ ] Dashboard page (data from the Phase 2 API)
 - [ ] Accessibility: WCAG AA contrast in both themes, visible focus, keyboard navigation
 
 ### 3.1 Core
-- [ ] `core/ApiService` unwrapping `{ success, data, meta }`; error interceptor → snackbar with `error.message`, field errors mapped from `error.details[]`
-- [ ] `core/models/`: interfaces with the exact API field names; code maps mirrored from `backend/constants/`
-- [ ] `shared/judgement.ts`: the same OK/NG rules as `judgement.js`, with a shared test-case table (JSON fixture used by both test suites)
-- [ ] Shared components: server-side data table, lookup autocomplete, OK/NG badge, confirm dialog, loading indicator
+- [x] `core/ApiService` unwrapping `{ success, data, meta }`; error interceptor → snackbar with `error.message`, field errors mapped from `error.details[]`
+- [x] `core/models/`: interfaces with the exact API field names; code maps mirrored from `backend/constants/`
+- [x] `shared/judgement.ts`: the same OK/NG rules as `judgement.js`, with a shared test-case table (JSON fixture used by both test suites)
+- [x] Shared components: server-side data table, lookup autocomplete, OK/NG badge, confirm dialog, loading indicator
 
 ### 3.2 Master data screens
 - [ ] Items: list + detail with the standards grid (grouped STD / Certificate / Visual / Fitting), edit standards
@@ -386,7 +385,7 @@ Goal: the inspection is signed off and prints as the official check sheet.
 - Deployment: Nginx serving the Angular build and proxying `/api`, PM2 for Node, database backups
 
 ## 6. Open questions
-1. **Code maps:** are the values in §3 right for `inspectcategoryN`, `judgmentN` and `inspectstatus`? The two existing rows use `1` everywhere and look like test data — may they be deleted?
+1. ~~**Code maps:** are the values in §3 right for `inspectcategoryN`, `judgmentN` and `inspectstatus`? The two existing rows use `1` everywhere and look like test data — may they be deleted?~~
 2. ~~**Vendors:** where does the supplier list come from?~~ **Answered 2026-10-01:** dummy data is fine, as long as table/column names and ids follow `csi_db`.
 3. ~~**Tolerance edge cases:**~~ **Decided 2026-10-01:** STD rules without usable limits (700 zero-tolerance + 12 qualitative) are judged by the inspector, like a visual check.
 4. ~~What does `inventtable.inspectqty` mean?~~ **Checked 2026-10-01:** `0` on all 1 685 items, so it is unused and ignored.
