@@ -311,9 +311,9 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 - [x] Shared components: server-side data table, lookup autocomplete, OK/NG badge, confirm dialog, loading indicator
 
 ### 3.2 Master data screens
-- [ ] Items: list + detail with the standards grid (grouped STD / Certificate / Visual / Fitting), edit standards
-- [ ] Vendors: list, create/edit form, CSV import
-- [ ] Users (Admin only, replaces the former "Checkers" menu): list, create, edit role / active, reset password
+- [x] Items: list + detail with the standards grid (grouped STD / Certificate / Visual / Fitting), edit standards
+- [x] Vendors: list, create/edit form, CSV import
+- [x] Users (Admin only, replaces the former "Checkers" menu): list, create, edit role / active, reset password
 - [ ] AQL table: plans, N / R / T tabs, the rows with the active range highlighted, a "try a lot size" calculator; editable by Admin
 
 ### 3.3 Inspection form (mirrors Form 7.4.3-F1)

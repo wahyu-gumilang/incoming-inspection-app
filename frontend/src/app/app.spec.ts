@@ -77,6 +77,11 @@ describe('App routes', { timeout: 20_000 }, () => {
     const harness = await RouterTestingHarness.create('/users');
     const el = harness.fixture.nativeElement as HTMLElement;
 
+    // The user list needs the backend; answer it with an empty page so the component renders.
+    http
+      .expectOne((req) => req.url === '/api/users' && req.method === 'GET')
+      .flush({ success: true, data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+
     expect(url()).toBe('/users');
     expect(
       [...el.querySelectorAll('.mainnav .nav-item')].map((a) => a.textContent?.trim()),

@@ -62,8 +62,9 @@ export const routes: Routes = [
         path: 'users',
         title: 'Users',
         canActivate: [adminGuard],
-        loadComponent: placeholder,
-        data: { title: 'Users', icon: 'group', stage: 'Stage 2' },
+        loadComponent: () =>
+          import('./features/users/users.component').then((m) => m.Users),
+        data: { title: 'Users', icon: 'group' },
       },
       {
         path: 'profile',
