@@ -80,7 +80,8 @@ describe('App routes', { timeout: 20_000 }, () => {
     expect(url()).toBe('/users');
     expect(
       [...el.querySelectorAll('.mainnav .nav-item')].map((a) => a.textContent?.trim()),
-    ).toContain('Users');
+    ).toContain('Master data expand_more');
+    expect(el.querySelector('.page h1')?.textContent).toBe('Users');
   });
 
   it('keeps a user on a temporary password on the change-password page', async () => {

@@ -7,7 +7,14 @@
     Existing vendor codes will be skipped.
   </p>
 
-  <div class="file-drop-zone" (click)="fileInput.click()">
+  <div
+    class="file-drop-zone"
+    tabindex="0"
+    role="button"
+    (click)="fileInput.click()"
+    (keydown.enter)="fileInput.click()"
+    (keydown.space)="fileInput.click()"
+  >
     <input
       #fileInput
       type="file"

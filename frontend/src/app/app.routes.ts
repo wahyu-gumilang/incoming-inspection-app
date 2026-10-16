@@ -48,8 +48,9 @@ export const routes: Routes = [
       {
         path: 'items',
         title: 'Items & standards',
-        loadComponent: placeholder,
-        data: { title: 'Items & standards', icon: 'inventory_2', stage: 'Stage 3' },
+        loadComponent: () =>
+          import('./features/items/items.component').then((m) => m.Items),
+        data: { title: 'Items & standards', icon: 'inventory_2' },
       },
       {
         path: 'aql',

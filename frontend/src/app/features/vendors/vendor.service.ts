@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService } from '../../core/api/api.service';
-import { Vendor, VendorListResponse, VendorResponse } from './vendor';
+import { VendorListResponse, VendorResponse } from './vendor';
 
 @Injectable({ providedIn: 'root' })
 export class VendorService {
@@ -33,14 +33,13 @@ export class VendorService {
   }
 
   delete(vendaccount: string) {
-    return this.api.delete<void>(`/vendors/${encodeURIComponent(vendaccount)}`);
+    return this.api.delete(`/vendors/${encodeURIComponent(vendaccount)}`);
   }
 
   importCsv(file: File) {
     const formData = new FormData();
     formData.append('file', file);
-    return this.api.post<VendorListResponse>('/vendors/import', formData, {
-      headers: { 'Content-Type': undefined },
-    });
+    // Angular sets the multipart Content-Type (with boundary) from the FormData body.
+    return this.api.post<VendorListResponse>('/vendors/import', formData);
   }
 }

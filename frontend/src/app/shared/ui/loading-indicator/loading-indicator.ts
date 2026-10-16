@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
-  selector: 'loading-indicator',
+  selector: 'app-loading-indicator',
   standalone: true,
   imports: [CommonModule, MatProgressSpinnerModule],
   template: `

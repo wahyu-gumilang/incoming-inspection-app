@@ -1,6 +1,6 @@
 import { HttpTestingController } from '@angular/common/http/testing';
 import { AuthService } from '../core/auth/auth.service';
-import { Role, User } from '../core/models/user';
+import { User, UserRole } from '../core/models/user';
 
 export function fakeUser(changes: Partial<User> = {}): User {
   return {
@@ -8,7 +8,7 @@ export function fakeUser(changes: Partial<User> = {}): User {
     username: '070203',
     fullname: 'Wahyu Gumilang',
     email: null,
-    role: 'ADMIN' as Role,
+    role: 'ADMIN' as UserRole,
     active: true,
     must_change_password: false,
     theme: 'light',

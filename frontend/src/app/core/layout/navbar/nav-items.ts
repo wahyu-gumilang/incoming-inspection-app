@@ -1,8 +1,9 @@
 export interface NavLink {
   type: 'link';
   label: string;
-  route: string;
+  path: string;
   icon: string;
+  hint?: string;
   roles?: string[]; // empty or undefined = all roles
 }
 
@@ -11,33 +12,36 @@ export interface NavGroup {
   label: string;
   icon: string;
   children: NavLink[];
-  roles?: string[];
 }
 
 export type NavEntry = NavLink | NavGroup;
 
-export const NAV_ITEMS: NavEntry[] = [
+export function isGroup(entry: NavEntry): entry is NavGroup {
+  return entry.type === 'group';
+}
+
+export const NAV: NavEntry[] = [
   {
     type: 'link',
     label: 'Dashboard',
-    route: '/dashboard',
+    path: '/dashboard',
     icon: 'dashboard',
   },
   {
     type: 'link',
     label: 'Inspections',
-    route: '/inspections',
+    path: '/inspections',
     icon: 'fact_check',
   },
   {
     type: 'group',
-    label: 'Master Data',
+    label: 'Master data',
     icon: 'database',
     children: [
-      { type: 'link', label: 'Items', route: '/items', icon: 'inventory_2' },
-      { type: 'link', label: 'Vendors', route: '/vendors', icon: 'business' },
-      { type: 'link', label: 'AQL Table', route: '/aql', icon: 'table_chart' },
-      { type: 'link', label: 'Users', route: '/users', icon: 'people', roles: ['ADMIN'] },
+      { type: 'link', label: 'Items', path: '/items', icon: 'inventory_2' },
+      { type: 'link', label: 'Vendors', path: '/vendors', icon: 'business' },
+      { type: 'link', label: 'AQL', path: '/aql', icon: 'table_chart' },
+      { type: 'link', label: 'Users', path: '/users', icon: 'people', roles: ['ADMIN'] },
     ],
   },
 ];

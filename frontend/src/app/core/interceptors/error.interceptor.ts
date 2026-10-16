@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { ToastService } from '../../shared/ui/toast/toast.service';
 import { ApiError } from '../api/api-error';
 
@@ -14,7 +14,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
 
   return next(req).pipe(
-    throwError((err: unknown) => {
+    catchError((err: unknown) => {
       if (err instanceof HttpErrorResponse) {
         const apiError = ApiError.from(err);
 

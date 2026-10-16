@@ -2,21 +2,20 @@ import {
   Component,
   computed,
   effect,
-  inject,
   input,
   model,
   output,
   signal,
   ViewChild,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AsyncPipe } from '@angular/common';
+import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Observable, of, switchMap, tap } from 'rxjs';
 
 export interface LookupOption {
@@ -32,13 +31,13 @@ export interface LookupOption {
   selector: 'app-lookup-autocomplete',
   imports: [
     FormsModule,
+    ReactiveFormsModule,
     MatAutocompleteModule,
     MatInputModule,
     MatFormFieldModule,
     MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    AsyncPipe,
   ],
   template: `
     <mat-form-field
@@ -91,7 +90,7 @@ export interface LookupOption {
           </mat-option>
         }
 
-        @for (option of filteredOptions | async; track option.value) {
+        @for (option of filteredOptions(); track option.value) {
           <mat-option [value]="option">
             <div class="lookup-option">
               <span class="lookup-option-label">{{ option.label }}</span>
@@ -102,7 +101,7 @@ export interface LookupOption {
           </mat-option>
         }
 
-        @if (!loading() && (filteredOptions | async)?.length === 0 && searchControl.value) {
+        @if (!loading() && (filteredOptions().length === 0) && searchControl.value) {
           <mat-option disabled class="lookup-no-results">
             No results found
           </mat-option>
@@ -214,19 +213,24 @@ export class LookupAutocomplete {
 
   @ViewChild(MatAutocompleteTrigger) private readonly trigger!: MatAutocompleteTrigger;
 
-  private readonly searchControl = new import('@angular/forms').FormControl<string | LookupOption>('');
+  // Referenced by the template (formControl binding, clear button, no-results check).
+readonly searchControl = new FormControl<string | LookupOption>('');
 
   readonly displayFn = (option: LookupOption | string): string => {
     if (typeof option === 'string') return option;
     return option?.label ?? '';
   };
 
-  readonly filteredOptions = computed(() => {
+  // Options filtered by the current search text. A plain array (not an Observable),
+  // so the template reads it directly instead of through the async pipe.
+  readonly filteredOptions = computed<LookupOption[]>(() => {
     const opts = this.options();
     const text = this.searchControl.value;
-    if (!text || typeof text !== 'string') return of(opts);
+    if (!text || typeof text !== 'string') return opts;
     const q = text.toLowerCase();
-    return of(opts.filter((o) => o.label.toLowerCase().includes(q) || o.value.toLowerCase().includes(q)));
+    return opts.filter(
+      (o) => o.label.toLowerCase().includes(q) || o.value.toLowerCase().includes(q),
+    );
   });
 
   constructor() {

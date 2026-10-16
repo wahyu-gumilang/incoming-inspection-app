@@ -29,4 +29,9 @@ export class ApiError extends Error {
     if (err instanceof ApiError) return err;
     return new ApiError(0, 'NETWORK_ERROR', 'Network error');
   }
+
+  /** Returns the message for a single field from `details`, or '' if absent. */
+  fieldMessage(field: string): string {
+    return this.details.find((d) => d.field === field)?.message ?? '';
+  }
 }

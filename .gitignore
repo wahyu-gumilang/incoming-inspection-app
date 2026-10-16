@@ -10,3 +10,6 @@ docs/csi_db.sql
 frontend/dist/
 frontend/.angular/
 backend/reports/output/
+
+.aider.*
+.aider*
