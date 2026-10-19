@@ -55,8 +55,9 @@ export const routes: Routes = [
       {
         path: 'aql',
         title: 'AQL table',
-        loadComponent: placeholder,
-        data: { title: 'AQL table', icon: 'table_chart', stage: 'Stage 3' },
+        loadComponent: () =>
+          import('./features/aql/aql.component').then((m) => m.AqlPage),
+        data: { title: 'AQL table', icon: 'table_chart' },
       },
       {
         path: 'users',

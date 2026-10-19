@@ -89,6 +89,27 @@ describe('App routes', { timeout: 20_000 }, () => {
     expect(el.querySelector('.page h1')?.textContent).toBe('Users');
   });
 
+  it('lets an Admin open the AQL table page', async () => {
+    await signIn(auth, http);
+    const harness = await RouterTestingHarness.create('/aql');
+    const el = harness.fixture.nativeElement as HTMLElement;
+
+    // The AQL page loads plans with their rows; answer both requests.
+    const s1Rows = [
+      { planid: 1, inspectcategory: 1, lotmin: 2, lotmax: 50, codeletter: 'A', samplesize: 2, acceptnum: 0, rejectnum: 1 },
+      { planid: 1, inspectcategory: 1, lotmin: 51, lotmax: 500, codeletter: 'B', samplesize: 3, acceptnum: 0, rejectnum: 1 },
+    ];
+    http
+      .expectOne((req) => req.url === '/api/aql/plans' && req.method === 'GET')
+      .flush({ success: true, data: [{ planid: 1, name: 'S-1 · zero defects', inspectlevel: 'S-1', aql: '0', isdefault: true, note: null, updated_at: null, categories: [1, 2, 3] }] });
+    http
+      .expectOne((req) => req.url === '/api/aql/plans/1' && req.method === 'GET')
+      .flush({ success: true, data: { planid: 1, name: 'S-1 · zero defects', inspectlevel: 'S-1', aql: '0', isdefault: true, note: null, updated_at: null, rows: s1Rows } });
+
+    expect(url()).toBe('/aql');
+    expect(el.querySelector('.page h1')?.textContent).toBe('AQL table');
+  });
+
   it('keeps a user on a temporary password on the change-password page', async () => {
     await signIn(auth, http, fakeUser({ must_change_password: true }));
     const harness = await RouterTestingHarness.create('/inspections');

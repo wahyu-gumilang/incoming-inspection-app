@@ -314,7 +314,7 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 - [x] Items: list + detail with the standards grid (grouped STD / Certificate / Visual / Fitting), edit standards
 - [x] Vendors: list, create/edit form, CSV import
 - [x] Users (Admin only, replaces the former "Checkers" menu): list, create, edit role / active, reset password
-- [ ] AQL table: plans, N / R / T tabs, the rows with the active range highlighted, a "try a lot size" calculator; editable by Admin
+- [x] AQL table: plans, N / R / T tabs, the rows with the active range highlighted, a "try a lot size" calculator; editable by Admin
 
 ### 3.3 Inspection form (mirrors Form 7.4.3-F1)
 - [ ] **Header:** Part name / Part no (item lookup), Supplier (vendor lookup), inspect date, measuring instrument
