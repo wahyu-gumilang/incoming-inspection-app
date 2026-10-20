@@ -30,8 +30,10 @@ describe('App routes', { timeout: 20_000 }, () => {
   });
 
   afterEach(() => {
-    // The navbar's status chip polls /api/health; these tests don't care about it.
-    http.match('/api/health');
+    // The navbar's status chip polls /api/health; the dashboard and other pages open
+    // their own data requests. Flush whatever is still pending so nothing leaks
+    // into the next test's module.
+    for (const req of http.match((r) => true)) req.flush({});
     http.verify();
   });
 
@@ -50,10 +52,24 @@ describe('App routes', { timeout: 20_000 }, () => {
   it('opens the dashboard inside the navbar shell after sign-in', async () => {
     await signIn(auth, http);
     const harness = await RouterTestingHarness.create('/');
+    // The dashboard pulls its stats on open; answer with an empty dataset.
+    http
+      .expectOne((req) => req.url.includes('/api/inspections/stats') && req.method === 'GET')
+      .flush({
+        success: true,
+        data: {
+          kpis: { inspections: 0, ngRate: 0, waiting: 0, waitingOld: 0, acceptedRate: 0 },
+          chart: [],
+          bySupplier: [],
+          recent: [],
+          waiting: [],
+          drafts: [],
+        },
+      });
     const el = harness.fixture.nativeElement as HTMLElement;
 
     expect(url()).toBe('/dashboard');
-    expect(el.querySelector('.page h1')?.textContent).toBe('Dashboard');
+    expect(el.querySelector('h1')?.textContent).toBe('Dashboard');
     expect(el.querySelector('.brand + .brand-divider')).not.toBeNull();
     expect(TestBed.inject(Title).getTitle()).toBe('Dashboard · Incoming Inspection');
   });

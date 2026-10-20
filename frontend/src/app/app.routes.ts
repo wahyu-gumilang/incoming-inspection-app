@@ -29,8 +29,9 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         title: 'Dashboard',
-        loadComponent: placeholder,
-        data: { title: 'Dashboard', icon: 'space_dashboard', stage: 'Stage 5' },
+        loadComponent: () =>
+          import('./features/dashboard/dashboard.component').then((m) => m.Dashboard),
+        data: { title: 'Dashboard', icon: 'space_dashboard' },
       },
       {
         path: 'inspections',

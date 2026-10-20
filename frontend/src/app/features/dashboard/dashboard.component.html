@@ -1,0 +1,231 @@
+<div class="dashboard-page">
+  <div class="page-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p class="subtitle">
+        @if (auth()?.fullname) {
+          Hi, {{ auth()?.fullname }}.
+        } @else {
+          Overview of incoming inspections.
+        }
+      </p>
+    </div>
+    <div class="header-actions">
+      <div class="period-tabs" role="tablist" aria-label="Period">
+        @for (p of periods; track p.value) {
+          <button
+            type="button"
+            role="tab"
+            class="period-tab"
+            [class.on]="period() === p.value"
+            (click)="setPeriod(p.value)"
+          >
+            {{ p.label }}
+          </button>
+        }
+      </div>
+      <a mat-icon-button routerLink="/inspections" matTooltip="New inspection" aria-label="New inspection">
+        <mat-icon>add</mat-icon>
+      </a>
+    </div>
+  </div>
+
+  @if (loading() && !stats()) {
+    <app-loading-indicator />
+  } @else if (loadError() && !stats()) {
+    <div class="load-error" role="alert">
+      {{ loadError() }}
+      <button mat-stroked-button (click)="load()">Retry</button>
+    </div>
+  } @else if (stats()) {
+    @let s = stats()!;
+
+    <!-- KPI cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <mat-icon>fact_check</mat-icon>
+          <span>Inspections · {{ periodLabel() }}</span>
+        </div>
+        <div class="kpi-value">{{ s.kpis.inspections }}</div>
+        <div class="kpi-sub">check sheets started in this period</div>
+      </div>
+      <div class="kpi-card" [class.kpi-warn]="s.kpis.ngRate > 0">
+        <div class="kpi-label">
+          <mat-icon>priority_high</mat-icon>
+          <span>NG rate</span>
+        </div>
+        <div class="kpi-value">{{ pct(s.kpis.ngRate) }}</div>
+        <div class="kpi-sub">share of judged deliveries with NG pieces</div>
+      </div>
+      <div class="kpi-card" [class.kpi-warn]="s.kpis.waiting > 0">
+        <div class="kpi-label">
+          <mat-icon>hourglass_top</mat-icon>
+          <span>Waiting for check</span>
+        </div>
+        <div class="kpi-value">{{ s.kpis.waiting }}</div>
+        <div class="kpi-sub">
+          @if (s.kpis.waitingOld > 0) {
+            <span class="kpi-old">{{ s.kpis.waitingOld }} waiting since yesterday</span>
+          } @else {
+            nothing older than today
+          }
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <mat-icon>verified</mat-icon>
+          <span>Accepted rate</span>
+        </div>
+        <div class="kpi-value">{{ pct(s.kpis.acceptedRate) }}</div>
+        <div class="kpi-sub">share of received pieces accepted or conceded</div>
+      </div>
+    </div>
+
+    <!-- Alert: NG-heavy suppliers -->
+    @if (ngSuppliers().length > 0) {
+      <div class="alert-card" role="alert">
+        <mat-icon>warning_amber</mat-icon>
+        <div>
+          <b>{{ ngSuppliers().length }} supplier(s) with high NG in {{ periodLabel().toLowerCase() }}.</b>
+          <ul class="alert-list">
+            @for (sup of ngSuppliers(); track sup.supplier) {
+              <li>
+                <span class="supplier-name">{{ sup.supplier }}</span>
+                <span class="alert-meta">{{ sup.ng }} NG piece(s) across {{ sup.deliveries }} judged delivery(ies)</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    }
+
+    <!-- Chart + right column -->
+    <div class="main-grid">
+      <section class="card chart-card">
+        <div class="card-head">
+          <h3>Inspections &amp; NG pieces · last 6 months</h3>
+        </div>
+        @if (hasChartData()) {
+          <div class="chart" role="img" aria-label="Bar chart of inspections and NG pieces per month">
+            @for (point of chart(); track point.month) {
+              @let h = point.inspections / chartMax() * 100;
+              @let g = point.ng / chartMax() * 100;
+              <div class="chart-col">
+                <div class="chart-nums">
+                  <span class="num-insp">{{ point.inspections }}</span>
+                  <span class="num-ng" [class.zero]="point.ng === 0">{{ point.ng }}</span>
+                </div>
+                <div class="chart-bars">
+                  <div class="bar bar-insp" [style.height.%]="h"></div>
+                  <div class="bar bar-ng" [style.height.%]="g"></div>
+                </div>
+                <div class="chart-label">{{ monthLabel(point.month) }}</div>
+              </div>
+            }
+          </div>
+          <div class="chart-legend">
+            <span><i class="swatch swatch-insp"></i>Inspections</span>
+            <span><i class="swatch swatch-ng"></i>NG pieces</span>
+          </div>
+        } @else {
+          <div class="chart-empty">No inspections in the last 6 months.</div>
+        }
+      </section>
+
+      <div class="side-column">
+        <!-- Waiting for your check (Checker / Admin only) -->
+        @if (waiting().length > 0) {
+          <section class="card">
+            <div class="card-head">
+              <h3>Waiting for your check</h3>
+            </div>
+            <ul class="mini-list">
+              @for (w of waiting(); track w.inspectnum) {
+                <li>
+                  <div class="mini-row" [routerLink]="['/inspections', w.inspectnum]">
+                    <div class="mini-main">
+                      <b>{{ w.itemname || w.inspectnum }}</b>
+                      <span class="mini-sub">
+                        {{ w.inspectnum }} · by {{ w.inspectby || 'unknown' }} · {{ ageLabel(w.created_at) }}
+                      </span>
+                    </div>
+                    @if (w.ng > 0) {
+                      <span class="mini-ng">{{ w.ng }} NG</span>
+                    }
+                    <mat-icon class="mini-arrow">chevron_right</mat-icon>
+                  </div>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        <!-- Your drafts -->
+        @if (drafts().length > 0) {
+          <section class="card">
+            <div class="card-head">
+              <h3>Your drafts</h3>
+            </div>
+            <ul class="mini-list">
+              @for (d of drafts(); track d.inspectnum) {
+                <li>
+                  <div class="mini-row" [routerLink]="['/inspections', d.inspectnum]">
+                    <div class="mini-main">
+                      <b>{{ d.itemname || d.inspectnum }}</b>
+                      <span class="mini-sub">{{ d.inspectnum }}</span>
+                    </div>
+                    @if (d.ng > 0) {
+                      <span class="mini-ng">{{ d.ng }} NG</span>
+                    }
+                    <mat-icon class="mini-arrow">chevron_right</mat-icon>
+                  </div>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+    </div>
+
+    <!-- Recent inspections -->
+    <section class="card">
+      <div class="card-head">
+        <h3>Recent inspections</h3>
+        <a class="see-all" routerLink="/inspections">See all <mat-icon>chevron_right</mat-icon></a>
+      </div>
+      @if (recent().length > 0) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Inspection no.</th>
+                <th>Date</th>
+                <th>Item</th>
+                <th>Supplier</th>
+                <th>Status</th>
+                <th class="num-col">NG</th>
+                <th class="num-col">Deliveries</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of recent(); track r.inspectnum) {
+                <tr [routerLink]="['/inspections', r.inspectnum]" class="row-link">
+                  <td class="mono">{{ r.inspectnum }}</td>
+                  <td>{{ r.inspectdate || '—' }}</td>
+                  <td>{{ r.itemname || '—' }}</td>
+                  <td>{{ r.supplier || '—' }}</td>
+                  <td><span class="chip" [class]="statusClass(r.status)">{{ statusLabel(r.status) }}</span></td>
+                  <td class="num-col">{{ r.ng }}</td>
+                  <td class="num-col">{{ r.judged > 0 ? r.judged : '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="table-empty">No inspections yet. Start one from the Inspections page.</div>
+      }
+    </section>
+  }
+</div>

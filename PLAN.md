@@ -301,7 +301,7 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 - [x] Dialogs (`shared/ui/modal`): the only way to create or edit records; centered with a backdrop on desktop, full-screen below 600px, closable with Esc / ✕, focus trapped and restored
 - [x] Shared look for tables, forms, buttons, OK/NG and status chips, empty / loading / error states, toasts
 - [ ] Profile settings page (name, email, theme, change password)
-- [ ] Dashboard page (data from the Phase 2 API)
+- [x] Dashboard page (data from the Phase 2 API)
 - [ ] Accessibility: WCAG AA contrast in both themes, visible focus, keyboard navigation
 
 ### 3.1 Core
