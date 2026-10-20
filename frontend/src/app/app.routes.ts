@@ -36,8 +36,11 @@ export const routes: Routes = [
       {
         path: 'inspections',
         title: 'Inspections',
-        loadComponent: placeholder,
-        data: { title: 'Inspections', icon: 'fact_check', stage: 'Stage 4' },
+        loadComponent: () =>
+          import('./features/inspections/inspection-list/inspection-list.component').then(
+            (m) => m.InspectionsListComponent,
+          ),
+        data: { title: 'Inspections', icon: 'fact_check' },
       },
       {
         path: 'vendors',
