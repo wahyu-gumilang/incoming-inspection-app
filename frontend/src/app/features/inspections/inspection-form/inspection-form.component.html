@@ -1,0 +1,122 @@
+<mat-toolbar class="head">
+  <button mat-icon-button (click)="back()" aria-label="Back">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="head-title">
+    {{ detail ? detail.inspectnum : inspectnum() }} · {{ detail ? detail.itemname : '…' }}
+  </span>
+  <span class="muted">{{ detail ? detail.name : '' }}</span>
+  <span class="spacer"></span>
+  @if (detail) {
+    <span class="status-chip" [class]="'status-chip status-' + detail.inspectstatus.toLowerCase()">
+      {{ statusLabel[detail.inspectstatus] }}
+    </span>
+  }
+  @if (isEditable) {
+    <button mat-flat-button color="primary" disabled>
+      <mat-icon>edit</mat-icon> Edit (coming soon)
+    </button>
+  }
+</mat-toolbar>
+
+@if (loading) {
+  <p class="muted">Memuat inspeksi…</p>
+} @else if (!detail) {
+  <p class="muted">Inspeksi tidak ditemukan.</p>
+} @else {
+  <section class="sheet-card">
+    <div class="sheet-meta">
+      <div class="meta-item">
+        <span class="meta-label">Part no.</span>
+        <span class="mono">{{ detail.itemid }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Supplier</span>
+        <span>{{ detail.name }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Date</span>
+        <span>{{ detail.inspectdate | date: 'dd/MM/yyyy' }}</span>
+      </div>
+      @if (detail.instrument) {
+        <div class="meta-item">
+          <span class="meta-label">Instrument</span>
+          <span>{{ detail.instrument }}</span>
+        </div>
+      }
+      @if (detail.qfnum) {
+        <div class="meta-item">
+          <span class="meta-label">QF No.</span>
+          <span class="mono">{{ detail.qfnum }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="sheet-wrap">
+      <table class="sheet">
+        <thead>
+          <tr>
+            <th class="row-label">Type</th>
+            <th class="row-item">Item</th>
+            <th class="row-standard">Standard</th>
+            <th class="row-tol">Tolerance</th>
+            @for (n of columns; track n) {
+              @if (delivery(n); as d) {
+                <th class="col-head">
+                  <span class="col-title">Col {{ n }}</span>
+                  <span class="col-sub">{{ categoryLabel[d.inspectcategory] }}</span>
+                </th>
+              }
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows; track row.linenum) {
+            <tr>
+              <td class="row-label">{{ typeLabel[row.type] ?? row.type }}</td>
+              <td class="row-item">{{ row.label }}</td>
+              <td class="row-standard">{{ row.standardTxt || '—' }}</td>
+              <td class="row-tol">{{ row.toleranceText || '—' }}</td>
+              @for (n of columns; track n) {
+                @if (delivery(n)) {
+                  <td class="col-cell">
+                    <div class="actual">{{ cellActual(row, n) }}</div>
+                    <app-ok-ng-pill [status]="cellStatus(row, n)" />
+                  </td>
+                }
+              }
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="foot-label" colspan="4">Judgment</td>
+            @for (n of columns; track n) {
+              @if (delivery(n); as d) {
+                <td class="col-cell">
+                  <span
+                    class="j-badge"
+                    [class]="'j-badge j-' + d.judgment"
+                    [title]="judgmentLabel[d.judgment]"
+                  >
+                    {{ judgmentMark[d.judgment] ?? '—' }}
+                  </span>
+                </td>
+              }
+            }
+          </tr>
+          @if (detail.deliveries.some((d) => d.concessionnote)) {
+            <tr>
+              <td class="foot-label">Concession note</td>
+              @for (n of columns; track n) {
+                @if (delivery(n); as d) {
+                  <td class="col-cell">{{ d.concessionnote ? d.concessionnote : '—' }}</td>
+                }
+              }
+            </tr>
+          }
+        </tfoot>
+      </table>
+    </div>
+  </section>
+}

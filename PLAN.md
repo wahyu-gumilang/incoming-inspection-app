@@ -1,7 +1,7 @@
 # PLAN.md — Incoming Inspection QC System Roadmap
 
 Status: `[ ]` todo · `[~]` in progress · `[x]` done
-Last updated: 2026-10-20
+Last updated: 2026-10-21
 
 ## 1. Goal
 
@@ -317,8 +317,8 @@ Agreed direction (2026-10-01): as modern as possible; brand colors from the Chub
 - [x] AQL table: plans, N / R / T tabs, the rows with the active range highlighted, a "try a lot size" calculator; editable by Admin
 
 ### 3.3 Inspection form (mirrors Form 7.4.3-F1)
-- [~] **Inspection list** (WIP, in `frontend/src/app/features/inspections/`, uncommitted as of 2026-10-20): `inspection.service.ts` (full CRUD wrapper for the Phase 2 API), `inspection.model.ts` (code maps for `JudgmentLabel` / `JudgmentMark` / `InspectionStatusLabel`), and `InspectionsListComponent` with search + date-range + status filters, paging, and judgment chips. Not yet in git: check `git status` for `frontend/src/app/features/inspections/`. The detail form and delivery modal are the next steps.
-- [~] **Inspection list** (in progress 2026-10-20, in `frontend/src/app/features/inspections/`): `inspection.service.ts` (CRUD wrapper over the Phase 2 API: list with paging/filter, get, create, header edit, save delivery, remove delivery), `inspection.model.ts` (code maps `JudgmentLabel` / `JudgmentMark` / `InspectionStatusLabel`), `InspectionsListComponent` (debounced search on no./P/O, date-range + status filters, 15-per-page paging, judgment chips), router entry replacing the placeholder; `InspectionFormComponent` is a placeholder until the form lands.
+- [x] **Inspection list** (committed `f1958d1`, 2026-10-20, in `frontend/src/app/features/inspections/`): `inspection.service.ts` (CRUD wrapper over the Phase 2 API: list with paging/filter, get, create, header edit, save delivery, remove delivery), `inspection.model.ts` (code maps `JudgmentLabel` / `JudgmentMark` / `InspectionStatusLabel`, plus check-sheet helpers `buildCheckSheet`, `judgmentOptions`, `toleranceTextOf`), `InspectionsListComponent` (debounced search on no./P/O, date-range + status filters, 15-per-page paging, judgment chips), router entry replacing the placeholder; `InspectionFormComponent` is a placeholder until the form lands.
+- [x] **Header / New inspection dialog** (2026-10-21, uncommitted as of this update): `NewInspectionDialog` (`inspection-form/new-inspection-dialog.component.{ts,html,scss}`) — item lookup (part no / name, top 20), vendor lookup, inspection date, measuring instrument, QF no.; creates the draft via `POST /api/inspections` and hands the new `inspectnum` to the detail view. Opened from the list's "Buat Inspeksi" button.
 - [ ] **Header:** Part name / Part no (item lookup), Supplier (vendor lookup), inspect date, measuring instrument
 - [ ] Choosing the item loads `/api/inspections/template` and fills the lines; changing the item on a filled form asks for confirmation
 - [ ] **Check sheet (read-only view):** rows = `STD` lines (No, Item, Standard, Tolerance), then Certificate No, Visual, Fitting; columns = 7 delivery columns of `Actual | OK/NG`; NG highlighted red
