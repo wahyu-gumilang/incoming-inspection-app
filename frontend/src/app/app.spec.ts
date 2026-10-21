@@ -33,7 +33,7 @@ describe('App routes', { timeout: 20_000 }, () => {
     // The navbar's status chip polls /api/health; the dashboard and other pages open
     // their own data requests. Flush whatever is still pending so nothing leaks
     // into the next test's module.
-    for (const req of http.match((r) => true)) req.flush({});
+    for (const req of http.match(() => true)) req.flush({});
     http.verify();
   });
 

@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   JudgmentLabel,
@@ -18,6 +19,10 @@ import {
 } from '../inspection.model';
 import { InspectionService } from '../inspection.service';
 import { InspectionFormComponent } from '../inspection-form/inspection-form.component';
+import {
+  NewInspectionDialog,
+  NewInspectionResult,
+} from '../inspection-form/new-inspection-dialog.component';
 
 @Component({
   selector: 'app-inspections',
@@ -40,7 +45,7 @@ import { InspectionFormComponent } from '../inspection-form/inspection-form.comp
           <h1>Inspeksi Barang Diterima</h1>
           <p>Rekam, evaluasi, dan simpan inspeksi material & suku cadang yang diterima.</p>
         </div>
-        <button mat-flat-button color="primary" (click)="openForm(null)">
+        <button mat-flat-button color="primary" (click)="createInspection()">
           <mat-icon>add</mat-icon>
           Buat Inspeksi
         </button>
@@ -173,8 +178,8 @@ import { InspectionFormComponent } from '../inspection-form/inspection-form.comp
       </div>
     </section>
 
-    @if (showForm()) {
-      <app-inspection-form [inspectnum]="editingId()" (closed)="onFormClosed()" />
+    @if (showForm() && editingId()) {
+      <app-inspection-form [inspectnum]="editingId()!" (closed)="onFormClosed()" />
     }
   `,
   styleUrl: './inspection-list.scss',
@@ -186,6 +191,7 @@ export class InspectionsListComponent implements OnInit {
 
   private readonly service = inject(InspectionService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
 
   readonly statuses = [
     { value: '', label: 'Semua' },
@@ -265,8 +271,18 @@ export class InspectionsListComponent implements OnInit {
   }
 
   openForm(id: string | null): void {
+    if (!id) return;
     this.editingId.set(id);
     this.showForm.set(true);
+  }
+
+  createInspection(): void {
+    void this.dialog
+      .open(NewInspectionDialog, { width: '640px' })
+      .afterClosed()
+      .subscribe((result: NewInspectionResult | null) => {
+        if (result) this.openForm(result.inspectnum);
+      });
   }
 
   onFormClosed(): void {
