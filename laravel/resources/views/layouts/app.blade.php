@@ -27,7 +27,7 @@
     <header class="topbar">
         <a class="brand" href="{{ route('dashboard') }}">
             <img class="logo-light" src="{{ asset('brand/logo.png') }}" alt="Chubbsafes">
-            <img class="logo-dark" src="{{ asset('brand/logo-white.png') }}" alt="Chubbsafes">
+            <img class="logo-dark" src="{{ asset('brand/chubbsafes-white.png') }}" alt="Chubbsafes">
             <span>
                 <strong>Incoming Inspection QC</strong>
                 <small>PT. Chubb Safes Indonesia</small>

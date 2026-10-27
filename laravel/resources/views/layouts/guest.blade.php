@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,21 +7,23 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 <body class="auth-body">
-    <main class="auth-page">
-        <section class="auth-brand">
-            <img src="{{ asset('brand/logo-white.png') }}" alt="Chubbsafes">
-            <h1>Incoming Inspection QC</h1>
-            <p>PT. Chubb Safes Indonesia</p>
-            <p class="auth-note">
-                Record, evaluate and store incoming inspections against Form No. 7.4.3-F1.
-            </p>
-        </section>
+    <div class="auth-background" aria-hidden="true"></div>
 
-        <section class="auth-card">
-            <div class="auth-inner">
-                @yield('content')
-            </div>
+    <header class="auth-topbar">
+        <img src="{{ asset('brand/chubbsafes-white.png') }}" alt="Chubbsafes">
+        <span>Incoming Inspection QC</span>
+    </header>
+
+    <main class="auth-stage">
+        <section class="auth-card" aria-labelledby="login-title">
+            @yield('content')
         </section>
     </main>
+
+    <footer class="auth-page-footer">
+        &copy; 2026 PT. Chubb Safes Indonesia. All rights reserved.
+    </footer>
+
+    @stack('scripts')
 </body>
 </html>
