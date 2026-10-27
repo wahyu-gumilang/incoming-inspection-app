@@ -74,6 +74,43 @@
   }
 }
 
+.header-edit {
+  .edit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--mat-sys-on-surface-variant, #888);
+    }
+  }
+
+  .edit-input {
+    border: 1px solid var(--mat-sys-outline-variant, #ccc);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .warn-text {
+    color: #92400e;
+    font-size: 13px;
+    margin: 0;
+  }
+}
+
 .mono {
   font-family: 'Courier New', monospace;
 }

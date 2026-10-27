@@ -13,8 +13,16 @@
     </span>
   }
   @if (isEditable) {
-    <button mat-flat-button color="primary" disabled>
-      <mat-icon>edit</mat-icon> Edit (coming soon)
+    <button mat-flat-button color="primary" (click)="toggleEditing()">
+      <mat-icon>{{ editing ? 'close' : 'edit' }}</mat-icon> {{ editing ? 'Cancel' : 'Edit header' }}
+    </button>
+    <button
+      mat-flat-button
+      color="warn"
+      [disabled]="!editing || saving"
+      (click)="saveHeader()"
+    >
+      <mat-icon>save</mat-icon> Save
     </button>
   }
 </mat-toolbar>
@@ -24,6 +32,52 @@
 } @else if (!detail) {
   <p class="muted">Inspeksi tidak ditemukan.</p>
 } @else {
+  @if (isEditable && editing) {
+    <section class="sheet-card header-edit">
+      <div class="edit-grid">
+        <div class="edit-field">
+          <span class="meta-label">Part no. (read-only, item swap pending)</span>
+          <input
+            class="edit-input"
+            type="text"
+            value="{{ detail.itemname }} ({{ detail.itemid }})"
+            readonly
+          />
+          @if (itemSelected() && itemSelected()!.value !== detail.itemid) {
+            <span class="pending-item">Pilihan baru: {{ itemSelected()!.label }}</span>
+          }
+        </div>
+        <div class="edit-field">
+          <span class="meta-label">Supplier</span>
+          <app-lookup-autocomplete
+            label="Supplier"
+            [required]="true"
+            placeholder="Vendor account / name"
+            [minSearchLength]="2"
+            [search]="vendorSearch"
+            [selected]="vendorSelected()"
+            (selectedChange)="onVendorPick($event)"
+          />
+        </div>
+        <div class="edit-field">
+          <span class="meta-label">Date</span>
+          <input class="edit-input" type="date" [ngModel]="headerForm.inspectdate" (ngModelChange)="headerForm.inspectdate = $event" />
+        </div>
+        <div class="edit-field">
+          <span class="meta-label">Instrument</span>
+          <input class="edit-input" type="text" [ngModel]="headerForm.instrument" (ngModelChange)="headerForm.instrument = $event" />
+        </div>
+        <div class="edit-field">
+          <span class="meta-label">QF No.</span>
+          <input class="edit-input" type="text" [ngModel]="headerForm.qfnum" (ngModelChange)="headerForm.qfnum = $event" />
+        </div>
+      </div>
+      @if (itemSelected() && itemSelected()!.value !== detail.itemid) {
+        <span class="pending-item">Pilihan baru: {{ itemSelected()!.label }} (belum bisa disimpan)</span>
+      }
+    </section>
+  }
+
   <section class="sheet-card">
     <div class="sheet-meta">
       <div class="meta-item">

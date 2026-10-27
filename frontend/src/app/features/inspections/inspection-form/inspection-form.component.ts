@@ -1,12 +1,16 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map, Observable } from 'rxjs';
 import { InspectionDetail, DeliveryInfo } from '../../../core/models/inspection';
 import { OkNgPill } from '../../../shared/ui/ok-ng-pill/ok-ng-pill';
+import { LookupAutocomplete, LookupOption } from '../../../shared/ui/lookup-autocomplete/lookup-autocomplete';
+import { ItemService } from '../../items/item.service';
+import { VendorService } from '../../vendors/vendor.service';
 import {
   COLUMNS,
   CATEGORY_LABEL,
@@ -15,20 +19,24 @@ import {
   InspectionStatusLabel,
   TYPE_LABEL,
   buildCheckSheet,
+  CheckSheetRow,
 } from '../inspection.model';
-import { InspectionService } from '../inspection.service';
+import { InspectionService, UpdateHeaderInput } from '../inspection.service';
 
-// Read-only check sheet (Form 7.4.3-F1): header, the characteristic rows, and one
-// Actual / OK-NG column per delivery. Editing (delivery modal, header form) lands
-// in a later iteration; this view is what you see right now.
+// Form 7.4.3-F1 view: header, the characteristic rows, and one Actual / OK-NG
+// column per delivery. The header is editable on drafts (supplier, date,
+// instrument, QF no.); changing the item on a filled form asks for
+// confirmation. Item-swap server-side support lands in a later iteration.
 @Component({
   selector: 'app-inspection-form',
   imports: [
     CommonModule,
+    FormsModule,
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
     OkNgPill,
+    LookupAutocomplete,
   ],
   templateUrl: './inspection-form.component.html',
   styleUrl: './inspection-form.scss',
@@ -46,10 +54,33 @@ export class InspectionFormComponent {
 
   private readonly service = inject(InspectionService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly itemService = inject(ItemService);
+  private readonly vendorService = inject(VendorService);
 
   detail: InspectionDetail | null = null;
-  rows: ReturnType<typeof buildCheckSheet> = [];
+  rows: CheckSheetRow[] = [];
   loading = true;
+
+  editing = false;
+  saving = false;
+
+  // Header edit state; item and supplier selections seed the lookup fields.
+  headerForm: UpdateHeaderInput = {};
+  itemSelected = signal<LookupOption | null>(null);
+  vendorSelected = signal<LookupOption | null>(null);
+
+  // LookupAutocomplete wants (query) => Observable<Option[]>.
+  readonly itemSearch = (q: string): Observable<LookupOption[]> =>
+    this.itemService.list({ q, limit: 20 }).pipe(
+      map((res) => res.data.map((i) => ({ value: i.itemid, label: i.itemid, sublabel: i.name }))),
+    );
+
+  readonly vendorSearch = (q: string): Observable<LookupOption[]> =>
+    this.vendorService.lookup(q).pipe(
+      map((res) =>
+        res.data.map((v) => ({ value: v.vendaccount, label: v.name, sublabel: v.vendaccount })),
+      ),
+    );
 
   get isEditable(): boolean {
     return this.detail?.editable === true;
@@ -59,12 +90,12 @@ export class InspectionFormComponent {
     return this.detail?.deliveries.find((d) => d.n === n && d.used) ?? null;
   }
 
-  cellActual(row: ReturnType<typeof buildCheckSheet>[number], n: number): string {
+  cellActual(row: CheckSheetRow, n: number): string {
     const v = row.actual(n);
     return v === null || v === undefined ? '–' : String(v);
   }
 
-  cellStatus(row: ReturnType<typeof buildCheckSheet>[number], n: number) {
+  cellStatus(row: CheckSheetRow, n: number) {
     return row.status(n);
   }
 
@@ -77,12 +108,71 @@ export class InspectionFormComponent {
     try {
       this.detail = await firstValueFrom(this.service.get(this.inspectnum()));
       this.rows = buildCheckSheet(this.detail);
+      this.seedHeaderForm();
     } catch {
       this.detail = null;
       this.rows = [];
       this.snackBar.open('Gagal memuat inspeksi', 'OK', { duration: 3000 });
     } finally {
       this.loading = false;
+    }
+  }
+
+  private seedHeaderForm(): void {
+    const d = this.detail;
+    if (!d) return;
+    this.headerForm = {
+      accountnum: d.accountnum,
+      inspectdate: d.inspectdate,
+      instrument: d.instrument,
+      qfnum: d.qfnum,
+    };
+    this.itemSelected.set({ value: d.itemid, label: d.itemname, sublabel: d.itemid });
+    this.vendorSelected.set({ value: d.accountnum, label: d.name, sublabel: d.accountnum });
+  }
+
+  toggleEditing(): void {
+    if (this.editing) {
+      this.cancelEditing();
+      return;
+    }
+    this.editing = true;
+    this.seedHeaderForm();
+  }
+
+  cancelEditing(): void {
+    this.editing = false;
+    this.seedHeaderForm();
+  }
+
+  onItemPick(opt: LookupOption | null): void {
+    if (opt) this.itemSelected.set(opt);
+  }
+
+  onVendorPick(opt: LookupOption | null): void {
+    if (opt) this.headerForm.accountnum = opt.value;
+  }
+
+  async saveHeader(): Promise<void> {
+    if (!this.detail) return;
+    this.saving = true;
+    try {
+      const payload: UpdateHeaderInput = {
+        accountnum: this.headerForm.accountnum,
+        inspectdate: this.headerForm.inspectdate,
+        instrument: this.headerForm.instrument,
+        qfnum: this.headerForm.qfnum,
+      };
+      this.detail = await firstValueFrom(
+        this.service.updateHeader(this.detail.inspectnum, payload),
+      );
+      this.rows = buildCheckSheet(this.detail);
+      this.cancelEditing();
+      this.snackBar.open('Header disimpan', 'OK', { duration: 2000 });
+    } catch {
+      this.snackBar.open('Gagal menyimpan header', 'OK', { duration: 3000 });
+    } finally {
+      this.saving = false;
     }
   }
 
