@@ -1,32 +1,83 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Domain\User\Role;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    protected $table = 'usertable';
+
+    protected $primaryKey = 'userid';
+
+    public $incrementing = true;
+
+    protected $keyType = 'int';
+
+    public $timestamps = false;
 
     /**
-     * Get the attributes that should be cast.
-     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'username',
+        'fullname',
+        'email',
+        'role',
+        'password_hash',
+        'active',
+        'must_change_password',
+        'theme',
+        'last_login_at',
+    ];
+
+    /**
+     * @var list<string>
+     */
+    protected $hidden = ['password_hash'];
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'active' => 'boolean',
+            'must_change_password' => 'boolean',
+            'last_login_at' => 'datetime',
         ];
+    }
+
+    public function getAuthPassword(): string
+    {
+        return $this->password_hash;
+    }
+
+    public function getAuthPasswordName(): string
+    {
+        return 'password_hash';
+    }
+
+    public function hasRole(string ...$roles): bool
+    {
+        return in_array($this->role, $roles, true);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === Role::ADMIN;
+    }
+
+    public function isChecker(): bool
+    {
+        return $this->hasRole(Role::CHECKER, Role::ADMIN);
+    }
+
+    public function roleLabel(): string
+    {
+        return Role::label($this->role);
     }
 }

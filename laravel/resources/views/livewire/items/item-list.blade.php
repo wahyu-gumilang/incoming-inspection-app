@@ -1,22 +1,22 @@
-<div class="poc-card">
-    <div class="poc-toolbar">
+<div class="items-panel">
+    <div class="items-toolbar">
         <div>
-            <h1>Items &amp; standards</h1>
-            <p>Proof of concept: Laravel 13 + Livewire 4 reading the real <code>csi_db</code>.</p>
+            <h1>Items and standards</h1>
+            <p>Search the item master and inspect its standards.</p>
         </div>
         <input
             type="search"
             wire:model.live.debounce.300ms="search"
-            placeholder="Search part no. or name"
+            placeholder="Search part number or name"
             aria-label="Search items"
-        />
+        >
     </div>
 
-    <table>
+    <table class="items-table">
         <thead>
             <tr>
-                <th>Part No.</th>
-                <th>Part Name</th>
+                <th>Part number</th>
+                <th>Part name</th>
                 <th>Standards</th>
             </tr>
         </thead>
@@ -35,7 +35,7 @@
         </tbody>
     </table>
 
-    <p class="poc-note">
+    <p class="items-note">
         Showing {{ $items->count() }} of {{ number_format($total) }} items. The search uses a
         Livewire server round trip.
     </p>

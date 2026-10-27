@@ -17,15 +17,16 @@ changes.
 1. Copy .env.example to .env.
 2. Set the database connection to the local csi_db database.
 3. Run composer install.
-4. Run php artisan key:generate.
-5. Start the application with the PHP built-in server.
-6. Open /items to confirm the database connection.
+4. Run php85 artisan key:generate.
+5. Run ./serve to start the application.
+6. Open /login. The item list at /items requires a signed-in user.
 
 ## Local commands
 
 | Command | Purpose |
 |---|---|
-| php85 -S 127.0.0.1:8000 -t public public/index.php | Start the application. |
+| ./serve | Start the application. |
+| php85 -S 127.0.0.1:8000 -t public server.php | Start without the serve script. |
 | php85 vendor/bin/phpunit | Run the test suite. |
 | php85 vendor/bin/pint | Format the PHP code. |
 | php85 vendor/bin/pint --test | Check formatting without writing. |
@@ -49,5 +50,6 @@ extensions.
 
 ## Status
 
-The application is in the migration phase. The first proof of concept is the item list at
-/items. Authentication, master data, inspections and reporting are still in progress.
+The application is in the migration phase. Login, logout, session authentication, roles and
+the application shell are in place. The item list is the first data screen. Master data,
+inspections and reporting are still in progress.

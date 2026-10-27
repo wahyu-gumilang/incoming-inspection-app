@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -e
+
+cd "$(dirname "$0")"
+
+exec php85 -S 127.0.0.1:8000 -t public server.php
