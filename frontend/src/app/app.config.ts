@@ -1,5 +1,6 @@
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import {
   TitleStrategy,
   provideRouter,
@@ -16,6 +17,7 @@ export const appConfig: ApplicationConfig = {
     // View Transitions cross-fade the page on every menu change (skipped by browsers without it).
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideHttpClient(withFetch(), withInterceptors([sessionExpiredInterceptor])),
+    provideNativeDateAdapter(),
     { provide: TitleStrategy, useClass: PageTitleStrategy },
   ],
 };

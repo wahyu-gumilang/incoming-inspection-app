@@ -46,6 +46,19 @@ describe('ApiService', () => {
     expect(await result).toBeUndefined();
   });
 
+  it('sends a raw text body for CSV import', async () => {
+    const result = firstValueFrom(
+      api.postText<{ created: number }>('/vendors/import', 'V-0001,PT Supplier'),
+    );
+
+    const req = http.expectOne((r) => r.url === '/api/vendors/import' && r.method === 'POST');
+    expect(req.request.body).toBe('V-0001,PT Supplier');
+    expect(req.request.headers.get('Content-Type')).toContain('text/csv');
+    req.flush({ success: true, data: { created: 1 } });
+
+    expect(await result).toEqual({ created: 1 });
+  });
+
   it('turns an error reply into an ApiError with the field details', async () => {
     const result = firstValueFrom(api.post('/vendors', {})).catch((e: unknown) => e);
 

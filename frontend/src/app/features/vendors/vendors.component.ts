@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ApiError } from '../../core/api/api-error';
 import { VendorService } from './vendor.service';
 import { Vendor } from './vendor';
 import { VendorFormDialog } from './vendor-form-dialog/vendor-form-dialog.component';
@@ -63,13 +64,16 @@ export class Vendors implements OnInit {
         q: this.search() || undefined,
       })
       .subscribe({
-        next: (res) => {
-          this.vendors.set(res.data);
-          this.total.set(res.meta.total);
-          this.totalPages.set(res.meta.totalPages);
+        next: ({ rows, meta }) => {
+          this.vendors.set(rows);
+          this.total.set(meta.total);
+          this.totalPages.set(meta.totalPages);
           this.loading.set(false);
         },
-        error: () => this.loading.set(false),
+        error: (err) => {
+          this.loading.set(false);
+          this.snackBar.open(ApiError.from(err).message, 'Close', { duration: 5000 });
+        },
       });
   }
 
@@ -156,8 +160,7 @@ export class Vendors implements OnInit {
             this.loadVendors();
           },
           error: (err) => {
-            const msg = err.error?.error?.message || 'Failed to delete vendor';
-            this.snackBar.open(msg, 'Close', { duration: 5000 });
+            this.snackBar.open(ApiError.from(err).message, 'Close', { duration: 5000 });
           },
         });
       }

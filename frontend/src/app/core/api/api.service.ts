@@ -40,6 +40,15 @@ export class ApiService {
     return this.unwrap(this.http.put<ApiSuccess<T>>(this.url(path), body));
   }
 
+  // Raw body endpoints (vendor CSV import): the API reads text/csv, not multipart.
+  postText<T>(path: string, body: string, contentType = 'text/csv'): Observable<T> {
+    return this.unwrap(
+      this.http.post<ApiSuccess<T>>(this.url(path), body, {
+        headers: { 'Content-Type': contentType },
+      }),
+    );
+  }
+
   delete(path: string): Observable<void> {
     return this.http
       .delete<void>(this.url(path))

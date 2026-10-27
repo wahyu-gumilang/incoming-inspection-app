@@ -9,18 +9,7 @@ export interface VendorLookup {
   name: string;
 }
 
-export interface VendorListResponse {
-  success: boolean;
-  data: Vendor[];
-  meta: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
-export interface VendorResponse {
-  success: boolean;
-  data: Vendor;
+export interface VendorImportResult {
+  created: number;
+  skipped: string[];
 }

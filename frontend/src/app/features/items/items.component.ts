@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../core/auth/auth.service';
+import { ApiError } from '../../core/api/api-error';
 import { ItemService } from './item.service';
 import { ItemRow } from './item';
 import { ItemFormDialog } from './item-form-dialog/item-form-dialog.component';
@@ -74,13 +75,16 @@ export class Items implements OnInit {
         hasStandards: this.hasStandards(),
       })
       .subscribe({
-        next: (res) => {
-          this.items.set(res.data);
-          this.total.set(res.meta.total);
-          this.totalPages.set(res.meta.totalPages);
+        next: ({ rows, meta }) => {
+          this.items.set(rows);
+          this.total.set(meta.total);
+          this.totalPages.set(meta.totalPages);
           this.loading.set(false);
         },
-        error: () => this.loading.set(false),
+        error: (err) => {
+          this.loading.set(false);
+          this.snackBar.open(ApiError.from(err).message, 'Close', { duration: 5000 });
+        },
       });
   }
 

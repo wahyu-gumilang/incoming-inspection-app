@@ -4,18 +4,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ApiError } from '../../../core/api/api-error';
 import { VendorService } from '../vendor.service';
 
 @Component({
   selector: 'app-vendor-import-dialog',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatIconModule,
-    MatSnackBarModule,
-  ],
+  imports: [CommonModule, MatButtonModule, MatDialogModule, MatIconModule, MatSnackBarModule],
   templateUrl: './vendor-import-dialog.component.html',
   styleUrls: ['./vendor-import-dialog.component.scss'],
 })
@@ -47,23 +42,25 @@ export class VendorImportDialog {
       next: (res) => {
         this.uploading = false;
         this.result = {
-          created: res.data.length,
-          skipped: 0,
+          created: res.created,
+          skipped: res.skipped.length,
           errors: [],
         };
-        this.snackBar.open(`Imported ${res.data.length} vendors`, 'Close', { duration: 3000 });
+        const skipped = res.skipped.length ? ` · ${res.skipped.length} skipped` : '';
+        this.snackBar.open(`Imported ${res.created} vendors${skipped}`, 'Close', {
+          duration: 4000,
+        });
         this.dialogRef.close(true);
       },
       error: (err) => {
         this.uploading = false;
-        const details = err.error?.error?.details;
-        const errors = details
-          ? details.map((d: { message: string }) => d.message)
-          : [err.error?.error?.message || 'Import failed'];
+        const error = ApiError.from(err);
         this.result = {
           created: 0,
           skipped: 0,
-          errors,
+          errors: error.details.length
+            ? error.details.map((detail) => detail.message)
+            : [error.message],
         };
       },
     });

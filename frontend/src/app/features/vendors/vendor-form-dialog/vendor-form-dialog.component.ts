@@ -6,6 +6,7 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ApiError } from '../../../core/api/api-error';
 import { VendorService } from '../vendor.service';
 import { Vendor } from '../vendor';
 
@@ -67,8 +68,7 @@ export class VendorFormDialog implements OnInit {
       },
       error: (err) => {
         this.saving = false;
-        const msg = err.error?.error?.message || 'Failed to save vendor';
-        this.snackBar.open(msg, 'Close', { duration: 5000 });
+        this.snackBar.open(ApiError.from(err).message, 'Close', { duration: 5000 });
       },
     });
   }

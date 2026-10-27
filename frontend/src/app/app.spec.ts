@@ -1,6 +1,7 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { Title } from '@angular/platform-browser';
 import { Router, TitleStrategy, provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -22,6 +23,7 @@ describe('App routes', { timeout: 20_000 }, () => {
         provideRouter(routes, withComponentInputBinding()),
         provideHttpClient(withInterceptors([sessionExpiredInterceptor])),
         provideHttpClientTesting(),
+        provideNativeDateAdapter(),
         { provide: TitleStrategy, useClass: PageTitleStrategy },
       ],
     });
@@ -74,6 +76,63 @@ describe('App routes', { timeout: 20_000 }, () => {
     expect(TestBed.inject(Title).getTitle()).toBe('Dashboard · Incoming Inspection');
   });
 
+  it('opens the inspections list for a signed-in user', async () => {
+    await signIn(auth, http);
+    const harness = await RouterTestingHarness.create('/inspections');
+    const el = harness.fixture.nativeElement as HTMLElement;
+
+    expect(url()).toBe('/inspections');
+    expect(el.querySelector('h1')?.textContent).toContain('Inspeksi');
+
+    // The list debounces its first load by 250 ms.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    http
+      .expectOne((req) => req.url.includes('/api/inspections') && req.method === 'GET')
+      .flush({
+        success: true,
+        data: [],
+        meta: { page: 1, limit: 15, total: 0, totalPages: 0 },
+      });
+  });
+
+  it('opens the items page with the unwrapped list shape', async () => {
+    await signIn(auth, http);
+    const harness = await RouterTestingHarness.create('/items');
+
+    http
+      .expectOne((req) => req.url === '/api/items' && req.method === 'GET')
+      .flush({
+        success: true,
+        data: [],
+        meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
+      });
+    harness.fixture.detectChanges();
+    const el = harness.fixture.nativeElement as HTMLElement;
+
+    expect(url()).toBe('/items');
+    expect(el.querySelector('h1')?.textContent).toContain('Items');
+    expect(el.querySelector('app-loading-indicator')).toBeNull();
+  });
+
+  it('opens the vendors page with the unwrapped list shape', async () => {
+    await signIn(auth, http);
+    const harness = await RouterTestingHarness.create('/vendors');
+
+    http
+      .expectOne((req) => req.url === '/api/vendors' && req.method === 'GET')
+      .flush({
+        success: true,
+        data: [],
+        meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
+      });
+    harness.fixture.detectChanges();
+    const el = harness.fixture.nativeElement as HTMLElement;
+
+    expect(url()).toBe('/vendors');
+    expect(el.querySelector('h1')?.textContent).toContain('Vendors');
+    expect(el.querySelector('app-loading-indicator')).toBeNull();
+  });
+
   it('shows the Users menu to an Admin only', async () => {
     await signIn(auth, http, fakeUser({ role: 'INSPECTOR', fullname: 'Andi Pratama' }));
     const harness = await RouterTestingHarness.create('/dashboard');
@@ -112,15 +171,59 @@ describe('App routes', { timeout: 20_000 }, () => {
 
     // The AQL page loads plans with their rows; answer both requests.
     const s1Rows = [
-      { planid: 1, inspectcategory: 1, lotmin: 2, lotmax: 50, codeletter: 'A', samplesize: 2, acceptnum: 0, rejectnum: 1 },
-      { planid: 1, inspectcategory: 1, lotmin: 51, lotmax: 500, codeletter: 'B', samplesize: 3, acceptnum: 0, rejectnum: 1 },
+      {
+        planid: 1,
+        inspectcategory: 1,
+        lotmin: 2,
+        lotmax: 50,
+        codeletter: 'A',
+        samplesize: 2,
+        acceptnum: 0,
+        rejectnum: 1,
+      },
+      {
+        planid: 1,
+        inspectcategory: 1,
+        lotmin: 51,
+        lotmax: 500,
+        codeletter: 'B',
+        samplesize: 3,
+        acceptnum: 0,
+        rejectnum: 1,
+      },
     ];
     http
       .expectOne((req) => req.url === '/api/aql/plans' && req.method === 'GET')
-      .flush({ success: true, data: [{ planid: 1, name: 'S-1 · zero defects', inspectlevel: 'S-1', aql: '0', isdefault: true, note: null, updated_at: null, categories: [1, 2, 3] }] });
+      .flush({
+        success: true,
+        data: [
+          {
+            planid: 1,
+            name: 'S-1 · zero defects',
+            inspectlevel: 'S-1',
+            aql: '0',
+            isdefault: true,
+            note: null,
+            updated_at: null,
+            categories: [1, 2, 3],
+          },
+        ],
+      });
     http
       .expectOne((req) => req.url === '/api/aql/plans/1' && req.method === 'GET')
-      .flush({ success: true, data: { planid: 1, name: 'S-1 · zero defects', inspectlevel: 'S-1', aql: '0', isdefault: true, note: null, updated_at: null, rows: s1Rows } });
+      .flush({
+        success: true,
+        data: {
+          planid: 1,
+          name: 'S-1 · zero defects',
+          inspectlevel: 'S-1',
+          aql: '0',
+          isdefault: true,
+          note: null,
+          updated_at: null,
+          rows: s1Rows,
+        },
+      });
 
     expect(url()).toBe('/aql');
     expect(el.querySelector('.page h1')?.textContent).toBe('AQL table');

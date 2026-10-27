@@ -9,17 +9,6 @@ export interface ItemRow {
   warningCount: number;
 }
 
-export interface ItemListResponse {
-  success: boolean;
-  data: ItemRow[];
-  meta: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
 // A standard the user adds/updates through the form dialog. Mirrors the backend
 // validator: numbers are decimal(18,2); STD requires a numeric `standard`.
 export interface StandardInput {
