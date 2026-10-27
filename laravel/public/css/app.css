@@ -414,21 +414,6 @@ p {
         radial-gradient(circle at 50% 45%, transparent 0%, rgba(2, 10, 22, 0.62) 74%);
 }
 
-.auth-stage::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: min(620px, 86vw);
-    height: min(620px, 86vw);
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(14, 165, 233, 0.2), transparent 68%);
-    filter: blur(22px);
-    opacity: 0.6;
-    transform: translate(-50%, -50%);
-    z-index: -1;
-    pointer-events: none;
-}
 
 .auth-topbar {
     position: fixed;
@@ -688,6 +673,18 @@ p {
     text-align: center;
 }
 
+
+.auth-page-footer {
+    position: absolute;
+    right: 0;
+    bottom: 14px;
+    left: 0;
+    z-index: 3;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    text-align: center;
+}
 
 @keyframes auth-fade-in {
     from {

@@ -18,6 +18,10 @@
         <section class="auth-card" aria-labelledby="login-title">
             @yield('content')
         </section>
+
+        <footer class="auth-page-footer">
+            &copy; 2026 PT. Chubb Safes Indonesia. All rights reserved.
+        </footer>
     </main>
 
     @stack('scripts')
