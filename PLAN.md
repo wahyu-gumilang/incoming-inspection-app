@@ -3,6 +3,8 @@
 This file is the roadmap and the source of truth for the application. Read it together with
 CLAUDE.md before making changes.
 
+Status marks: ✓ = done, ✗ = not done.
+
 ## 1. Goal
 
 Build a web application for the Quality team of PT. Chubb Safes Indonesia to record,
@@ -53,20 +55,20 @@ the business rules that have already been tested.
 
 | Status | Item | Notes |
 |---|---|---|
-| Done | Portable PHP 8.5 runtime | PHP 8.5.4 from the Ubuntu 26.04 packages, installed in the user home directory. XAMPP and Apache were not modified. |
-| Done | Composer | Composer 2.10.3 in the user home directory. |
-| Done | Laravel application | Laravel 13.38.0 in the laravel directory. |
-| Done | Livewire | Livewire 4.4.8. |
-| Done | Database connection | Laravel connects to the XAMPP MariaDB database csi_db. |
-| Done | Proof of concept page | GET /items reads inventtable and searches item id and name through Livewire. |
-| Next | Database setup command | A PHP command must apply the legacy baseline and SQL migrations to a fresh database and to csi_db_test. |
-| Planned | Authentication | Session login against usertable, roles, password change and login rate limit. |
-| Planned | Master data | Items, standards, vendors and users. |
-| Planned | AQL administration | AQL plans and plan rows. |
-| Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
-| Planned | Dashboard | KPI cards, NG chart and recent inspections. |
-| Planned | Reporting | Submit and check workflow, PDF output. |
-| Next | Tests | PHPUnit is installed and one feature test covers /items. Judgement, AQL and workflow tests still need to be written. |
+| ✓ Done | Portable PHP 8.5 runtime | PHP 8.5.4 from the Ubuntu 26.04 packages, installed in the user home directory. XAMPP and Apache were not modified. |
+| ✓ Done | Composer | Composer 2.10.3 in the user home directory. |
+| ✓ Done | Laravel application | Laravel 13.38.0 in the laravel directory. |
+| ✓ Done | Livewire | Livewire 4.4.8. |
+| ✓ Done | Database connection | Laravel connects to the XAMPP MariaDB database csi_db. |
+| ✓ Done | Proof of concept page | GET /items reads inventtable and searches item id and name through Livewire. |
+| ✗ Next | Database setup command | A PHP command must apply the legacy baseline and SQL migrations to a fresh database and to csi_db_test. |
+| ✗ Planned | Authentication | Session login against usertable, roles, password change and login rate limit. |
+| ✗ Planned | Master data | Items, standards, vendors and users. |
+| ✗ Planned | AQL administration | AQL plans and plan rows. |
+| ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
+| ✗ Planned | Dashboard | KPI cards, NG chart and recent inspections. |
+| ✗ Planned | Reporting | Submit and check workflow, PDF output. |
+| ✗ Next | Tests | PHPUnit is installed and one feature test covers /items. Judgement, AQL and workflow tests still need to be written. |
 
 Local addresses while the migration is in progress:
 
@@ -287,78 +289,78 @@ from Quality, as recorded in Section 9.
 
 | Status | Task |
 |---|---|
-| Done | Install PHP 8.5 CLI with pdo_mysql, mbstring, xml, curl, zip, bcmath and intl. |
-| Done | Install Composer locally. |
-| Done | Create Laravel 13 in laravel and connect it to csi_db. |
-| Done | Add Livewire 4 and render the first item list proof of concept. |
-| Done | Read real data from inventtable and inventinspectitem. |
-| Done | Add a basic PHPUnit feature test for the /items page against csi_db_test. |
-| Next | Add a PHP command that applies baseline.sql, the SQL migrations and the fixtures to a test database. |
-| Next | Add a development script that starts the PHP built-in server with the portable runtime. |
+| ✓ Done | Install PHP 8.5 CLI with pdo_mysql, mbstring, xml, curl, zip, bcmath and intl. |
+| ✓ Done | Install Composer locally. |
+| ✓ Done | Create Laravel 13 in laravel and connect it to csi_db. |
+| ✓ Done | Add Livewire 4 and render the first item list proof of concept. |
+| ✓ Done | Read real data from inventtable and inventinspectitem. |
+| ✓ Done | Add a basic PHPUnit feature test for the /items page against csi_db_test. |
+| ✗ Next | Add a PHP command that applies baseline.sql, the SQL migrations and the fixtures to a test database. |
+| ✗ Next | Add a development script that starts the PHP built-in server with the portable runtime. |
 
 ### Phase P1 - Authentication and application shell
 
 | Status | Task |
 |---|---|
-| Planned | Custom user provider and guard for usertable. |
-| Planned | Login, logout, session cookie and CSRF protection. |
-| Planned | Login rate limit and equal error messages for unknown users and wrong passwords. |
-| Planned | Middleware for authentication, active user, must_change_password and role. |
-| Planned | Profile page for name, email, theme and password change. |
-| Planned | Admin user management: invite or create user, change role, deactivate, reset password. |
-| Planned | Blade shell with navbar, profile menu, theme switch and database status. |
-| Planned | Feature tests for login, logout, roles, inactive users and forced password change. |
+| ✗ Planned | Custom user provider and guard for usertable. |
+| ✗ Planned | Login, logout, session cookie and CSRF protection. |
+| ✗ Planned | Login rate limit and equal error messages for unknown users and wrong passwords. |
+| ✗ Planned | Middleware for authentication, active user, must_change_password and role. |
+| ✗ Planned | Profile page for name, email, theme and password change. |
+| ✗ Planned | Admin user management: invite or create user, change role, deactivate, reset password. |
+| ✗ Planned | Blade shell with navbar, profile menu, theme switch and database status. |
+| ✗ Planned | Feature tests for login, logout, roles, inactive users and forced password change. |
 
 ### Phase P2 - Master data
 
 | Status | Task |
 |---|---|
-| Planned | Items list with search, paging and standard counts. |
-| Planned | Item detail with standards grouped by STD, CERTIFIKAT, VISUAL and FITTING. |
-| Planned | Item create and rename. |
-| Planned | Standard create, update and delete with the existing validation rules. |
-| Planned | Vendor list, lookup, create, rename, delete and CSV import. |
-| Planned | AQL plan list, plan detail, row editing and default plan selection. |
-| Planned | Port the item, vendor and AQL tests from the legacy backend. |
+| ✗ Planned | Items list with search, paging and standard counts. |
+| ✗ Planned | Item detail with standards grouped by STD, CERTIFIKAT, VISUAL and FITTING. |
+| ✗ Planned | Item create and rename. |
+| ✗ Planned | Standard create, update and delete with the existing validation rules. |
+| ✗ Planned | Vendor list, lookup, create, rename, delete and CSV import. |
+| ✗ Planned | AQL plan list, plan detail, row editing and default plan selection. |
+| ✗ Planned | Port the item, vendor and AQL tests from the legacy backend. |
 
 ### Phase P3 - Inspections
 
 | Status | Task |
 |---|---|
-| Planned | Inspection list with filters, paging, status and judgment. |
-| Planned | Create inspection from item and supplier; snapshot the standards on the server. |
-| Planned | Generate the inspection number under a row lock. |
-| Planned | Delivery step 1: purchase order, delivery date, quantity and category with live AQL values. |
-| Planned | Delivery step 2: actual values, live OK and NG, visual, fitting and certificate results. |
-| Planned | Delivery step 3: defective pieces, suggested judgment, human judgment and concession note. |
-| Planned | Server-side recalculation of all statuses and AQL values. |
-| Planned | Check sheet view in the Form 7.4.3-F1 structure. |
-| Planned | Read-only mode for submitted and checked inspections. |
-| Planned | Dashboard with KPI cards, NG chart and recent inspections. |
-| Planned | Feature tests for every judgment rule, numbering, snapshot, permissions and transactions. |
+| ✗ Planned | Inspection list with filters, paging, status and judgment. |
+| ✗ Planned | Create inspection from item and supplier; snapshot the standards on the server. |
+| ✗ Planned | Generate the inspection number under a row lock. |
+| ✗ Planned | Delivery step 1: purchase order, delivery date, quantity and category with live AQL values. |
+| ✗ Planned | Delivery step 2: actual values, live OK and NG, visual, fitting and certificate results. |
+| ✗ Planned | Delivery step 3: defective pieces, suggested judgment, human judgment and concession note. |
+| ✗ Planned | Server-side recalculation of all statuses and AQL values. |
+| ✗ Planned | Check sheet view in the Form 7.4.3-F1 structure. |
+| ✗ Planned | Read-only mode for submitted and checked inspections. |
+| ✗ Planned | Dashboard with KPI cards, NG chart and recent inspections. |
+| ✗ Planned | Feature tests for every judgment rule, numbering, snapshot, permissions and transactions. |
 
 ### Phase P4 - Reporting and approval
 
 | Status | Task |
 |---|---|
-| Planned | Status flow DRAFT to SUBMITTED to CHECKED, with return from SUBMITTED to DRAFT. |
-| Planned | Submit action: requires the inspector, all used columns judged and a server-side recalculation. |
-| Planned | Check action: only CHECKER or ADMIN; records the checker and timestamp. |
-| Planned | Return action: requires a reason. |
-| Planned | PDF template for Form 7.4.3-F1 with a PHP PDF engine. |
-| Planned | A4 landscape, repeated table headers, page X of Y and a watermark for non-checked inspections. |
-| Planned | Print and download from the inspection page. |
-| Planned | Tests for the PDF response and the approval flow. |
+| ✗ Planned | Status flow DRAFT to SUBMITTED to CHECKED, with return from SUBMITTED to DRAFT. |
+| ✗ Planned | Submit action: requires the inspector, all used columns judged and a server-side recalculation. |
+| ✗ Planned | Check action: only CHECKER or ADMIN; records the checker and timestamp. |
+| ✗ Planned | Return action: requires a reason. |
+| ✗ Planned | PDF template for Form 7.4.3-F1 with a PHP PDF engine. |
+| ✗ Planned | A4 landscape, repeated table headers, page X of Y and a watermark for non-checked inspections. |
+| ✗ Planned | Print and download from the inspection page. |
+| ✗ Planned | Tests for the PDF response and the approval flow. |
 
 ### Phase P5 - Cutover
 
 | Status | Task |
 |---|---|
-| Planned | Full test suite and manual QC walkthrough against the paper form. |
-| Planned | WAMP deployment with Apache, PHP 8.5 and the production database. |
-| Planned | Backup and restore procedure. |
-| Planned | Remove the legacy backend and frontend directories after owner sign-off. |
-| Planned | Update this plan and CLAUDE.md to reflect the final codebase. |
+| ✗ Planned | Full test suite and manual QC walkthrough against the paper form. |
+| ✗ Planned | WAMP deployment with Apache, PHP 8.5 and the production database. |
+| ✗ Planned | Backup and restore procedure. |
+| ✗ Planned | Remove the legacy backend and frontend directories after owner sign-off. |
+| ✗ Planned | Update this plan and CLAUDE.md to reflect the final codebase. |
 
 ## 7. Testing and quality
 

@@ -374,7 +374,8 @@ controllers, Livewire components or Blade views.
 - The check sheet keeps the structure of Form 7.4.3-F1. It may look more modern, but the
   rows, columns and footer must not drift from the paper form.
 - The UI language is English, matching the labels on Form 7.4.3-F1.
-- Do not use emojis or decorative Unicode in the application or in documentation.
+- Do not use emojis or decorative Unicode in the application. In documentation, the only
+  allowed non-ASCII characters are the status marks ✓ (done) and ✗ (not done).
 - Meet WCAG AA contrast, visible focus and keyboard navigation.
 - Respect reduced motion.
 
@@ -408,9 +409,9 @@ Commands:
 PLAN.md and CLAUDE.md must stay clean and easy to scan.
 
 - Use plain Markdown.
-- Use ASCII characters only.
-- Do not use emojis, decorative symbols, checkbox syntax or colored status marks.
-- Use plain status words in tables: Done, Next, Planned, Blocked.
+- Use ASCII characters except for the status marks ✓ (done) and ✗ (not done).
+- Do not use any other emoji, decorative symbol, checkbox syntax or colored status mark.
+- Use the status marks with a plain word in tables: ✓ Done, ✗ Next, ✗ Planned, ✗ Blocked.
 - Use short headings and short sentences.
 - Use tables for decisions, status, versions and mappings.
 - Keep file paths, table names, column names and code terms exact.
