@@ -580,6 +580,11 @@ p {
     color: #a8b3c4;
 }
 
+.auth-input::-ms-reveal,
+.auth-input::-ms-clear {
+    display: none;
+}
+
 .auth-input:hover {
     border-color: #c3cfdf;
 }
