@@ -5,7 +5,7 @@
 @section('content')
     <div class="auth-heading">
         <h1 class="auth-title" id="login-title">Sign in</h1>
-        <p class="auth-subtitle">Incoming Inspection QC - PT. Chubb Safes Indonesia</p>
+        <p class="auth-subtitle">Please Enter Your Detail</p>
     </div>
 
     @if ($errors->any())
@@ -93,11 +93,6 @@
     </form>
 
     <p class="auth-help">Need access? Contact your system administrator.</p>
-
-    <div class="auth-card-footer">
-        <span>PT. Chubb Safes Indonesia</span>
-        <span>Form No. 7.4.3-F1</span>
-    </div>
 @endsection
 
 @push('scripts')

@@ -495,6 +495,7 @@ p {
 
 .auth-heading {
     margin-bottom: 26px;
+    text-align: center;
 }
 
 .auth-title {
@@ -687,29 +688,6 @@ p {
     text-align: center;
 }
 
-.auth-card-footer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 6px 12px;
-    margin-top: 22px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(148, 163, 184, 0.22);
-    color: #64748b;
-    font-size: 10.5px;
-}
-
-.auth-page-footer {
-    position: fixed;
-    right: 0;
-    bottom: 14px;
-    left: 0;
-    z-index: 3;
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 10.5px;
-    letter-spacing: 0.04em;
-    text-align: center;
-}
 
 @keyframes auth-fade-in {
     from {
@@ -770,17 +748,6 @@ p {
 
     .auth-title {
         font-size: 26px;
-    }
-
-    .auth-card-footer {
-        flex-direction: column;
-        align-items: center;
-        gap: 3px;
-        text-align: center;
-    }
-
-    .auth-page-footer {
-        font-size: 9.5px;
     }
 }
 

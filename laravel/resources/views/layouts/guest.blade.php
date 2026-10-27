@@ -20,10 +20,6 @@
         </section>
     </main>
 
-    <footer class="auth-page-footer">
-        &copy; 2026 PT. Chubb Safes Indonesia. All rights reserved.
-    </footer>
-
     @stack('scripts')
 </body>
 </html>
