@@ -417,13 +417,15 @@ p {
 
 .auth-topbar {
     position: fixed;
-    top: 28px;
-    right: 32px;
-    left: 32px;
+    top: 0;
+    right: 0;
+    left: 0;
     z-index: 3;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    height: 92px;
+    padding: 0 32px;
     gap: 20px;
     animation: auth-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
@@ -436,14 +438,19 @@ p {
 }
 
 .auth-topbar img {
+    width: 138px;
     height: 34px;
-    width: auto;
+    object-fit: contain;
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
 
+.auth-brand-left img {
+    object-position: left center;
+}
+
 .auth-topbar .auth-gunnebo {
-    height: 25px;
     flex: 0 0 auto;
+    object-position: right center;
 }
 
 .auth-topbar span {
@@ -773,18 +780,17 @@ p {
 
 @media (max-width: 640px) {
     .auth-topbar {
-        top: 18px;
-        right: 18px;
-        left: 18px;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 74px;
+        padding: 0 18px;
         gap: 10px;
     }
 
     .auth-topbar img {
+        width: 106px;
         height: 26px;
-    }
-
-    .auth-topbar .auth-gunnebo {
-        height: 20px;
     }
 
     .auth-brand-left {
