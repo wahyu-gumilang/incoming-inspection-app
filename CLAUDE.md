@@ -106,7 +106,8 @@ Commands:
 |---|---|
 | php85 -v | Check the PHP 8.5 runtime. |
 | composer --version | Check Composer. |
-| php85 -S 127.0.0.1:8000 -t public public/index.php | Start the Laravel application from the laravel directory. |
+| ./serve | Start the Laravel application from the laravel directory. |
+| php85 -S 127.0.0.1:8000 -t public server.php | Start the application without the serve script. |
 | php85 vendor/bin/phpunit | Run the PHP test suite. |
 | php85 vendor/bin/phpunit --filter=Judgement | Run one test group. |
 | php85 vendor/bin/pint | Format PHP code. |
@@ -117,8 +118,10 @@ Important:
 - Do not use php artisan serve or php artisan test with the portable runtime. Laravel
   re-executes PHP_BINARY and the child process loses the portable library path, php.ini and
   extensions.
-- Use the built-in server command above during development.
+- Use the serve script or the built-in server command above during development.
 - Run PHPUnit directly with php85 vendor/bin/phpunit.
+- Existing password hashes use the bcrypt prefix $2b$. Keep App\Hashing\LegacyBcryptHasher
+  in place: it accepts those hashes and rehashes them to Laravel's $2y$ format on login.
 - The application database is csi_db.
 - Database tests must use csi_db_test and must never touch csi_db.
 - Copy laravel/.env.example to laravel/.env for a new environment.

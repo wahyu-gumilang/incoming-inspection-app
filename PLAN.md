@@ -62,19 +62,19 @@ the business rules that have already been tested.
 | ✓ Done | Database connection | Laravel connects to the XAMPP MariaDB database csi_db. |
 | ✓ Done | Proof of concept page | GET /items reads inventtable and searches item id and name through Livewire. |
 | ✗ Next | Database setup command | A PHP command must apply the legacy baseline and SQL migrations to a fresh database and to csi_db_test. |
-| ✗ Planned | Authentication | Session login against usertable, roles, password change and login rate limit. |
+| ✓ Done | Authentication and shell | Session login against usertable, roles, forced password change, profile settings, login rate limit and a functional Blade shell. Admin user management is next. |
 | ✗ Planned | Master data | Items, standards, vendors and users. |
 | ✗ Planned | AQL administration | AQL plans and plan rows. |
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
-| ✗ Planned | Dashboard | KPI cards, NG chart and recent inspections. |
+| ✗ Planned | Dashboard | Basic database counts are shown. KPI cards, NG chart and recent inspections still need the inspection data. |
 | ✗ Planned | Reporting | Submit and check workflow, PDF output. |
-| ✗ Next | Tests | PHPUnit is installed and one feature test covers /items. Judgement, AQL and workflow tests still need to be written. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard and items with 20 tests and 77 assertions. Judgement and AQL tests are next. |
 
 Local addresses while the migration is in progress:
 
 | Application | Address |
 |---|---|
-| PHP proof of concept | http://localhost:8000/items |
+| PHP application (csi_db) | http://localhost:8000/login |
 | Legacy Angular application | http://localhost:4200 |
 | Legacy Node API | http://localhost:5000 |
 | Design mockups | http://localhost:8080/index.html |
@@ -295,21 +295,21 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Add Livewire 4 and render the first item list proof of concept. |
 | ✓ Done | Read real data from inventtable and inventinspectitem. |
 | ✓ Done | Add a basic PHPUnit feature test for the /items page against csi_db_test. |
+| ✓ Done | Add a development script (serve) that starts the PHP built-in server with the portable runtime. |
 | ✗ Next | Add a PHP command that applies baseline.sql, the SQL migrations and the fixtures to a test database. |
-| ✗ Next | Add a development script that starts the PHP built-in server with the portable runtime. |
 
 ### Phase P1 - Authentication and application shell
 
 | Status | Task |
 |---|---|
-| ✗ Planned | Custom user provider and guard for usertable. |
-| ✗ Planned | Login, logout, session cookie and CSRF protection. |
-| ✗ Planned | Login rate limit and equal error messages for unknown users and wrong passwords. |
-| ✗ Planned | Middleware for authentication, active user, must_change_password and role. |
-| ✗ Planned | Profile page for name, email, theme and password change. |
+| ✓ Done | Custom user provider and guard for usertable. |
+| ✓ Done | Login, logout, session cookie and CSRF protection. |
+| ✓ Done | Login rate limit and equal error messages for unknown users and wrong passwords. |
+| ✓ Done | Middleware for authentication, active user, must_change_password and role. |
+| ✓ Done | Profile page for name, email, theme and password change. |
 | ✗ Planned | Admin user management: invite or create user, change role, deactivate, reset password. |
-| ✗ Planned | Blade shell with navbar, profile menu, theme switch and database status. |
-| ✗ Planned | Feature tests for login, logout, roles, inactive users and forced password change. |
+| ✓ Done | Functional Blade shell with navbar, profile menu and theme switch. Final visual design is pending the new mockups. |
+| ✓ Done | Feature tests for login, logout, roles, inactive users and forced password change. |
 
 ### Phase P2 - Master data
 
