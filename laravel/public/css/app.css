@@ -418,18 +418,32 @@ p {
 .auth-topbar {
     position: fixed;
     top: 28px;
+    right: 32px;
     left: 32px;
     z-index: 3;
     display: flex;
     align-items: center;
-    gap: 14px;
+    justify-content: space-between;
+    gap: 20px;
     animation: auth-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.auth-brand-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
 }
 
 .auth-topbar img {
     height: 34px;
     width: auto;
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.auth-topbar .auth-gunnebo {
+    height: 25px;
+    flex: 0 0 auto;
 }
 
 .auth-topbar span {
@@ -501,6 +515,10 @@ p {
     margin-bottom: 18px;
 }
 
+.auth-alert[hidden] {
+    display: none;
+}
+
 .auth-form {
     display: flex;
     flex-direction: column;
@@ -566,8 +584,19 @@ p {
     box-shadow: 0 0 0 4px rgba(0, 79, 156, 0.12), 0 8px 24px rgba(0, 79, 156, 0.08);
 }
 
-.auth-input-error {
+.auth-input.auth-input-error,
+.auth-input.auth-input-error:focus {
     border-color: #dc2626;
+    background: #fff7f7;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
+}
+
+.auth-input-wrap-error {
+    animation: auth-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.auth-input-wrap-error .auth-input-icon {
+    color: #dc2626;
 }
 
 .auth-input-wrap:focus-within .auth-input-icon {
@@ -708,6 +737,29 @@ p {
     }
 }
 
+@keyframes auth-shake {
+    10%,
+    90% {
+        transform: translateX(-1px);
+    }
+
+    20%,
+    80% {
+        transform: translateX(2px);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translateX(-4px);
+    }
+
+    40%,
+    60% {
+        transform: translateX(4px);
+    }
+}
+
 @keyframes auth-mesh {
     from {
         transform: scale(1);
@@ -722,12 +774,21 @@ p {
 @media (max-width: 640px) {
     .auth-topbar {
         top: 18px;
+        right: 18px;
         left: 18px;
         gap: 10px;
     }
 
     .auth-topbar img {
         height: 26px;
+    }
+
+    .auth-topbar .auth-gunnebo {
+        height: 20px;
+    }
+
+    .auth-brand-left {
+        gap: 10px;
     }
 
     .auth-topbar span {
@@ -748,6 +809,24 @@ p {
     }
 }
 
+@media (max-height: 700px) {
+    .auth-stage {
+        padding: 68px 20px 40px;
+    }
+
+    .auth-card {
+        padding: 30px 34px 24px;
+    }
+
+    .auth-heading {
+        margin-bottom: 20px;
+    }
+
+    .auth-form {
+        gap: 14px;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .auth-background,
     .auth-background::before,
@@ -760,6 +839,10 @@ p {
     .auth-eye,
     .auth-submit {
         transition: none;
+    }
+
+    .auth-input-wrap-error {
+        animation: none;
     }
 }
 

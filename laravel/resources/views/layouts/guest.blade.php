@@ -10,8 +10,11 @@
     <div class="auth-background" aria-hidden="true"></div>
 
     <header class="auth-topbar">
-        <img src="{{ asset('brand/chubbsafes-white.png') }}" alt="Chubbsafes">
-        <span>Incoming Inspection QC</span>
+        <div class="auth-brand-left">
+            <img src="{{ asset('brand/chubbsafes-white.png') }}" alt="Chubbsafes">
+            <span>Incoming Inspection QC</span>
+        </div>
+        <img class="auth-gunnebo" src="{{ asset('brand/gunnebo-white.png') }}" alt="Gunnebo">
     </header>
 
     <main class="auth-stage">

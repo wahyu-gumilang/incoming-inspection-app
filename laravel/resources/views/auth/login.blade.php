@@ -18,12 +18,18 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('login.store') }}" class="auth-form">
+    <div class="alert alert-error auth-alert" id="client-error" role="alert" hidden>
+        <ul>
+            <li id="client-error-message"></li>
+        </ul>
+    </div>
+
+    <form method="POST" action="{{ route('login.store') }}" class="auth-form" novalidate>
         @csrf
 
         <div class="auth-field">
             <label class="auth-label" for="username">Username</label>
-            <div class="auth-input-wrap">
+            <div class="auth-input-wrap @error('username') auth-input-wrap-error @enderror">
                 <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="12" cy="8" r="3.5"></circle>
                     <path d="M4.5 20a7.5 7.5 0 0 1 15 0"></path>
@@ -39,6 +45,7 @@
                     autocapitalize="none"
                     spellcheck="false"
                     maxlength="50"
+                    @error('username') aria-invalid="true" @enderror
                     required
                 >
             </div>
@@ -46,18 +53,19 @@
 
         <div class="auth-field">
             <label class="auth-label" for="password">Password</label>
-            <div class="auth-input-wrap">
+            <div class="auth-input-wrap @if ($errors->has('username') || $errors->has('password')) auth-input-wrap-error @endif">
                 <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <rect x="5" y="10" width="14" height="10" rx="2"></rect>
                     <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
                 </svg>
                 <input
-                    class="auth-input @error('password') auth-input-error @enderror"
+                    class="auth-input @if ($errors->has('username') || $errors->has('password')) auth-input-error @endif"
                     id="password"
                     type="password"
                     name="password"
                     placeholder="Enter your password"
                     autocomplete="current-password"
+                    @if ($errors->has('username') || $errors->has('password')) aria-invalid="true" @endif
                     required
                 >
                 <button
@@ -98,18 +106,86 @@
 @push('scripts')
     <script>
         (() => {
+            const form = document.querySelector('.auth-form');
+            const username = document.getElementById('username');
             const password = document.getElementById('password');
             const toggle = document.querySelector('[data-password-toggle]');
             const eyeOpen = toggle?.querySelector('.eye-open');
             const eyeClosed = toggle?.querySelector('.eye-closed');
             const warning = document.getElementById('caps-warning');
+            const clientError = document.getElementById('client-error');
+            const clientErrorMessage = document.getElementById('client-error-message');
 
-            if (!password || !toggle) {
+            if (!form || !username || !password) {
                 return;
             }
 
             if (window.matchMedia('(min-width: 720px)').matches) {
-                document.getElementById('username')?.focus({ preventScroll: true });
+                username.focus({ preventScroll: true });
+            }
+
+            const setInputError = (input, invalid) => {
+                const wrapper = input.closest('.auth-input-wrap');
+
+                input.classList.remove('auth-input-error');
+                wrapper?.classList.remove('auth-input-wrap-error');
+
+                if (invalid) {
+                    void input.offsetWidth;
+                    input.classList.add('auth-input-error');
+                    wrapper?.classList.add('auth-input-wrap-error');
+                    input.setAttribute('aria-invalid', 'true');
+                } else {
+                    input.removeAttribute('aria-invalid');
+                }
+            };
+
+            const hideClientErrorWhenReady = () => {
+                if (username.value.trim() && password.value && clientError) {
+                    clientError.hidden = true;
+                }
+            };
+
+            form.addEventListener('submit', (event) => {
+                const usernameEmpty = username.value.trim() === '';
+                const passwordEmpty = password.value === '';
+
+                if (!usernameEmpty && !passwordEmpty) {
+                    return;
+                }
+
+                event.preventDefault();
+                setInputError(username, usernameEmpty);
+                setInputError(password, passwordEmpty);
+
+                if (clientError && clientErrorMessage) {
+                    clientErrorMessage.textContent = usernameEmpty && passwordEmpty
+                        ? 'Please enter your username and password.'
+                        : usernameEmpty
+                            ? 'Please enter your username.'
+                            : 'Please enter your password.';
+                    clientError.hidden = false;
+                }
+
+                (usernameEmpty ? username : password).focus({ preventScroll: true });
+            });
+
+            username.addEventListener('input', () => {
+                if (username.value.trim()) {
+                    setInputError(username, false);
+                    hideClientErrorWhenReady();
+                }
+            });
+
+            password.addEventListener('input', () => {
+                if (password.value) {
+                    setInputError(password, false);
+                    hideClientErrorWhenReady();
+                }
+            });
+
+            if (!toggle) {
+                return;
             }
 
             toggle.addEventListener('click', () => {
