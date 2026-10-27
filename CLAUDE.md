@@ -367,7 +367,9 @@ controllers, Livewire components or Blade views.
 
 - The old mockups in docs/design/mockups are a reference only. The owner is reviewing the
   design direction again.
-- Do not finalize page styling before the new mockups are approved.
+- The login page design was approved and finalized on 2026-10-27. Do not change its layout,
+  background, card, copy or interactions without a new owner request.
+- Do not finalize styling for other pages before the new mockups are approved.
 - Use the Chubbsafes brand blue and the existing neutral palette as the starting point.
 - Use the Inter font and the Material Symbols Rounded icon set.
 - Support light and dark themes.

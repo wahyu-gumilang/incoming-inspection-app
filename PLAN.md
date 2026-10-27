@@ -62,7 +62,7 @@ the business rules that have already been tested.
 | ✓ Done | Database connection | Laravel connects to the XAMPP MariaDB database csi_db. |
 | ✓ Done | Proof of concept page | GET /items reads inventtable and searches item id and name through Livewire. |
 | ✗ Next | Database setup command | A PHP command must apply the legacy baseline and SQL migrations to a fresh database and to csi_db_test. |
-| ✓ Done | Authentication and shell | Session login against usertable, roles, forced password change, profile settings, login rate limit and a functional Blade shell. Admin user management is next. |
+| ✓ Done | Authentication and shell | Session login against usertable, roles, forced password change, profile settings, login rate limit and a functional Blade shell. The login page design was approved and finalized on 2026-10-27. Admin user management is next. |
 | ✗ Planned | Master data | Items, standards, vendors and users. |
 | ✗ Planned | AQL administration | AQL plans and plan rows. |
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
@@ -308,7 +308,7 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Middleware for authentication, active user, must_change_password and role. |
 | ✓ Done | Profile page for name, email, theme and password change. |
 | ✗ Planned | Admin user management: invite or create user, change role, deactivate, reset password. |
-| ✓ Done | Functional Blade shell with navbar, profile menu and theme switch. Final visual design is pending the new mockups. |
+| ✓ Done | Functional Blade shell with navbar, profile menu and theme switch. The login page design is final. Other page designs are pending the new mockups. |
 | ✓ Done | Feature tests for login, logout, roles, inactive users and forced password change. |
 
 ### Phase P2 - Master data
@@ -395,7 +395,7 @@ Deployment checklist:
 
 | Topic | Open question | Current handling |
 |---|---|---|
-| Design | The old mockups are being reviewed again. | Build functional screens first. Do not finalize UI until the owner approves the new direction. |
+| Design | The old mockups are being reviewed again. | The login page is final as of 2026-10-27. Build other screens functionally until the owner approves the new direction. |
 | PHP patch | XAMPP has PHP 8.2.12. The development runtime is 8.5.4. Production should be 8.5.12. | Use the portable PHP 8.5 runtime for development and install 8.5.12 for deployment. |
 | Development server | XAMPP Apache cannot run Laravel 13 with its bundled PHP. | Use the PHP built-in server during development. Configure XAMPP Apache or WAMP only after approval. |
 | AQL plan | The default plan and the tightened and reduced rules still need Quality confirmation. | Keep the current plan and rules as provisional. |
