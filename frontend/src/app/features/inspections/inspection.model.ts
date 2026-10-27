@@ -46,17 +46,26 @@ export const InspectionStatusLabel: Record<string, string> = {
   CHECKED: 'Checked',
 };
 
+// Mirrors backend/constants/inspection.js: 0 = no mark (100 % inspection).
+export const INSPECT_CATEGORY = {
+  FULL: 0,
+  NORMAL: 1,
+  REDUCE: 2,
+  TIGHTENING: 3,
+} as const;
+
 export const CATEGORY_LABEL: Record<number, string> = {
-  0: '100 %',
-  1: 'N',
-  2: 'R',
-  3: 'T',
+  [INSPECT_CATEGORY.FULL]: '100 %',
+  [INSPECT_CATEGORY.NORMAL]: 'N',
+  [INSPECT_CATEGORY.REDUCE]: 'R',
+  [INSPECT_CATEGORY.TIGHTENING]: 'T',
 };
 
 export const CATEGORIES: { value: 0 | 1 | 2 | 3; mark: string; name: string }[] = [
-  { value: 1, mark: 'N', name: 'Normal' },
-  { value: 2, mark: 'R', name: 'Reduced' },
-  { value: 3, mark: 'T', name: 'Tightening' },
+  { value: INSPECT_CATEGORY.NORMAL, mark: 'N', name: 'Normal' },
+  { value: INSPECT_CATEGORY.REDUCE, mark: 'R', name: 'Reduced' },
+  { value: INSPECT_CATEGORY.TIGHTENING, mark: 'T', name: 'Tightening' },
+  { value: INSPECT_CATEGORY.FULL, mark: '—', name: '100 % inspection' },
 ];
 
 export const COLUMN_COUNT = 7;

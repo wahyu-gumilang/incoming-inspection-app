@@ -16,12 +16,7 @@
     <button mat-flat-button color="primary" (click)="toggleEditing()">
       <mat-icon>{{ editing ? 'close' : 'edit' }}</mat-icon> {{ editing ? 'Cancel' : 'Edit header' }}
     </button>
-    <button
-      mat-flat-button
-      color="warn"
-      [disabled]="!editing || saving"
-      (click)="saveHeader()"
-    >
+    <button mat-flat-button color="warn" [disabled]="!editing || saving" (click)="saveHeader()">
       <mat-icon>save</mat-icon> Save
     </button>
   }
@@ -61,24 +56,54 @@
         </div>
         <div class="edit-field">
           <span class="meta-label">Date</span>
-          <input class="edit-input" type="date" [ngModel]="headerForm.inspectdate" (ngModelChange)="headerForm.inspectdate = $event" />
+          <input
+            class="edit-input"
+            type="date"
+            [ngModel]="headerForm.inspectdate"
+            (ngModelChange)="headerForm.inspectdate = $event"
+          />
         </div>
         <div class="edit-field">
           <span class="meta-label">Instrument</span>
-          <input class="edit-input" type="text" [ngModel]="headerForm.instrument" (ngModelChange)="headerForm.instrument = $event" />
+          <input
+            class="edit-input"
+            type="text"
+            [ngModel]="headerForm.instrument"
+            (ngModelChange)="headerForm.instrument = $event"
+          />
         </div>
         <div class="edit-field">
           <span class="meta-label">QF No.</span>
-          <input class="edit-input" type="text" [ngModel]="headerForm.qfnum" (ngModelChange)="headerForm.qfnum = $event" />
+          <input
+            class="edit-input"
+            type="text"
+            [ngModel]="headerForm.qfnum"
+            (ngModelChange)="headerForm.qfnum = $event"
+          />
         </div>
       </div>
       @if (itemSelected() && itemSelected()!.value !== detail.itemid) {
-        <span class="pending-item">Pilihan baru: {{ itemSelected()!.label }} (belum bisa disimpan)</span>
+        <span class="pending-item"
+          >Pilihan baru: {{ itemSelected()!.label }} (belum bisa disimpan)</span
+        >
       }
     </section>
   }
 
   <section class="sheet-card">
+    <div class="sheet-head">
+      <div>
+        <h2>Check sheet</h2>
+        <span class="muted">{{ usedCount }} of {{ columns.length }} deliveries</span>
+      </div>
+      @if (canAddDelivery) {
+        <button mat-stroked-button color="primary" type="button" (click)="openDelivery(null)">
+          <mat-icon>add</mat-icon>
+          Add delivery
+        </button>
+      }
+    </div>
+
     <div class="sheet-meta">
       <div class="meta-item">
         <span class="meta-label">Part no.</span>
@@ -117,8 +142,18 @@
             @for (n of columns; track n) {
               @if (delivery(n); as d) {
                 <th class="col-head">
-                  <span class="col-title">Col {{ n }}</span>
-                  <span class="col-sub">{{ categoryLabel[d.inspectcategory] }}</span>
+                  <button
+                    type="button"
+                    class="col-btn"
+                    [disabled]="!isEditable"
+                    [attr.aria-label]="'Edit delivery ' + n"
+                    (click)="openDelivery(n)"
+                  >
+                    <span class="col-title">Delivery {{ n }}</span>
+                    <span class="col-sub">
+                      {{ categoryLabel[d.inspectcategory] }} · {{ d.purchordernum || '—' }}
+                    </span>
+                  </button>
                 </th>
               }
             }
@@ -144,7 +179,64 @@
         </tbody>
         <tfoot>
           <tr>
-            <td class="foot-label" colspan="4">Judgment</td>
+            <td class="foot-label" colspan="4">P/O No.</td>
+            @for (n of columns; track n) {
+              @if (delivery(n); as d) {
+                <td class="col-cell mono">{{ d.purchordernum || '—' }}</td>
+              }
+            }
+          </tr>
+          <tr>
+            <td class="foot-label" colspan="4">Delivery date</td>
+            @for (n of columns; track n) {
+              @if (delivery(n); as d) {
+                <td class="col-cell">{{ d.deliverydate | date: 'dd/MM/yyyy' }}</td>
+              }
+            }
+          </tr>
+          <tr>
+            <td class="foot-label" colspan="4">QTY received / Insp. category *)</td>
+            @for (n of columns; track n) {
+              @if (delivery(n); as d) {
+                <td class="col-cell">
+                  <span class="mono">{{ d.qty_received === null ? '—' : d.qty_received }}</span>
+                  / {{ categoryLabel[d.inspectcategory] ?? '—' }}
+                </td>
+              }
+            }
+          </tr>
+          <tr class="aql-row">
+            <td class="foot-label" colspan="4">Sample size (AQL)</td>
+            @for (n of columns; track n) {
+              @if (delivery(n); as d) {
+                <td class="col-cell">
+                  @if (d.samplesize !== null) {
+                    <span class="aql-cell">
+                      <b>{{ d.samplesize }} pcs</b>
+                      <span>Ac {{ d.acceptnum ?? '–' }} · Re {{ d.rejectnum ?? '–' }}</span>
+                    </span>
+                  } @else {
+                    —
+                  }
+                </td>
+              }
+            }
+          </tr>
+          <tr>
+            <td class="foot-label" colspan="4">NG / Total sample</td>
+            @for (n of columns; track n) {
+              @if (delivery(n); as d) {
+                <td class="col-cell">
+                  <span class="mono ng-pieces" [class.has-ng]="(d.notgood ?? 0) > 0">{{
+                    d.notgood ?? 0
+                  }}</span>
+                  / {{ d.samplesize ?? '–' }}
+                </td>
+              }
+            }
+          </tr>
+          <tr>
+            <td class="foot-label" colspan="4">Judgment **)</td>
             @for (n of columns; track n) {
               @if (delivery(n); as d) {
                 <td class="col-cell">
@@ -156,6 +248,14 @@
                     {{ judgmentMark[d.judgment] ?? '—' }}
                   </span>
                 </td>
+              }
+            }
+          </tr>
+          <tr>
+            <td class="foot-label" colspan="4">QF No.</td>
+            @for (n of columns; track n) {
+              @if (delivery(n)) {
+                <td class="col-cell mono">{{ detail.qfnum || '—' }}</td>
               }
             }
           </tr>
@@ -172,5 +272,17 @@
         </tfoot>
       </table>
     </div>
+    <div class="sheet-legend">
+      <span><b>*)</b> T: Tightening · N: Normal · R: Reduce · — : 100 % inspection</span>
+      <span><b>**)</b> O: Accepted · X: Rejected · C: Concession</span>
+    </div>
   </section>
+
+  <app-delivery-dialog
+    [open]="deliveryOpen()"
+    (openChange)="deliveryOpen.set($event)"
+    [detail]="detail"
+    [editN]="editingDelivery()"
+    (saved)="onDeliverySaved($event)"
+  />
 }

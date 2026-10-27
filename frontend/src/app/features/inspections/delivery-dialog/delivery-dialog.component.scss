@@ -1,0 +1,386 @@
+.steps {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0 12px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 140px;
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 600;
+
+  .num {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--surface-sunk);
+    font-size: 12px;
+  }
+
+  &.on {
+    color: var(--brand);
+
+    .num {
+      background: var(--brand);
+      color: var(--on-brand);
+    }
+  }
+
+  &.done {
+    color: var(--ok);
+
+    .num {
+      background: var(--ok-bg);
+      color: var(--ok);
+    }
+  }
+}
+
+.problems {
+  margin: 0;
+  padding: 10px 14px 10px 30px;
+  border-radius: 10px;
+  background: var(--ng-bg);
+  color: var(--ng);
+  font-size: 13px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+
+  button {
+    border: 0;
+    background: transparent;
+    padding: 8px 14px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-2);
+    cursor: pointer;
+
+    &.on {
+      background: var(--brand);
+      color: var(--on-brand);
+    }
+  }
+
+  &.cat {
+    width: fit-content;
+  }
+
+  &.small button {
+    padding: 5px 10px;
+    font-size: 12px;
+
+    &.ok.on {
+      background: var(--ok);
+    }
+
+    &.ng.on {
+      background: var(--ng);
+    }
+  }
+}
+
+.aql-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--brand-50);
+  color: var(--brand);
+
+  > div {
+    min-width: 56px;
+    text-align: center;
+  }
+
+  b {
+    display: block;
+    font-size: 22px;
+  }
+
+  span {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+
+  .ac b {
+    color: var(--ok);
+  }
+
+  .re b {
+    color: var(--ng);
+  }
+
+  &.muted-box {
+    background: var(--surface-2);
+    color: var(--text-2);
+  }
+}
+
+.note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.measure {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-2);
+    font-size: 12px;
+  }
+
+  td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .subtle {
+    color: var(--text-3);
+    font-size: 12px;
+  }
+
+  tr.section td {
+    padding: 12px 10px 4px;
+    border-bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-3);
+  }
+}
+
+.cell-status {
+  width: 112px;
+}
+
+.actual-input,
+.coa-input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface-sunk);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.actual-input {
+  max-width: 120px;
+  text-align: center;
+
+  &.ng {
+    border-color: var(--ng);
+    background: var(--ng-bg);
+    color: var(--ng);
+  }
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ng-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ng-input {
+  width: 96px;
+  height: 48px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface-sunk);
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.of {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-3);
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+
+  &.o {
+    background: var(--ok-bg);
+    color: var(--ok);
+  }
+
+  &.x {
+    background: var(--ng-bg);
+    color: var(--ng);
+  }
+}
+
+.judgment {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+
+  button {
+    display: grid;
+    gap: 2px;
+    justify-items: center;
+    padding: 12px 10px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+
+    b {
+      font-size: 20px;
+    }
+
+    span {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    small {
+      font-size: 10px;
+      color: var(--text-3);
+      text-align: center;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &.j-1.on {
+      border-color: var(--ok);
+      background: var(--ok-bg);
+      color: var(--ok);
+    }
+
+    &.j-2.on {
+      border-color: var(--ng);
+      background: var(--ng-bg);
+      color: var(--ng);
+    }
+
+    &.j-3.on {
+      border-color: var(--warn);
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+  }
+}
+
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 76px;
+  padding: 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface-sunk);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.dfoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.dfoot mat-spinner {
+  display: inline-block;
+  margin-right: 6px;
+}
+
+@media (max-width: 599.98px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .judgment {
+    grid-template-columns: 1fr;
+  }
+
+  .steps {
+    display: none;
+  }
+}

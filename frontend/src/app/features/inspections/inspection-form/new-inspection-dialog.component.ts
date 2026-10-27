@@ -9,7 +9,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { map, Observable } from 'rxjs';
-import { LookupAutocomplete, LookupOption } from '../../../shared/ui/lookup-autocomplete/lookup-autocomplete';
+import {
+  LookupAutocomplete,
+  LookupOption,
+} from '../../../shared/ui/lookup-autocomplete/lookup-autocomplete';
 import { ItemService } from '../../items/item.service';
 import { VendorService } from '../../vendors/vendor.service';
 import { InspectionService } from '../inspection.service';
@@ -52,16 +55,20 @@ export class NewInspectionDialog {
 
   // LookupAutocomplete wants (query) => Observable<Option[]>.
   readonly itemSearch = (q: string): Observable<LookupOption[]> =>
-    this.itemService.list({ q, limit: 20 }).pipe(
-      map((res) => res.data.map((i) => ({ value: i.itemid, label: i.itemid, sublabel: i.name }))),
-    );
+    this.itemService
+      .list({ q, limit: 20 })
+      .pipe(
+        map((res) => res.rows.map((i) => ({ value: i.itemid, label: i.itemid, sublabel: i.name }))),
+      );
 
   readonly vendorSearch = (q: string): Observable<LookupOption[]> =>
-    this.vendorService.lookup(q).pipe(
-      map((res) =>
-        res.data.map((v) => ({ value: v.vendaccount, label: v.name, sublabel: v.vendaccount })),
-      ),
-    );
+    this.vendorService
+      .lookup(q)
+      .pipe(
+        map((res) =>
+          res.map((v) => ({ value: v.vendaccount, label: v.name, sublabel: v.vendaccount })),
+        ),
+      );
 
   onItemPick(opt: LookupOption | null): void {
     this.item = opt ? { id: opt.value, label: opt.label } : null;

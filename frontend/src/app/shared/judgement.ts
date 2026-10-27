@@ -22,7 +22,7 @@ export const RULE_MODE = {
 
 type RuleMode = (typeof RULE_MODE)[keyof typeof RULE_MODE];
 
-interface Rule {
+export interface Rule {
   standard: number | null;
   text: string | null;
   plus: number | null;

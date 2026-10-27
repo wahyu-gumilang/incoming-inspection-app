@@ -160,9 +160,19 @@ describe('delivery columns (the delivery modal)', () => {
       [27.88, S.OK],
     ]);
     expect(d.otherLines.every((l) => l.status_1 === S.OK)).toBe(true);
-    expect(d.deliveries[0]).toEqual({
+    expect(d.deliveries[0]).toMatchObject({
       n: 1,
       used: true,
+      purchordernum: '33932',
+      deliverydate: '2026-09-15',
+      qty_received: 50,
+      inspectcategory: CAT.NORMAL,
+      notgood: 0,
+      judgment: J.ACCEPTED,
+      concessionnote: null,
+      samplesize: 2,
+      acceptnum: 0,
+      rejectnum: 1,
       ngCells: 0,
       suggestedJudgment: J.ACCEPTED,
     });

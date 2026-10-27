@@ -1,0 +1,414 @@
+<app-modal
+  [open]="open()"
+  (openChange)="open.set($event)"
+  [title]="title()"
+  [subtitle]="subtitle()"
+  size="lg"
+  [dismissible]="!saving()"
+>
+  @if (draft(); as d) {
+    <div class="steps" aria-label="Steps">
+      @for (s of [1, 2, 3]; track s) {
+        <div class="step" [class.on]="step() === s" [class.done]="step() > s">
+          <span class="num">{{ s }}</span>
+          <span class="label">{{
+            s === 1 ? 'Delivery & sample' : s === 2 ? 'Measurements' : 'Result'
+          }}</span>
+        </div>
+      }
+    </div>
+
+    @if (problems().length) {
+      <ul class="problems" role="alert">
+        @for (problem of problems(); track $index) {
+          <li>{{ problem }}</li>
+        }
+      </ul>
+    }
+
+    @switch (step()) {
+      @case (1) {
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>P/O No.</mat-label>
+            <input
+              matInput
+              class="mono"
+              [ngModel]="d.purchordernum"
+              (ngModelChange)="setPo($event)"
+              placeholder="e.g. 34561"
+              maxlength="30"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Delivery date</mat-label>
+            <input
+              matInput
+              type="date"
+              [ngModel]="d.deliverydate"
+              (ngModelChange)="setDeliverydate($event)"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>QTY received (lot size)</mat-label>
+            <input
+              matInput
+              type="number"
+              min="1"
+              inputmode="numeric"
+              [ngModel]="d.qty"
+              (ngModelChange)="setQty($event)"
+              placeholder="pcs"
+            />
+          </mat-form-field>
+
+          <div class="field">
+            <span class="field-label">Inspection category *)</span>
+            <div class="seg cat" role="radiogroup" aria-label="Inspection category">
+              @for (category of categories; track category.value) {
+                <button
+                  type="button"
+                  [class.on]="d.inspectcategory === category.value"
+                  [attr.aria-pressed]="d.inspectcategory === category.value"
+                  [title]="category.name"
+                  (click)="setCategory(category.value)"
+                >
+                  {{ category.mark }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="aql-box" [class.muted-box]="!aql()">
+          <mat-icon>table_chart</mat-icon>
+          @if (aqlLoading()) {
+            <mat-spinner diameter="22" />
+            <span>Looking up the AQL plan…</span>
+          } @else {
+            @if (aql(); as plan) {
+              <div>
+                <b>{{ plan.samplesize }}</b>
+                <span>Sample (pcs)</span>
+              </div>
+              <div class="ac">
+                <b>{{ plan.acceptnum }}</b>
+                <span>Accept ≤</span>
+              </div>
+              <div class="re">
+                <b>{{ plan.rejectnum }}</b>
+                <span>Reject ≥</span>
+              </div>
+            } @else {
+              <span>{{ aqlError() || 'Enter the QTY received to get the sample size.' }}</span>
+            }
+          }
+        </div>
+
+        @if (aql(); as plan) {
+          <p class="note">
+            @if (plan.fullInspection) {
+              The lot is smaller than the sample: inspect every piece (100 %).
+            } @else {
+              AQL plan code letter {{ plan.codeletter }} · {{ categoryLabel[d.inspectcategory] }}.
+            }
+          </p>
+        }
+      }
+
+      @case (2) {
+        <div class="table-wrap">
+          <table class="measure">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Item</th>
+                <th>Standard</th>
+                <th>Tolerance</th>
+                <th>Actual</th>
+                <th>OK / NG</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (line of d.std; track line.linenum) {
+                <tr>
+                  <td class="subtle">{{ $index + 1 }}</td>
+                  <td>
+                    <b>{{ line.label }}</b>
+                  </td>
+                  <td class="num">{{ line.standardTxt || '—' }}</td>
+                  <td class="num">{{ line.toleranceText || '—' }}</td>
+                  <td>
+                    <input
+                      class="actual-input"
+                      [class.ng]="statusOf(line) === 0"
+                      inputmode="decimal"
+                      [ngModel]="line.actual"
+                      (ngModelChange)="setActual(line.linenum, $event)"
+                      (keydown.enter)="onActualEnter($event)"
+                      [attr.aria-label]="'Actual for ' + line.label"
+                    />
+                  </td>
+                  <td class="cell-status">
+                    @if (line.mode === 'MANUAL') {
+                      <div class="seg small" role="radiogroup">
+                        <button
+                          type="button"
+                          class="ok"
+                          [class.on]="isOk(line.manualStatus)"
+                          (click)="setManualStatus(line.linenum, 1)"
+                        >
+                          OK
+                        </button>
+                        <button
+                          type="button"
+                          class="ng"
+                          [class.on]="isNg(line.manualStatus)"
+                          (click)="setManualStatus(line.linenum, 0)"
+                        >
+                          NG
+                        </button>
+                      </div>
+                    } @else {
+                      <app-ok-ng-pill [status]="statusOf(line)" />
+                    }
+                  </td>
+                </tr>
+              }
+
+              <tr class="section">
+                <td colspan="6">Certificate No</td>
+              </tr>
+              @if (certificateLines().length) {
+                @for (line of certificateLines(); track line.linenum) {
+                  <tr>
+                    <td></td>
+                    <td>
+                      <b>{{ line.label || 'COA NO.' }}</b>
+                    </td>
+                    <td colspan="2"></td>
+                    <td>
+                      <input
+                        class="coa-input"
+                        [ngModel]="line.actualTxt"
+                        (ngModelChange)="setCertificate(line.linenum, $event)"
+                        placeholder="COA number"
+                      />
+                    </td>
+                    <td class="cell-status">
+                      <div class="seg small" role="radiogroup">
+                        <button
+                          type="button"
+                          class="ok"
+                          [class.on]="isOk(line.status)"
+                          (click)="setOtherStatus(line.linenum, 1)"
+                        >
+                          OK
+                        </button>
+                        <button
+                          type="button"
+                          class="ng"
+                          [class.on]="isNg(line.status)"
+                          (click)="setOtherStatus(line.linenum, 0)"
+                        >
+                          NG
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              } @else {
+                <tr>
+                  <td></td>
+                  <td colspan="5" class="subtle">No certificate required for this part.</td>
+                </tr>
+              }
+
+              <tr class="section">
+                <td colspan="6">Visual</td>
+              </tr>
+              @for (line of visualLines(); track line.linenum) {
+                <tr>
+                  <td></td>
+                  <td colspan="3">
+                    <b>{{ line.label }}</b>
+                  </td>
+                  <td></td>
+                  <td class="cell-status">
+                    <div class="seg small" role="radiogroup">
+                      <button
+                        type="button"
+                        class="ok"
+                        [class.on]="isOk(line.status)"
+                        (click)="setOtherStatus(line.linenum, 1)"
+                      >
+                        OK
+                      </button>
+                      <button
+                        type="button"
+                        class="ng"
+                        [class.on]="isNg(line.status)"
+                        (click)="setOtherStatus(line.linenum, 0)"
+                      >
+                        NG
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+
+              <tr class="section">
+                <td colspan="6">Fitting</td>
+              </tr>
+              @for (line of fittingLines(); track line.linenum) {
+                <tr>
+                  <td></td>
+                  <td>
+                    <b>{{ line.label }}</b>
+                  </td>
+                  <td class="num">{{ line.standardTxt || '—' }}</td>
+                  <td></td>
+                  <td></td>
+                  <td class="cell-status">
+                    <div class="seg small" role="radiogroup">
+                      <button
+                        type="button"
+                        class="ok"
+                        [class.on]="isOk(line.status)"
+                        (click)="setOtherStatus(line.linenum, 1)"
+                      >
+                        OK
+                      </button>
+                      <button
+                        type="button"
+                        class="ng"
+                        [class.on]="isNg(line.status)"
+                        (click)="setOtherStatus(line.linenum, 0)"
+                      >
+                        NG
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="note">
+          Enter moves to the next value. Values outside the tolerance turn red straight away.
+        </p>
+      }
+
+      @case (3) {
+        <div class="result">
+          <div class="field">
+            <label for="ng-pieces">NG / Total sample (defective pieces in the sample)</label>
+            <div class="ng-row">
+              <input
+                id="ng-pieces"
+                class="ng-input"
+                type="number"
+                min="0"
+                [ngModel]="d.notgood"
+                (ngModelChange)="setNotgood($event)"
+              />
+              <span class="of">/ {{ aql() ? aql()!.samplesize : '–' }}</span>
+            </div>
+            <p class="note">{{ hint() }}</p>
+          </div>
+
+          @if (suggestion(); as suggested) {
+            <div class="suggestion" [class.o]="suggested === 1" [class.x]="suggested === 2">
+              <mat-icon>{{ suggested === 1 ? 'check_circle' : 'cancel' }}</mat-icon>
+              @if (suggested === 1) {
+                Suggested: Accept — {{ d.notgood }} defective ≤ Ac {{ aql()!.acceptnum }}
+              } @else {
+                Suggested: Reject — {{ d.notgood }} defective ≥ Re {{ aql()!.rejectnum }}
+              }
+            </div>
+          }
+
+          <div class="field">
+            <span class="field-label">Judgment **)</span>
+            <div class="judgment">
+              @for (choice of choices(); track choice.value) {
+                <button
+                  type="button"
+                  [class]="'j j-' + choice.value"
+                  [class.on]="d.judgment === choice.value"
+                  [disabled]="!choice.enabled"
+                  (click)="setJudgment(choice.value)"
+                >
+                  <b>{{ choice.mark }}</b>
+                  <span>{{ choice.label }}</span>
+                  @if (choice.hint) {
+                    <small>{{ choice.hint }}</small>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (isConcession(d.judgment)) {
+            <div class="field">
+              <label for="concession-note">Concession note</label>
+              <textarea
+                id="concession-note"
+                class="textarea"
+                [ngModel]="d.note"
+                (ngModelChange)="setNote($event)"
+                placeholder="Why is this delivery accepted under concession, and by whom?"
+              ></textarea>
+            </div>
+          }
+
+          <p class="note">
+            QF No. and the sign-off belong to the inspection header, not to one delivery.
+          </p>
+        </div>
+      }
+    }
+  } @else {
+    <p class="note">Preparing the delivery…</p>
+  }
+
+  <div class="dfoot" modalFooter>
+    <button mat-button type="button" (click)="back()" [disabled]="step() === 1 || saving()">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </button>
+    <span class="spacer"></span>
+    <button mat-button type="button" (click)="close()" [disabled]="saving()">Cancel</button>
+    @if (step() < 3) {
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        class="next"
+        (click)="next()"
+        [disabled]="step() === 1 && aqlLoading()"
+      >
+        Next
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    } @else {
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        class="next"
+        (click)="next()"
+        [disabled]="saving()"
+      >
+        @if (saving()) {
+          <mat-spinner diameter="16" />
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        {{ saving() ? 'Saving…' : 'Save delivery' }}
+      </button>
+    }
+  </div>
+</app-modal>

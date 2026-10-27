@@ -91,7 +91,7 @@ export interface DeliveryInfo {
   acceptnum: number | null;
   rejectnum: number | null;
   ngCells: number;
-  suggestedJudgment: Judgment;
+  suggestedJudgment: Judgment | null;
 }
 
 export interface InspectionDetail extends InspectionHeader {

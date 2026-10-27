@@ -125,9 +125,21 @@ function deliveries(header, lines, otherLines) {
             acceptnum: header[`acceptnum${n}`],
             rejectnum: header[`rejectnum${n}`],
           };
+    // The delivery modal reads a column back from here, so it carries the
+    // stored column values as well as the computed ones.
     return {
       n,
       used: n <= used,
+      purchordernum: header[`purchordernum${n}`],
+      deliverydate: header[`deliverydate${n}`],
+      qty_received: header[`qty_received${n}`],
+      inspectcategory: header[`inspectcategory${n}`],
+      notgood: header[`notgood${n}`],
+      judgment: header[`judgment${n}`],
+      concessionnote: header[`concessionnote${n}`],
+      samplesize: header[`samplesize${n}`],
+      acceptnum: header[`acceptnum${n}`],
+      rejectnum: header[`rejectnum${n}`],
       ngCells: ngCells[n - 1],
       suggestedJudgment: n <= used && plan ? j.suggestJudgment(header[`notgood${n}`], plan) : null,
     };

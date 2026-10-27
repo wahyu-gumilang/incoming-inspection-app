@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,7 +8,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom, map, Observable } from 'rxjs';
 import { InspectionDetail, DeliveryInfo } from '../../../core/models/inspection';
 import { OkNgPill } from '../../../shared/ui/ok-ng-pill/ok-ng-pill';
-import { LookupAutocomplete, LookupOption } from '../../../shared/ui/lookup-autocomplete/lookup-autocomplete';
+import {
+  LookupAutocomplete,
+  LookupOption,
+} from '../../../shared/ui/lookup-autocomplete/lookup-autocomplete';
 import { ItemService } from '../../items/item.service';
 import { VendorService } from '../../vendors/vendor.service';
 import {
@@ -22,6 +25,7 @@ import {
   CheckSheetRow,
 } from '../inspection.model';
 import { InspectionService, UpdateHeaderInput } from '../inspection.service';
+import { DeliveryDialogComponent } from '../delivery-dialog/delivery-dialog.component';
 
 // Form 7.4.3-F1 view: header, the characteristic rows, and one Actual / OK-NG
 // column per delivery. The header is editable on drafts (supplier, date,
@@ -37,6 +41,7 @@ import { InspectionService, UpdateHeaderInput } from '../inspection.service';
     MatToolbarModule,
     OkNgPill,
     LookupAutocomplete,
+    DeliveryDialogComponent,
   ],
   templateUrl: './inspection-form.component.html',
   styleUrl: './inspection-form.scss',
@@ -56,6 +61,7 @@ export class InspectionFormComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly itemService = inject(ItemService);
   private readonly vendorService = inject(VendorService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   detail: InspectionDetail | null = null;
   rows: CheckSheetRow[] = [];
@@ -64,6 +70,10 @@ export class InspectionFormComponent {
   editing = false;
   saving = false;
 
+  // Delivery dialog: null editN adds the next column, otherwise edits that one.
+  readonly deliveryOpen = signal(false);
+  readonly editingDelivery = signal<number | null>(null);
+
   // Header edit state; item and supplier selections seed the lookup fields.
   headerForm: UpdateHeaderInput = {};
   itemSelected = signal<LookupOption | null>(null);
@@ -71,19 +81,31 @@ export class InspectionFormComponent {
 
   // LookupAutocomplete wants (query) => Observable<Option[]>.
   readonly itemSearch = (q: string): Observable<LookupOption[]> =>
-    this.itemService.list({ q, limit: 20 }).pipe(
-      map((res) => res.data.map((i) => ({ value: i.itemid, label: i.itemid, sublabel: i.name }))),
-    );
+    this.itemService
+      .list({ q, limit: 20 })
+      .pipe(
+        map((res) => res.rows.map((i) => ({ value: i.itemid, label: i.itemid, sublabel: i.name }))),
+      );
 
   readonly vendorSearch = (q: string): Observable<LookupOption[]> =>
-    this.vendorService.lookup(q).pipe(
-      map((res) =>
-        res.data.map((v) => ({ value: v.vendaccount, label: v.name, sublabel: v.vendaccount })),
-      ),
-    );
+    this.vendorService
+      .lookup(q)
+      .pipe(
+        map((res) =>
+          res.map((v) => ({ value: v.vendaccount, label: v.name, sublabel: v.vendaccount })),
+        ),
+      );
 
   get isEditable(): boolean {
     return this.detail?.editable === true;
+  }
+
+  get usedCount(): number {
+    return this.detail?.deliveries.filter((d) => d.used).length ?? 0;
+  }
+
+  get canAddDelivery(): boolean {
+    return this.isEditable && this.usedCount < COLUMNS.length;
   }
 
   delivery(n: number): DeliveryInfo | null {
@@ -115,6 +137,7 @@ export class InspectionFormComponent {
       this.snackBar.open('Gagal memuat inspeksi', 'OK', { duration: 3000 });
     } finally {
       this.loading = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -169,11 +192,26 @@ export class InspectionFormComponent {
       this.rows = buildCheckSheet(this.detail);
       this.cancelEditing();
       this.snackBar.open('Header disimpan', 'OK', { duration: 2000 });
+      this.cdr.markForCheck();
     } catch {
       this.snackBar.open('Gagal menyimpan header', 'OK', { duration: 3000 });
     } finally {
       this.saving = false;
     }
+  }
+
+  openDelivery(n: number | null): void {
+    if (!this.isEditable || !this.detail) return;
+    this.editingDelivery.set(n);
+    this.deliveryOpen.set(true);
+  }
+
+  onDeliverySaved(updated: InspectionDetail): void {
+    this.detail = updated;
+    this.rows = buildCheckSheet(updated);
+    this.deliveryOpen.set(false);
+    this.editingDelivery.set(null);
+    this.cdr.markForCheck();
   }
 
   back(): void {
