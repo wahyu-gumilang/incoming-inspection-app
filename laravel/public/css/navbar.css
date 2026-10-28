@@ -2,7 +2,7 @@
     font-family: "Manrope";
     font-style: normal;
     font-weight: 400 800;
-    font-display: swap;
+    font-display: block;
     src: url("/fonts/manrope-latin.woff2") format("woff2");
 }
 
@@ -69,7 +69,6 @@
     background: var(--nav-surface);
     backdrop-filter: blur(22px) saturate(1.15);
     -webkit-backdrop-filter: blur(22px) saturate(1.15);
-    animation: app-navbar-enter 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .app-navbar-top {
@@ -184,7 +183,9 @@
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
+    justify-content: center;
     gap: 7px;
+    width: 90px;
     height: 38px;
     padding: 0 13px;
     border-radius: 999px;
@@ -213,30 +214,39 @@
 }
 
 .app-navbar-weather-temp {
+    min-width: 36px;
     letter-spacing: -0.02em;
+    text-align: center;
 }
 
 .app-navbar-date {
     display: flex;
-    flex: 0 0 auto;
+    flex: 0 0 86px;
     flex-direction: column;
-    min-width: 78px;
+    width: 86px;
+    min-width: 0;
     color: var(--nav-text);
     line-height: 1.15;
 }
 
 .app-navbar-date strong {
+    overflow: hidden;
     font-size: 11.5px;
     font-weight: 800;
     letter-spacing: 0.01em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .app-navbar-date span {
     margin-top: 2px;
+    overflow: hidden;
     color: var(--nav-muted);
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.03em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .app-navbar-user {
@@ -595,18 +605,6 @@
     transform: translateX(-50%) scaleX(1);
 }
 
-@keyframes app-navbar-enter {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 @keyframes app-navbar-menu-in {
     from {
         opacity: 0;
@@ -711,9 +709,14 @@
     }
 
     .app-navbar-weather {
+        width: 82px;
         height: 34px;
         padding: 0 10px;
         font-size: 12px;
+    }
+
+    .app-navbar-weather-temp {
+        min-width: 34px;
     }
 
     .app-navbar-weather-icon .icon {
@@ -761,7 +764,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .app-navbar,
     .app-navbar-menu {
         animation: none;
     }

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="{{ auth()->user()->theme === 'system' ? 'light' : auth()->user()->theme }}">
+<html lang="en" class="app-html" data-theme="{{ auth()->user()->theme === 'system' ? 'light' : auth()->user()->theme }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Incoming Inspection QC') - Incoming Inspection QC</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+    <link rel="preload" href="{{ asset('fonts/manrope-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}?v={{ filemtime(public_path('css/navbar.css')) }}">
     @livewireStyles
     <script>
         (() => {
@@ -34,7 +35,7 @@
         @yield('content')
     </main>
 
-    <script src="{{ asset('js/navbar.js') }}" defer></script>
+    <script src="{{ asset('js/navbar.js') }}?v={{ filemtime(public_path('js/navbar.js')) }}" defer></script>
     @livewireScripts
 </body>
 </html>

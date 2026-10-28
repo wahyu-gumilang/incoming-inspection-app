@@ -68,6 +68,7 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | Topic | Decision |
 |---|---|
 | Navbar | Attached full-width sticky two-tier header with a bottom divider, light and dark variants. Inner content is max-width 1448px. |
+| Stability | The navbar stays at the same position across full page loads. No entry animation, stable scrollbar gutter, preloaded Manrope, fixed weather and date widths, and filemtime-versioned CSS/JS. |
 | Top tier | Chubbsafes logo only, a shorter pill search, weather badge, date and avatar menu right. |
 | Bottom tier | Only the primary navigation, centered, with Lucide outline icons and a short orange active underline. |
 | Menu | Dashboard, Inspection Form, AQL Table, Vendor, Reports and User Management. User Management is ADMIN only. |
@@ -78,7 +79,7 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | Palette | Ink and neutral surfaces with an orange accent. Light page #e9edf2; dark page #070b12. |
 | Type | Manrope, bundled locally at public/fonts/manrope-latin.woff2. No icon font. |
 | Search | Submits to the Items page and prefills the item search. |
-| Weather | Open-Meteo with Jakarta coordinates, a 15-minute browser cache and a --°C fallback. Confirm the plant location. |
+| Weather | Open-Meteo with Jakarta coordinates, a 15-minute browser cache and a --°C fallback. Keep fixed widths for the badge and date block so loading does not move the navbar. Confirm the plant location. |
 | Placeholders | Modules without features yet use a shared placeholder page so every menu link works. |
 
 ## 3. Current state

@@ -55,6 +55,10 @@ body {
     min-height: 100%;
 }
 
+html.app-html {
+    scrollbar-gutter: stable;
+}
+
 body {
     margin: 0;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;

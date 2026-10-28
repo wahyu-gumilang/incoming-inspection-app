@@ -449,9 +449,10 @@ Implemented on 2026-10-28.
 | Theme | Light, Dark and System are a segmented click control. It posts to profile.theme, saves usertable.theme and applies immediately. Revert and show an error if the save fails. |
 | Help Center | /help is a real page with sign-in, inspection and support guidance. Do not replace it with a dead link. |
 | Search | The navbar search submits to the Items page. Keep it functional; do not leave a decorative search box. |
-| Weather | The badge uses Open-Meteo with Jakarta coordinates, caches for 15 minutes and falls back to --°C. Confirm the plant location with the owner. |
+| Weather | The badge uses Open-Meteo with Jakarta coordinates, caches for 15 minutes and falls back to --°C. Keep fixed widths for the badge and date block so loading never moves them. Confirm the plant location with the owner. |
 | Responsive | Hide the date at 1100px and below. Wrap the search at 820px. The bottom navigation scrolls horizontally on phones. |
 | Page | The page content uses max-width 1448px with 24px gutters, aligned with the navbar content. |
+| Stability | No navbar entrance animation. html.app-html uses scrollbar-gutter: stable, and Manrope is preloaded. The weather badge and date block use fixed widths. CSS and JS URLs are versioned with filemtime. Full-page navigation must not move the navbar. |
 
 ## 12. Testing
 
