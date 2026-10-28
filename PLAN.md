@@ -49,6 +49,18 @@ The current PHP proof of concept is in the laravel directory. It already reads r
 from csi_db. The legacy application remains in backend and frontend for comparison and for
 the business rules that have already been tested.
 
+### 2.1 Login page decisions
+
+Date: 2026-10-28.
+
+| Topic | Decision |
+|---|---|
+| Submit loading | The Sign in button shows a futuristic loader for at least 450ms. The inputs, password toggle and Remember me checkbox are locked, but the fields stay in the submitted form. |
+| Remember me | Laravel keeps the session with usertable.remember_token. The application remembers the username in an encrypted, HttpOnly cookie for 400 days and prefills it after logout. |
+| Password autofill | The application never stores the password. The form uses autocomplete and requestSubmit so Edge and Chrome can save and autofill it. |
+| Caps Lock warning | Removed on 2026-10-28. The password eye remains. |
+| Tests | Login tests cover the loading state, remember token, remembered username, failed login and inactive users. |
+
 ## 3. Current state
 
 ### 3.1 PHP application
@@ -62,13 +74,13 @@ the business rules that have already been tested.
 | ✓ Done | Database connection | Laravel connects to the XAMPP MariaDB database csi_db. |
 | ✓ Done | Proof of concept page | GET /items reads inventtable and searches item id and name through Livewire. |
 | ✓ Done | Database setup command | `php85 artisan db:setup` loads `laravel/database/sql/baseline.sql`, the SQL migrations and the fixtures into a fresh database or `csi_db_test`. Applied migrations are recorded in `schema_migrations`. |
-| ✓ Done | Authentication and shell | Session login against usertable, roles, forced password change, profile settings, login rate limit and a functional Blade shell. The login page design was approved and finalized on 2026-10-27. Admin user management is next. |
+| ✓ Done | Authentication and shell | Session login against usertable, persistent Remember me with a remembered username and browser password-manager support, roles, forced password change, profile settings, login rate limit and a functional Blade shell. The login page design was approved and finalized on 2026-10-27. The submit loading state, locked inputs and Remember me option were approved on 2026-10-28. The Caps Lock warning was removed. Admin user management is next. |
 | ✗ Planned | Master data | Items, standards, vendors and users. |
 | ✗ Planned | AQL administration | AQL plans and plan rows. |
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
 | ✗ Planned | Dashboard | Basic database counts are shown. KPI cards, NG chart and recent inspections still need the inspection data. |
 | ✗ Planned | Reporting | Submit and check workflow, PDF output. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items and the database setup command with 30 tests and 98 assertions. Judgement and AQL tests are next. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username and the database setup command with 38 tests and 139 assertions. Judgement and AQL tests are next. |
 
 Local addresses while the migration is in progress:
 
@@ -151,6 +163,10 @@ Browser request:
 - Use Laravel CSRF protection.
 - Use Laravel's rate limiter for failed login attempts.
 - Never store authentication tokens in browser storage.
+- Use Laravel's remember-me cookie backed by usertable.remember_token.
+- Remember the username in an encrypted, HttpOnly cookie. Never store the password in the application.
+- Use autocomplete and requestSubmit so the browser password manager can save and autofill the password.
+- Lock the login form while submitting without removing the fields from the form.
 
 ### 4.4 Repository layout
 
@@ -186,7 +202,7 @@ does not rename legacy columns.
 | inspecttable | One inspection form. | Primary key inspectnum. Holds up to seven delivery columns. |
 | inspectline | Dimension lines for an inspection. | Composite primary key: inspectnum, linenum. Contains actual_1 to actual_7 and status_1 to status_7. |
 | inspectlineother | Visual, fitting and certificate lines. | Composite primary key: inspectnum, linenum. Contains actual_txt_1 to actual_txt_7 and status_1 to status_7. |
-| usertable | Application users. | userid primary key, unique username, role, password_hash, active, must_change_password, theme. |
+| usertable | Application users. | userid primary key, unique username, role, password_hash, remember_token, active, must_change_password, theme. |
 | aqlplan | AQL plans. | planid primary key. One plan is the default. |
 | aqlplanrow | Ranges for one AQL plan and category. | Primary key: planid, inspectcategory, lotmin. |
 | inspectnumseq | Inspection number sequence. | Used to generate INS-000001 style numbers. |
@@ -305,11 +321,14 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Custom user provider and guard for usertable. |
 | ✓ Done | Login, logout, session cookie and CSRF protection. |
 | ✓ Done | Login rate limit and equal error messages for unknown users and wrong passwords. |
+| ✓ Done | Final login page design, submit loading state, locked inputs, reduced-motion support and browser password-manager integration. |
+| ✓ Done | Remember me: persistent session, remembered username and encrypted username cookie. |
+| ✓ Done | Add usertable.remember_token through migration 014. |
 | ✓ Done | Middleware for authentication, active user, must_change_password and role. |
 | ✓ Done | Profile page for name, email, theme and password change. |
 | ✗ Planned | Admin user management: invite or create user, change role, deactivate, reset password. |
-| ✓ Done | Functional Blade shell with navbar, profile menu and theme switch. The login page design is final. Other page designs are pending the new mockups. |
-| ✓ Done | Feature tests for login, logout, roles, inactive users and forced password change. |
+| ✓ Done | Functional Blade shell with navbar, profile menu and theme switch. Other page designs are pending the new mockups. |
+| ✓ Done | Feature tests for login, logout, roles, inactive users, forced password change, loading state, Remember me and the remembered username. |
 
 ### Phase P2 - Master data
 
@@ -368,6 +387,7 @@ from Quality, as recorded in Section 9.
 - Unit tests cover the judgement engine and the AQL engine, including limits, Min, Max,
   empty values, negative tolerances, decimal edges and all seven columns.
 - Feature tests cover the main success path and the main error paths for every page.
+- Login tests cover the loading state, remember token, remembered username, failed login and inactive users.
 - Database tests use csi_db_test, never csi_db.
 - A database test must create or reset its own data. It must not depend on rows that another
   test changes.
@@ -396,6 +416,7 @@ Deployment checklist:
 | Topic | Open question | Current handling |
 |---|---|---|
 | Design | The old mockups are being reviewed again. | The login page is final as of 2026-10-27. Build other screens functionally until the owner approves the new direction. |
+| Remember me | Where is the password stored? | The application never stores it. It remembers the username in an encrypted HttpOnly cookie and lets Edge or Chrome save and autofill the password. |
 | PHP patch | XAMPP has PHP 8.2.12. The development runtime is 8.5.4. Production should be 8.5.12. | Use the portable PHP 8.5 runtime for development and install 8.5.12 for deployment. |
 | Development server | XAMPP Apache cannot run Laravel 13 with its bundled PHP. | Use the PHP built-in server during development. Configure XAMPP Apache or WAMP only after approval. |
 | AQL plan | The default plan and the tightened and reduced rules still need Quality confirmation. | Keep the current plan and rules as provisional. |

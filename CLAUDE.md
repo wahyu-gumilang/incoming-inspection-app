@@ -40,8 +40,10 @@ comparison and for porting tested business rules. It is not the target architect
 - The legacy UI lives in frontend.
 - The first PHP proof of concept is GET /items. It reads inventtable and searches item id
   and name through Livewire.
-- Authentication, master data, inspections, dashboard and PDF are not yet implemented in
-  PHP.
+- Authentication, the application shell, profile settings and the basic dashboard are
+  implemented in PHP. The login page is final and includes a submit loading state, a
+  remembered username and browser password-manager support.
+- Master data, AQL administration, inspections and PDF are not yet implemented in PHP.
 - Keep the legacy folders until the PHP application reaches parity and the owner approves
   the cutover.
 
@@ -245,6 +247,8 @@ controllers, Livewire components or Blade views.
 - actual_N and status_N are nullable. NULL means not measured.
 - deliverydateN used to default to today. Detect a used column from its purchase order or
   quantity, never from its date.
+- usertable.remember_token is nullable and belongs to Laravel's remember-me cookie. Never
+  expose it.
 - Legacy inspections with inspectstatus 1 are read-only.
 - oauth tables, orders and numseqtable belong to other systems. Do not modify them.
 
@@ -316,6 +320,11 @@ controllers, Livewire components or Blade views.
 - Use the Laravel session guard.
 - Authenticate against usertable, not a new users table.
 - Use the existing username and password_hash columns.
+- Use the Laravel remember-me cookie backed by usertable.remember_token. Never expose the
+  token.
+- Never store plaintext or reversible passwords for autofill. Use the browser password
+  manager through autocomplete and a real form submission. The application may remember only
+  the username in an encrypted, HttpOnly cookie.
 - Use Hash::check and never log or return password hashes.
 - Use Laravel CSRF protection for all state-changing requests.
 - Use the rate limiter for failed logins.
@@ -374,7 +383,9 @@ controllers, Livewire components or Blade views.
 
 - The old mockups in docs/design/mockups are a reference only. The owner is reviewing the
   design direction again.
-- The login page design was approved and finalized on 2026-10-27. Do not change its layout,
+- The login page design was approved and finalized on 2026-10-27. The submit loading
+  indicator, remembered username, browser password-manager integration and Remember me option
+  were approved on 2026-10-28. The Caps Lock warning was removed. Do not change its layout,
   background, card, copy or interactions without a new owner request.
 - Do not finalize styling for other pages before the new mockups are approved.
 - Use the Chubbsafes brand blue and the existing neutral palette as the starting point.
@@ -391,10 +402,25 @@ controllers, Livewire components or Blade views.
 - Meet WCAG AA contrast, visible focus and keyboard navigation.
 - Respect reduced motion.
 
+### 11.1 Login page
+
+Finalized on 2026-10-27. Updated on 2026-10-28.
+
+| Area | Rule |
+|---|---|
+| Submit loading | Show the loading state for at least 450ms. The button, username, password, password toggle and Remember me checkbox are locked, but the fields remain in the submitted form. |
+| Field locking | Use pointer-events none, tabindex -1, blur and aria-disabled. Do not use the disabled attribute, and do not mark the password field readonly. The browser password manager must still read the values. |
+| Remember me | Laravel's recaller cookie keeps the session. An encrypted, HttpOnly remembered_username cookie prefills the username after logout and is cleared when a successful login does not ask to be remembered. |
+| Password autofill | Never store plaintext or reversible passwords. Use autocomplete="username", autocomplete="current-password" and requestSubmit so Edge and Chrome can save and autofill the password. |
+| Caps Lock | The Caps Lock warning was removed. Do not reintroduce it. |
+| Motion | Respect prefers-reduced-motion for the loading, shake and checkbox animations. |
+| Tests | Cover the loading state, remember token, remembered username, failed login and inactive users. |
+
 ## 12. Testing
 
 - Write unit tests for the judgement engine and the AQL engine.
 - Write feature tests for every page and every write action.
+- Login page tests cover the loading state markup, remember token, remembered username, failed login and inactive users.
 - Test success paths and the main error paths.
 - Test exactly on each limit and 0.01 outside each limit.
 - Test Min, Max, zero tolerance, negative tolerance, qualitative tolerance and empty values.
