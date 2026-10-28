@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -17,13 +18,21 @@ use Illuminate\View\View;
 
 class LoginController extends Controller
 {
-    public function show(): View|RedirectResponse
+    private const REMEMBERED_USERNAME = 'remembered_username';
+
+    private const REMEMBERED_USERNAME_MINUTES = 60 * 24 * 400;
+
+    public function show(Request $request): View|RedirectResponse
     {
         if (Auth::check()) {
             return $this->redirectAfterLogin(Auth::user());
         }
 
-        return view('auth.login');
+        $rememberedUsername = $request->cookie(self::REMEMBERED_USERNAME);
+
+        return view('auth.login', [
+            'rememberedUsername' => is_string($rememberedUsername) ? $rememberedUsername : null,
+        ]);
     }
 
     public function login(LoginRequest $request): RedirectResponse
@@ -34,17 +43,18 @@ class LoginController extends Controller
 
         $username = $request->string('username')->trim()->toString();
         $password = $request->string('password')->toString();
+        $remember = $request->boolean('remember');
         $key = 'login:'.Str::lower($username).'|'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $minutes = (int) ceil(RateLimiter::availableIn($key) / 60);
 
             throw ValidationException::withMessages([
-                'username' => "Too many login attempts. Try again in {$minutes} minutes.",
+                'username' => 'Too many login attempts. Try again in '.$minutes.' '.Str::plural('minute', $minutes).'.',
             ]);
         }
 
-        if (! Auth::attempt(['username' => $username, 'password' => $password], false)) {
+        if (! Auth::attempt(['username' => $username, 'password' => $password], $remember)) {
             RateLimiter::hit($key, 900);
 
             throw ValidationException::withMessages([
@@ -69,6 +79,16 @@ class LoginController extends Controller
         RateLimiter::clear($key);
         $request->session()->regenerate();
         $user->forceFill(['last_login_at' => now()])->save();
+
+        if ($remember) {
+            Cookie::queue(
+                self::REMEMBERED_USERNAME,
+                $username,
+                self::REMEMBERED_USERNAME_MINUTES,
+            );
+        } else {
+            Cookie::queue(Cookie::forget(self::REMEMBERED_USERNAME));
+        }
 
         if ($user->must_change_password) {
             return redirect()->route('password.change');

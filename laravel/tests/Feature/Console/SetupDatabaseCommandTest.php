@@ -48,13 +48,14 @@ class SetupDatabaseCommandTest extends TestCase
 
         $connection = DB::connection(self::CONNECTION);
 
-        $this->assertSame(13, $connection->table('schema_migrations')->count());
+        $this->assertSame(14, $connection->table('schema_migrations')->count());
         $this->assertSame(3, $connection->table('inventtable')->count());
         $this->assertSame(6, $connection->table('usertable')->count());
         $this->assertTrue($connection->getSchemaBuilder()->hasTable('aqlplanrow'));
         $this->assertTrue($connection->getSchemaBuilder()->hasColumn('inspectline', 'tolerance_txt'));
         $this->assertTrue($connection->getSchemaBuilder()->hasColumn('inspecttable', 'samplesize1'));
         $this->assertTrue($connection->getSchemaBuilder()->hasColumn('inspecttable', 'inspectbyid'));
+        $this->assertTrue($connection->getSchemaBuilder()->hasColumn('usertable', 'remember_token'));
     }
 
     public function test_a_second_run_has_no_pending_migrations(): void

@@ -24,7 +24,7 @@
         </ul>
     </div>
 
-    <form method="POST" action="{{ route('login.store') }}" class="auth-form" novalidate>
+    <form method="POST" action="{{ route('login.store') }}" class="auth-form" autocomplete="on" novalidate>
         @csrf
 
         <div class="auth-field">
@@ -39,7 +39,7 @@
                     id="username"
                     type="text"
                     name="username"
-                    value="{{ old('username') }}"
+                    value="{{ old('username', $rememberedUsername ?? '') }}"
                     placeholder="Enter your username"
                     autocomplete="username"
                     autocapitalize="none"
@@ -87,18 +87,31 @@
                     </svg>
                 </button>
             </div>
-            <p class="caps-warning" id="caps-warning" role="status" aria-live="polite" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 4.5 21 20H3L12 4.5Z"></path>
-                    <path d="M12 9v5"></path>
-                    <path d="M12 17h.01"></path>
-                </svg>
-                Caps Lock is on.
-            </p>
         </div>
 
-        <button class="auth-submit" type="submit">Sign in</button>
+        <div class="auth-options">
+            <label class="auth-remember">
+                <input id="remember" type="checkbox" name="remember" value="1" @checked(old('remember'))>
+                <span class="auth-remember-box" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" fill="none" focusable="false">
+                        <path d="M3 8.5 6.2 11.7 13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                </span>
+                <span class="auth-remember-text">Remember me</span>
+            </label>
+        </div>
+
+        <button class="auth-submit" type="submit">
+            <span class="auth-submit-loader" aria-hidden="true">
+                <span class="auth-submit-loader-ring"></span>
+                <span class="auth-submit-loader-core"></span>
+            </span>
+            <span class="auth-submit-label">Sign in</span>
+            <span class="auth-submit-loading-label">Signing in</span>
+        </button>
     </form>
+
+    <span class="auth-status" id="login-status" role="status" aria-live="polite"></span>
 
     <p class="auth-help">Need access? Contact your system administrator.</p>
 @endsection
@@ -112,13 +125,59 @@
             const toggle = document.querySelector('[data-password-toggle]');
             const eyeOpen = toggle?.querySelector('.eye-open');
             const eyeClosed = toggle?.querySelector('.eye-closed');
-            const warning = document.getElementById('caps-warning');
             const clientError = document.getElementById('client-error');
             const clientErrorMessage = document.getElementById('client-error-message');
 
             if (!form || !username || !password) {
                 return;
             }
+
+            const submitButton = form.querySelector('.auth-submit');
+            const remember = form.querySelector('input[name="remember"]');
+            const loginStatus = document.getElementById('login-status');
+            let submitting = false;
+            let nativeSubmit = false;
+
+            const setLoading = (loading) => {
+                submitting = loading;
+                form.classList.toggle('is-loading', loading);
+                form.setAttribute('aria-busy', loading ? 'true' : 'false');
+                submitButton?.classList.toggle('is-loading', loading);
+
+                [username, password].forEach((input) => {
+                    input.tabIndex = loading ? -1 : 0;
+
+                    if (loading) {
+                        input.setAttribute('aria-disabled', 'true');
+                        input.blur();
+                    } else {
+                        input.removeAttribute('aria-disabled');
+                    }
+                });
+
+                if (toggle) {
+                    toggle.disabled = loading;
+                }
+
+                if (remember) {
+                    remember.tabIndex = loading ? -1 : 0;
+
+                    if (loading) {
+                        remember.setAttribute('aria-disabled', 'true');
+                        remember.blur();
+                    } else {
+                        remember.removeAttribute('aria-disabled');
+                    }
+                }
+
+                if (submitButton) {
+                    submitButton.disabled = loading;
+                }
+
+                if (loginStatus) {
+                    loginStatus.textContent = loading ? 'Signing in' : '';
+                }
+            };
 
             if (window.matchMedia('(min-width: 720px)').matches) {
                 username.focus({ preventScroll: true });
@@ -147,10 +206,36 @@
             };
 
             form.addEventListener('submit', (event) => {
+                if (nativeSubmit) {
+                    nativeSubmit = false;
+
+                    return;
+                }
+
+                if (submitting) {
+                    event.preventDefault();
+
+                    return;
+                }
+
                 const usernameEmpty = username.value.trim() === '';
                 const passwordEmpty = password.value === '';
 
                 if (!usernameEmpty && !passwordEmpty) {
+                    event.preventDefault();
+                    setLoading(true);
+
+                    // Let the browser paint the loading state before navigating.
+                    window.setTimeout(() => {
+                        try {
+                            nativeSubmit = true;
+                            form.requestSubmit();
+                        } catch {
+                            nativeSubmit = false;
+                            form.submit();
+                        }
+                    }, 450);
+
                     return;
                 }
 
@@ -184,6 +269,8 @@
                 }
             });
 
+            window.addEventListener('pageshow', () => setLoading(false));
+
             if (!toggle) {
                 return;
             }
@@ -201,25 +288,6 @@
                 }
 
                 password.focus();
-            });
-
-            const updateCapsLock = (event) => {
-                if (!warning) {
-                    return;
-                }
-
-                const active = typeof event.getModifierState === 'function'
-                    && event.getModifierState('CapsLock');
-
-                warning.hidden = !active;
-            };
-
-            password.addEventListener('keydown', updateCapsLock);
-            password.addEventListener('keyup', updateCapsLock);
-            password.addEventListener('blur', () => {
-                if (warning) {
-                    warning.hidden = true;
-                }
             });
         })();
     </script>
