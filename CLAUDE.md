@@ -409,7 +409,7 @@ Finalized on 2026-10-27. Updated on 2026-10-28.
 | Area | Rule |
 |---|---|
 | Submit loading | Show the loading state for at least 450ms. The button, username, password, password toggle and Remember me checkbox are locked, but the fields remain in the submitted form. |
-| Field locking | Use pointer-events none, tabindex -1, blur and aria-disabled. Do not use the disabled attribute, and do not mark the password field readonly. The browser password manager must still read the values. |
+| Field locking | Use pointer-events none, tabindex -1, blur and aria-disabled on the inputs. Do not use the disabled attribute on them, and do not mark the password field readonly. The browser password manager must still read the values. |
 | Remember me | Laravel's recaller cookie keeps the session. An encrypted, HttpOnly remembered_username cookie prefills the username after logout and is cleared when a successful login does not ask to be remembered. |
 | Password autofill | Never store plaintext or reversible passwords. Use autocomplete="username", autocomplete="current-password" and requestSubmit so Edge and Chrome can save and autofill the password. |
 | Caps Lock | The Caps Lock warning was removed. Do not reintroduce it. |
