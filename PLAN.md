@@ -61,14 +61,14 @@ the business rules that have already been tested.
 | ✓ Done | Livewire | Livewire 4.4.8. |
 | ✓ Done | Database connection | Laravel connects to the XAMPP MariaDB database csi_db. |
 | ✓ Done | Proof of concept page | GET /items reads inventtable and searches item id and name through Livewire. |
-| ✗ Next | Database setup command | A PHP command must apply the legacy baseline and SQL migrations to a fresh database and to csi_db_test. |
+| ✓ Done | Database setup command | `php85 artisan db:setup` loads `laravel/database/sql/baseline.sql`, the SQL migrations and the fixtures into a fresh database or `csi_db_test`. Applied migrations are recorded in `schema_migrations`. |
 | ✓ Done | Authentication and shell | Session login against usertable, roles, forced password change, profile settings, login rate limit and a functional Blade shell. The login page design was approved and finalized on 2026-10-27. Admin user management is next. |
 | ✗ Planned | Master data | Items, standards, vendors and users. |
 | ✗ Planned | AQL administration | AQL plans and plan rows. |
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
 | ✗ Planned | Dashboard | Basic database counts are shown. KPI cards, NG chart and recent inspections still need the inspection data. |
 | ✗ Planned | Reporting | Submit and check workflow, PDF output. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard and items with 20 tests and 77 assertions. Judgement and AQL tests are next. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items and the database setup command with 30 tests and 98 assertions. Judgement and AQL tests are next. |
 
 Local addresses while the migration is in progress:
 
@@ -102,8 +102,8 @@ allowed there until the PHP application is complete.
 | Asset | Location | Reuse |
 |---|---|---|
 | Database schema | docs/schema.sql and backend/db/baseline.sql | Keep the existing tables and columns for the PHP application. |
-| SQL migrations | backend/db/migrations | Apply them to a fresh database through a Laravel command. |
-| Test fixtures | backend/db/seeds/test-fixtures.sql | Reuse for the PHP test database. |
+| SQL migrations | backend/db/migrations and laravel/database/sql/migrations | Keep both copies in sync until cutover. `db:setup` applies the laravel copy. |
+| Test fixtures | backend/db/seeds/test-fixtures.sql and laravel/database/sql/fixtures | Reuse for the PHP test database. |
 | OK and NG rules | backend/services/judgement.js | Port the rules and test cases to PHP. |
 | AQL rules | backend/services/aql.js | Port the rules and test cases to PHP. |
 | Paper form | docs/chek sheet-qhse.pdf | Source of truth for the PDF layout. |
@@ -296,7 +296,7 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Read real data from inventtable and inventinspectitem. |
 | ✓ Done | Add a basic PHPUnit feature test for the /items page against csi_db_test. |
 | ✓ Done | Add a development script (serve) that starts the PHP built-in server with the portable runtime. |
-| ✗ Next | Add a PHP command that applies baseline.sql, the SQL migrations and the fixtures to a test database. |
+| ✓ Done | Add a PHP command that applies baseline.sql, the SQL migrations and the fixtures to a test database. |
 
 ### Phase P1 - Authentication and application shell
 

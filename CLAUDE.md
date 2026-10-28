@@ -112,6 +112,9 @@ Commands:
 | php85 vendor/bin/phpunit --filter=Judgement | Run one test group. |
 | php85 vendor/bin/pint | Format PHP code. |
 | php85 vendor/bin/pint --test | Check formatting without writing. |
+| DB_DATABASE=csi_db_test php85 artisan db:setup --fresh --seed | Rebuild csi_db_test from the baseline, migrations and fixtures. |
+| php85 artisan db:setup --status | Show applied and pending migrations. |
+| php85 artisan db:setup --force | Apply pending migrations to csi_db after a backup. |
 
 Important:
 
@@ -249,6 +252,10 @@ controllers, Livewire components or Blade views.
 
 - The application database is the existing csi_db.
 - The schema is based on backend/db/baseline.sql and the SQL files in backend/db/migrations.
+- The PHP copies used by the application live in laravel/database/sql. Keep them in sync with
+  backend/db until cutover, and add every new migration to both directories.
+- Rebuild csi_db_test with DB_DATABASE=csi_db_test php85 artisan db:setup --fresh --seed.
+  The command refuses a database whose name does not end with _test unless --force is given.
 - Do not rename or drop legacy columns.
 - Do not edit an applied SQL migration. Add a new numbered migration instead.
 - MariaDB commits DDL immediately. Keep each migration file to statements that are atomic on

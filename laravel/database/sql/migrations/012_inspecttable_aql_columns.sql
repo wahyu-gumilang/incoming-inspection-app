@@ -1,0 +1,33 @@
+-- What the AQL plan gave each delivery column when the inspection was saved
+-- (PLAN.md §2.3): editing the AQL table never changes saved inspections.
+-- concessionnoteN is required when judgmentN is Concession.
+ALTER TABLE inspecttable
+  ADD COLUMN IF NOT EXISTS aqlplanid int(11) NULL DEFAULT NULL AFTER judgment7,
+  ADD COLUMN IF NOT EXISTS samplesize1 int(11) NULL DEFAULT NULL AFTER aqlplanid,
+  ADD COLUMN IF NOT EXISTS samplesize2 int(11) NULL DEFAULT NULL AFTER samplesize1,
+  ADD COLUMN IF NOT EXISTS samplesize3 int(11) NULL DEFAULT NULL AFTER samplesize2,
+  ADD COLUMN IF NOT EXISTS samplesize4 int(11) NULL DEFAULT NULL AFTER samplesize3,
+  ADD COLUMN IF NOT EXISTS samplesize5 int(11) NULL DEFAULT NULL AFTER samplesize4,
+  ADD COLUMN IF NOT EXISTS samplesize6 int(11) NULL DEFAULT NULL AFTER samplesize5,
+  ADD COLUMN IF NOT EXISTS samplesize7 int(11) NULL DEFAULT NULL AFTER samplesize6,
+  ADD COLUMN IF NOT EXISTS acceptnum1 int(11) NULL DEFAULT NULL AFTER samplesize7,
+  ADD COLUMN IF NOT EXISTS acceptnum2 int(11) NULL DEFAULT NULL AFTER acceptnum1,
+  ADD COLUMN IF NOT EXISTS acceptnum3 int(11) NULL DEFAULT NULL AFTER acceptnum2,
+  ADD COLUMN IF NOT EXISTS acceptnum4 int(11) NULL DEFAULT NULL AFTER acceptnum3,
+  ADD COLUMN IF NOT EXISTS acceptnum5 int(11) NULL DEFAULT NULL AFTER acceptnum4,
+  ADD COLUMN IF NOT EXISTS acceptnum6 int(11) NULL DEFAULT NULL AFTER acceptnum5,
+  ADD COLUMN IF NOT EXISTS acceptnum7 int(11) NULL DEFAULT NULL AFTER acceptnum6,
+  ADD COLUMN IF NOT EXISTS rejectnum1 int(11) NULL DEFAULT NULL AFTER acceptnum7,
+  ADD COLUMN IF NOT EXISTS rejectnum2 int(11) NULL DEFAULT NULL AFTER rejectnum1,
+  ADD COLUMN IF NOT EXISTS rejectnum3 int(11) NULL DEFAULT NULL AFTER rejectnum2,
+  ADD COLUMN IF NOT EXISTS rejectnum4 int(11) NULL DEFAULT NULL AFTER rejectnum3,
+  ADD COLUMN IF NOT EXISTS rejectnum5 int(11) NULL DEFAULT NULL AFTER rejectnum4,
+  ADD COLUMN IF NOT EXISTS rejectnum6 int(11) NULL DEFAULT NULL AFTER rejectnum5,
+  ADD COLUMN IF NOT EXISTS rejectnum7 int(11) NULL DEFAULT NULL AFTER rejectnum6,
+  ADD COLUMN IF NOT EXISTS concessionnote1 varchar(255) NULL DEFAULT NULL AFTER rejectnum7,
+  ADD COLUMN IF NOT EXISTS concessionnote2 varchar(255) NULL DEFAULT NULL AFTER concessionnote1,
+  ADD COLUMN IF NOT EXISTS concessionnote3 varchar(255) NULL DEFAULT NULL AFTER concessionnote2,
+  ADD COLUMN IF NOT EXISTS concessionnote4 varchar(255) NULL DEFAULT NULL AFTER concessionnote3,
+  ADD COLUMN IF NOT EXISTS concessionnote5 varchar(255) NULL DEFAULT NULL AFTER concessionnote4,
+  ADD COLUMN IF NOT EXISTS concessionnote6 varchar(255) NULL DEFAULT NULL AFTER concessionnote5,
+  ADD COLUMN IF NOT EXISTS concessionnote7 varchar(255) NULL DEFAULT NULL AFTER concessionnote6;
