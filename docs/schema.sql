@@ -219,6 +219,7 @@ CREATE TABLE `usertable` (
   `role` varchar(20) NOT NULL,
   `password_hash` varchar(100) NOT NULL,
   `remember_token` varchar(100) DEFAULT NULL,
+  `avatar_path` varchar(255) DEFAULT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `must_change_password` tinyint(1) NOT NULL DEFAULT 0,
   `theme` varchar(10) NOT NULL DEFAULT 'light',

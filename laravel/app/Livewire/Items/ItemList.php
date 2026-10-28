@@ -12,6 +12,11 @@ class ItemList extends Component
 {
     public string $search = '';
 
+    public function mount(string $search = ''): void
+    {
+        $this->search = trim($search);
+    }
+
     public function render(): View
     {
         $items = app(ItemRepository::class);

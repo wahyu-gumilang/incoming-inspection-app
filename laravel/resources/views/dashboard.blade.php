@@ -37,8 +37,8 @@
     <div class="card">
         <h2>Current phase</h2>
         <p>
-            Authentication and the application shell are in place. Master data, AQL administration,
-            inspections and PDF reporting are the next milestones.
+            The new application shell and navigation are in place. Master data, AQL
+            administration, inspections and PDF reporting are the next milestones.
         </p>
     </div>
 @endsection

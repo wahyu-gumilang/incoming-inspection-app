@@ -92,7 +92,10 @@ Inside laravel, follow standard Laravel structure:
 | app/Http/Requests | Validation. |
 | app/Livewire | Livewire components when a separate class is needed. |
 | resources/views | Blade views and single-file Livewire components. |
-| resources/css and resources/js | UI assets. |
+| resources/views/components | Reusable Blade components such as the app navbar and icons. |
+| resources/css and resources/js | Vite entry assets. The application currently serves public/css and public/js directly. |
+| public/css and public/js | Styles and browser scripts loaded by the Blade layouts. |
+| storage/app/public/avatars | Uploaded profile photos. Never commit them. |
 | database/sql | Legacy baseline, SQL migrations and fixtures. |
 | tests/Unit | Pure business rule tests. |
 | tests/Feature | Page and database tests. |
@@ -249,6 +252,8 @@ controllers, Livewire components or Blade views.
   quantity, never from its date.
 - usertable.remember_token is nullable and belongs to Laravel's remember-me cookie. Never
   expose it.
+- usertable.avatar_path is nullable. A non-null path points to storage/app/public and is
+  served by the avatars route. Null falls back to the user's initials.
 - Legacy inspections with inspectstatus 1 are read-only.
 - oauth tables, orders and numseqtable belong to other systems. Do not modify them.
 
@@ -258,6 +263,8 @@ controllers, Livewire components or Blade views.
 - The schema is based on backend/db/baseline.sql and the SQL files in backend/db/migrations.
 - The PHP copies used by the application live in laravel/database/sql. Keep them in sync with
   backend/db until cutover, and add every new migration to both directories.
+- Store profile photos under storage/app/public/avatars and serve them through the avatars
+  route. Never commit uploaded files.
 - Rebuild csi_db_test with DB_DATABASE=csi_db_test php85 artisan db:setup --fresh --seed.
   The command refuses a database whose name does not end with _test unless --force is given.
 - Do not rename or drop legacy columns.
@@ -367,6 +374,12 @@ controllers, Livewire components or Blade views.
 ## 10. Blade and Livewire conventions
 
 - Use Blade components for repeated layout pieces.
+- The authenticated shell uses x-app-navbar from resources/views/components/app-navbar.blade.php.
+  Keep its two-tier layout and appearance in public/css/navbar.css.
+- Use x-icon from resources/views/components/icon.blade.php for inline Lucide outline icons.
+  Do not add an icon font.
+- public/js/navbar.js only handles the weather badge, the user menu and the search shortcut.
+  Do not put business rules there.
 - Use class-based Livewire 4 components under app/Livewire with Blade views under
   resources/views/livewire. Keep single-file components only for very small isolated widgets.
 - Keep component state small and typed.
@@ -381,18 +394,21 @@ controllers, Livewire components or Blade views.
 
 ## 11. UI and design
 
-- The old mockups in docs/design/mockups are a reference only. The owner is reviewing the
-  design direction again.
+- The old mockups in docs/design/mockups are a reference only. The login page and the
+  authenticated app shell are the current design.
 - The login page design was approved and finalized on 2026-10-27. The submit loading
   indicator, remembered username, browser password-manager integration and Remember me option
   were approved on 2026-10-28. The Caps Lock warning was removed. Do not change its layout,
   background, card, copy or interactions without a new owner request.
 - Do not finalize styling for other pages before the new mockups are approved.
-- Use the Chubbsafes brand blue and the existing neutral palette as the starting point.
-- Use the Inter font and the Material Symbols Rounded icon set.
+- The login page uses the Chubbsafes blue and dark glass palette. The authenticated shell uses
+  an ink and neutral palette with an orange accent. The logo keeps the brand color.
+- The login page uses Inter. The authenticated shell uses Manrope, bundled at
+  public/fonts/manrope-latin.woff2, and inline Lucide outline icons. Do not add an icon font.
 - Support light and dark themes.
 - Support desktop, tablet and phone widths.
-- Use one top navigation bar. Do not add a sidebar.
+- Use one top navigation bar. The authenticated shell implements it as an attached two-tier top
+  bar. Do not add a sidebar.
 - Every create or edit action opens a dialog. On phones the dialog uses the full screen.
 - The check sheet keeps the structure of Form 7.4.3-F1. It may look more modern, but the
   rows, columns and footer must not drift from the paper form.
@@ -416,11 +432,34 @@ Finalized on 2026-10-27. Updated on 2026-10-28.
 | Motion | Respect prefers-reduced-motion for the loading, shake and checkbox animations. |
 | Tests | Cover the loading state, remember token, remembered username, failed login and inactive users. |
 
+### 11.2 Application shell
+
+Implemented on 2026-10-28.
+
+| Area | Rule |
+|---|---|
+| Navbar | Attached full-width sticky header with a bottom divider, light and dark variants. Inner content is max-width 1448px with 24px gutters. |
+| Top tier | Chubbsafes logo only, a shorter pill search, weather badge, date and avatar menu. |
+| Bottom tier | Only the primary navigation, centered. Icons are 17px Lucide outlines; the active item has a short orange underline. |
+| Palette | Ink and neutral surfaces with an orange accent. The light page background is #e9edf2; the dark page background is #070b12. |
+| Type | Manrope for the authenticated shell. Use tabular numbers for weather, dates and metrics. |
+| Navigation | Dashboard, Inspection Form, AQL Table, Vendor, Reports and User Management. User Management is ADMIN only. |
+| User menu | Compact disclosure panel (max 280px) with a sharp upward notch under the avatar. The profile header shows only the name and role. Account Option contains User Setting, Help Center and Sign out. A second divider precedes the theme control. |
+| Avatar | Show usertable.avatar_path through the avatars route when present; otherwise show the user's initials. Upload and remove on the profile page. Never commit uploaded photos. |
+| Theme | Light, Dark and System are a segmented click control. It posts to profile.theme, saves usertable.theme and applies immediately. Revert and show an error if the save fails. |
+| Help Center | /help is a real page with sign-in, inspection and support guidance. Do not replace it with a dead link. |
+| Search | The navbar search submits to the Items page. Keep it functional; do not leave a decorative search box. |
+| Weather | The badge uses Open-Meteo with Jakarta coordinates, caches for 15 minutes and falls back to --°C. Confirm the plant location with the owner. |
+| Responsive | Hide the date at 1100px and below. Wrap the search at 820px. The bottom navigation scrolls horizontally on phones. |
+| Page | The page content uses max-width 1448px with 24px gutters, aligned with the navbar content. |
+
 ## 12. Testing
 
 - Write unit tests for the judgement engine and the AQL engine.
 - Write feature tests for every page and every write action.
 - Login page tests cover the loading state markup, remember token, remembered username, failed login and inactive users.
+- Navbar tests cover the primary menu, admin-only user management, module placeholders, the search query, the user menu, Help Center and theme persistence.
+- Profile tests cover avatar upload, removal, validation and serving.
 - Test success paths and the main error paths.
 - Test exactly on each limit and 0.01 outside each limit.
 - Test Min, Max, zero tolerance, negative tolerance, qualitative tolerance and empty values.

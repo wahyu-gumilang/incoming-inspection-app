@@ -28,6 +28,7 @@ class User extends Authenticatable
         'email',
         'role',
         'password_hash',
+        'avatar_path',
         'active',
         'must_change_password',
         'theme',

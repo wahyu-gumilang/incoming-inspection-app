@@ -43,7 +43,7 @@ The owner confirmed the final technology direction:
 | Development | XAMPP MariaDB and phpMyAdmin, with PHP 8.5 CLI for the application. |
 | Deployment | WAMP with Apache and PHP 8.5. |
 | Legacy code | The Node/Express backend and the Angular frontend are kept as a reference until the PHP application reaches parity. |
-| Design | The old mockups are a reference only. The final UI direction will be reviewed and approved again before the final Blade and Livewire screens are built. |
+| Design | The old mockups are a reference only. The login page is final. The authenticated shell uses the two-tier navbar from 2026-10-28. Other screens follow its tokens. |
 
 The current PHP proof of concept is in the laravel directory. It already reads real data
 from csi_db. The legacy application remains in backend and frontend for comparison and for
@@ -61,6 +61,26 @@ Date: 2026-10-28.
 | Caps Lock warning | Removed on 2026-10-28. The password eye remains. |
 | Tests | Login tests cover the loading state, remember token, remembered username, failed login and inactive users. |
 
+### 2.2 Application shell decisions
+
+Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.webp`. Adapted to an attached full-width header.
+
+| Topic | Decision |
+|---|---|
+| Navbar | Attached full-width sticky two-tier header with a bottom divider, light and dark variants. Inner content is max-width 1448px. |
+| Top tier | Chubbsafes logo only, a shorter pill search, weather badge, date and avatar menu right. |
+| Bottom tier | Only the primary navigation, centered, with Lucide outline icons and a short orange active underline. |
+| Menu | Dashboard, Inspection Form, AQL Table, Vendor, Reports and User Management. User Management is ADMIN only. |
+| User menu | Compact disclosure panel (max 280px) with an upward notch under the avatar. The header shows the name and role only. Account Option contains User Setting, Help Center and Sign out. |
+| Avatar | usertable.avatar_path photo when present; initials otherwise. Upload and remove on the Profile page. |
+| Theme | Light, Dark and System segmented control below a divider. It saves usertable.theme and applies immediately. |
+| Help | /help is a real Help Center page with access, inspection and support guidance. |
+| Palette | Ink and neutral surfaces with an orange accent. Light page #e9edf2; dark page #070b12. |
+| Type | Manrope, bundled locally at public/fonts/manrope-latin.woff2. No icon font. |
+| Search | Submits to the Items page and prefills the item search. |
+| Weather | Open-Meteo with Jakarta coordinates, a 15-minute browser cache and a --°C fallback. Confirm the plant location. |
+| Placeholders | Modules without features yet use a shared placeholder page so every menu link works. |
+
 ## 3. Current state
 
 ### 3.1 PHP application
@@ -75,12 +95,13 @@ Date: 2026-10-28.
 | ✓ Done | Proof of concept page | GET /items reads inventtable and searches item id and name through Livewire. |
 | ✓ Done | Database setup command | `php85 artisan db:setup` loads `laravel/database/sql/baseline.sql`, the SQL migrations and the fixtures into a fresh database or `csi_db_test`. Applied migrations are recorded in `schema_migrations`. |
 | ✓ Done | Authentication and shell | Session login against usertable, persistent Remember me with a remembered username and browser password-manager support, roles, forced password change, profile settings, login rate limit and a functional Blade shell. The login page design was approved and finalized on 2026-10-27. The submit loading state, locked inputs and Remember me option were approved on 2026-10-28. The Caps Lock warning was removed. Admin user management is next. |
+| ✓ Done | Application shell and navigation | Attached two-tier header with logo, pill search, live weather, date, avatar menu and centered module navigation. Manrope, Lucide outline icons, light and dark themes and responsive layouts. |
 | ✗ Planned | Master data | Items, standards, vendors and users. |
 | ✗ Planned | AQL administration | AQL plans and plan rows. |
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
 | ✗ Planned | Dashboard | Basic database counts are shown. KPI cards, NG chart and recent inspections still need the inspection data. |
 | ✗ Planned | Reporting | Submit and check workflow, PDF output. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username and the database setup command with 38 tests and 139 assertions. Judgement and AQL tests are next. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos and the database setup command with 52 tests and 202 assertions. Judgement and AQL tests are next. |
 
 Local addresses while the migration is in progress:
 
@@ -325,10 +346,13 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Remember me: persistent session, remembered username and encrypted username cookie. |
 | ✓ Done | Add usertable.remember_token through migration 014. |
 | ✓ Done | Middleware for authentication, active user, must_change_password and role. |
-| ✓ Done | Profile page for name, email, theme and password change. |
+| ✓ Done | Profile page for photo, name, email, theme and password change. |
+| ✓ Done | Profile photo upload and removal with photo-or-initials avatars. |
+| ✓ Done | Two-tier application header with logo, pill search, live weather, date, avatar menu and centered module navigation. |
+| ✓ Done | User menu with Account Option, Help Center and a persistent Light/Dark/System theme control. |
 | ✗ Planned | Admin user management: invite or create user, change role, deactivate, reset password. |
-| ✓ Done | Functional Blade shell with navbar, profile menu and theme switch. Other page designs are pending the new mockups. |
-| ✓ Done | Feature tests for login, logout, roles, inactive users, forced password change, loading state, Remember me and the remembered username. |
+| ✓ Done | Functional Blade shell with the new navbar, avatar menu and theme support. Other page designs will follow the new tokens. |
+| ✓ Done | Feature tests for login, logout, roles, inactive users, forced password change, loading state, Remember me, the remembered username, the navbar, the user menu, Help Center, theme persistence and profile photos. |
 
 ### Phase P2 - Master data
 
@@ -388,6 +412,8 @@ from Quality, as recorded in Section 9.
   empty values, negative tolerances, decimal edges and all seven columns.
 - Feature tests cover the main success path and the main error paths for every page.
 - Login tests cover the loading state, remember token, remembered username, failed login and inactive users.
+- Navbar tests cover the primary menu, admin-only user management, module placeholders, the search query, the user menu, Help Center and theme persistence.
+- Profile tests cover avatar upload, removal, validation and serving.
 - Database tests use csi_db_test, never csi_db.
 - A database test must create or reset its own data. It must not depend on rows that another
   test changes.
@@ -415,7 +441,8 @@ Deployment checklist:
 
 | Topic | Open question | Current handling |
 |---|---|---|
-| Design | The old mockups are being reviewed again. | The login page is final as of 2026-10-27. Build other screens functionally until the owner approves the new direction. |
+| Design | The old mockups are being reviewed again. | The login page is final as of 2026-10-27. The authenticated shell uses the attached two-tier header as of 2026-10-28. Build other screens with its tokens. |
+| Weather | Which location should the navbar weather show? | Open-Meteo with Jakarta coordinates, cached for 15 minutes. Confirm the plant location. |
 | Remember me | Where is the password stored? | The application never stores it. It remembers the username in an encrypted HttpOnly cookie and lets Edge or Chrome save and autofill the password. |
 | PHP patch | XAMPP has PHP 8.2.12. The development runtime is 8.5.4. Production should be 8.5.12. | Use the portable PHP 8.5 runtime for development and install 8.5.12 for deployment. |
 | Development server | XAMPP Apache cannot run Laravel 13 with its bundled PHP. | Use the PHP built-in server during development. Configure XAMPP Apache or WAMP only after approval. |
