@@ -89,6 +89,8 @@ body {
     --ng-bg: #fee4e2;
     --warn: #b54708;
     --warn-bg: #fef0c7;
+    --form-border-focus: #98a2b3;
+    --form-ring: rgba(152, 162, 179, 0.22);
     --radius: 18px;
     --radius-sm: 12px;
     --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 12px 32px rgba(16, 24, 40, 0.06);
@@ -117,6 +119,8 @@ body {
     --ng-bg: rgba(251, 113, 133, 0.16);
     --warn: #fbbf24;
     --warn-bg: rgba(251, 191, 36, 0.14);
+    --form-border-focus: #64748b;
+    --form-ring: rgba(148, 163, 184, 0.18);
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 18px 48px rgba(0, 0, 0, 0.35);
 }
 
@@ -493,9 +497,21 @@ p {
 }
 
 .input:focus,
-.select:focus {
-    border-color: var(--brand);
-    outline: 3px solid color-mix(in srgb, var(--brand) 18%, transparent);
+.select:focus,
+.app-body input:not([type="checkbox"]):not([type="radio"]):not([data-navbar-search]):focus,
+.app-body select:focus,
+.app-body textarea:focus {
+    border-color: var(--form-border-focus);
+    outline: 3px solid var(--form-ring);
+}
+
+.app-body .btn:focus-visible {
+    outline-color: var(--form-ring);
+}
+
+.app-body input[type="checkbox"]:focus-visible,
+.app-body input[type="radio"]:focus-visible {
+    outline-color: var(--form-ring);
 }
 
 .field-error {

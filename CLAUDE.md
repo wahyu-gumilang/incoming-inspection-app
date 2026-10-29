@@ -338,6 +338,8 @@ controllers, Livewire components or Blade views.
 - Re-read the user's active state and role on each request.
 - Use middleware for role checks: INSPECTOR, CHECKER, ADMIN.
 - An Admin cannot demote, deactivate or reset their own account.
+- Admin user management generates a temporary password, sets must_change_password and shows
+  the password once. Never store or display it again.
 - Deactivate users; do not delete them, so names on old inspections remain valid.
 - force password change must block all pages except the profile password page and logout.
 
@@ -443,6 +445,7 @@ Implemented on 2026-10-28.
 | Bottom tier | Only the primary navigation, centered. Icons are 17px Lucide outlines; the active item has a short orange underline. |
 | Palette | Ink and neutral surfaces with an orange accent. The light page background is #e9edf2; the dark page background is #070b12. |
 | Type | Manrope for the authenticated shell. Use tabular numbers for weather, dates and metrics. |
+| Forms | Use the gray --form-border-focus and --form-ring tokens for inputs, selects, textareas and buttons. Do not use the near-black brand for input focus. The users filters and the form role select use x-filter-select with a notched panel and coloured option text. |
 | Navigation | Dashboard, Inspection Form, AQL Table, Vendor, Reports and User Management. User Management is ADMIN only. |
 | User menu | Compact disclosure panel (max 280px) with a sharp upward notch under the avatar. The profile header shows only the name and role. Account Option contains User Setting, Help Center and Sign out. A second divider precedes the theme control. |
 | Avatar | Show usertable.avatar_path through the avatars route when present; otherwise show the user's initials. Upload and remove on the profile page. Never commit uploaded photos. |
@@ -461,6 +464,7 @@ Implemented on 2026-10-28.
 - Login page tests cover the loading state markup, remember token, remembered username, failed login and inactive users.
 - Navbar tests cover the primary menu, admin-only user management, module placeholders, the search query, the user menu, Help Center and theme persistence.
 - Profile tests cover avatar upload, removal, validation and serving.
+- User management tests cover admin access, search and filters, create with a temporary password, edit, self-protection, activation and password reset.
 - Test success paths and the main error paths.
 - Test exactly on each limit and 0.01 outside each limit.
 - Test Min, Max, zero tolerance, negative tolerance, qualitative tolerance and empty values.

@@ -63,6 +63,40 @@
             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             @break
 
+        @case('plus')
+            <path d="M5 12h14"></path>
+            <path d="M12 5v14"></path>
+            @break
+
+        @case('pencil')
+            <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
+            <path d="m15 5 4 4"></path>
+            @break
+
+        @case('key')
+            <circle cx="7.5" cy="15.5" r="5.5"></circle>
+            <path d="m21 2-9.6 9.6"></path>
+            <path d="m15.5 7.5 3 3L22 7l-3-3"></path>
+            @break
+
+        @case('user-x')
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <line x1="17" x2="22" y1="8" y2="13"></line>
+            <line x1="22" x2="17" y1="8" y2="13"></line>
+            @break
+
+        @case('user-check')
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <polyline points="16 11 18 13 22 9"></polyline>
+            @break
+
+        @case('x')
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+            @break
+
         @case('search')
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.3-4.3"></path>
@@ -70,6 +104,10 @@
 
         @case('chevron-down')
             <path d="m6 9 6 6 6-6"></path>
+            @break
+
+        @case('check')
+            <path d="M20 6 9 17l-5-5"></path>
             @break
 
         @case('settings')

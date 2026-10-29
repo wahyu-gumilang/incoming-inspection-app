@@ -95,14 +95,15 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | ✓ Done | Database connection | Laravel connects to the XAMPP MariaDB database csi_db. |
 | ✓ Done | Proof of concept page | GET /items reads inventtable and searches item id and name through Livewire. |
 | ✓ Done | Database setup command | `php85 artisan db:setup` loads `laravel/database/sql/baseline.sql`, the SQL migrations and the fixtures into a fresh database or `csi_db_test`. Applied migrations are recorded in `schema_migrations`. |
-| ✓ Done | Authentication and shell | Session login against usertable, persistent Remember me with a remembered username and browser password-manager support, roles, forced password change, profile settings, login rate limit and a functional Blade shell. The login page design was approved and finalized on 2026-10-27. The submit loading state, locked inputs and Remember me option were approved on 2026-10-28. The Caps Lock warning was removed. Admin user management is next. |
+| ✓ Done | Authentication and shell | Session login against usertable, persistent Remember me with a remembered username and browser password-manager support, roles, forced password change, profile settings, login rate limit and a functional Blade shell. The login page design was approved and finalized on 2026-10-27. The submit loading state, locked inputs and Remember me option were approved on 2026-10-28. The Caps Lock warning was removed. Master data is next. |
 | ✓ Done | Application shell and navigation | Attached two-tier header with logo, pill search, live weather, date, avatar menu and centered module navigation. Manrope, Lucide outline icons, light and dark themes and responsive layouts. |
+| ✓ Done | User Management | Admin-only list with search, role and status filters, pagination, create, edit, activate/deactivate, reset password and self-protection. Temporary passwords are generated once. |
 | ✗ Planned | Master data | Items, standards, vendors and users. |
 | ✗ Planned | AQL administration | AQL plans and plan rows. |
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
 | ✗ Planned | Dashboard | Basic database counts are shown. KPI cards, NG chart and recent inspections still need the inspection data. |
 | ✗ Planned | Reporting | Submit and check workflow, PDF output. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos and the database setup command with 52 tests and 202 assertions. Judgement and AQL tests are next. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management and the database setup command with 65 tests and 266 assertions. Judgement and AQL tests are next. |
 
 Local addresses while the migration is in progress:
 
@@ -351,9 +352,9 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Profile photo upload and removal with photo-or-initials avatars. |
 | ✓ Done | Two-tier application header with logo, pill search, live weather, date, avatar menu and centered module navigation. |
 | ✓ Done | User menu with Account Option, Help Center and a persistent Light/Dark/System theme control. |
-| ✗ Planned | Admin user management: invite or create user, change role, deactivate, reset password. |
+| ✓ Done | Admin user management: list/search/filter, create with a temporary password, edit, activate/deactivate, reset password and self-protection. |
 | ✓ Done | Functional Blade shell with the new navbar, avatar menu and theme support. Other page designs will follow the new tokens. |
-| ✓ Done | Feature tests for login, logout, roles, inactive users, forced password change, loading state, Remember me, the remembered username, the navbar, the user menu, Help Center, theme persistence and profile photos. |
+| ✓ Done | Feature tests for login, logout, roles, inactive users, forced password change, loading state, Remember me, the remembered username, the navbar, the user menu, Help Center, theme persistence, profile photos and user management. |
 
 ### Phase P2 - Master data
 
@@ -415,6 +416,7 @@ from Quality, as recorded in Section 9.
 - Login tests cover the loading state, remember token, remembered username, failed login and inactive users.
 - Navbar tests cover the primary menu, admin-only user management, module placeholders, the search query, the user menu, Help Center and theme persistence.
 - Profile tests cover avatar upload, removal, validation and serving.
+- User management tests cover admin access, search and filters, create with a temporary password, edit, self-protection, activation and password reset.
 - Database tests use csi_db_test, never csi_db.
 - A database test must create or reset its own data. It must not depend on rows that another
   test changes.

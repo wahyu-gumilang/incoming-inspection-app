@@ -44,15 +44,6 @@ class ModuleController extends Controller
         );
     }
 
-    public function users(): View
-    {
-        return $this->placeholder(
-            'User Management',
-            'Users, roles, activation status and password resets.',
-            'users',
-        );
-    }
-
     public function help(): View
     {
         return view('help.index');

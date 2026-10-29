@@ -86,6 +86,6 @@ class NavbarTest extends TestCase
             ->get('/users')
             ->assertOk()
             ->assertSee('User Management')
-            ->assertSee('Coming next');
+            ->assertSee('Add user');
     }
 }
