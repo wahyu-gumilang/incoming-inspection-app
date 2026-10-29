@@ -36,7 +36,7 @@ INSERT INTO inspectsetup (checkedby) VALUES
 ('Siti Rahayu');
 
 -- Users (password for all: Test-pass-123, hashed with bcrypt cost 4 to keep tests fast).
--- Same people as the mockups. 10305 is on a temporary password, 10099 is deactivated.
+-- Same people as the sample data. 10305 is on a temporary password, 10099 is deactivated.
 INSERT INTO usertable (username, fullname, role, password_hash, active, must_change_password) VALUES
 ('070203', 'Gumilang', 'ADMIN', '$2b$04$hHUBUml6KQaVFH8Z0zc4s./pw4eoqoIYU7Gk9/VN6jxp/UO3ax572', 1, 0),
 ('10234', 'Siti Rahayu', 'CHECKER', '$2b$04$hHUBUml6KQaVFH8Z0zc4s./pw4eoqoIYU7Gk9/VN6jxp/UO3ax572', 1, 0),

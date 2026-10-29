@@ -5,21 +5,19 @@
 @section('content')
     @php($user = auth()->user())
 
-    <div class="page-header">
-        <div>
-            <h1>Profile settings</h1>
-            <p>Update your photo, name, email address and theme preference.</p>
-        </div>
-    </div>
+    <x-ui.page-header
+        title="Profile settings"
+        description="Update your photo, name, email address and theme preference."
+    />
 
     @if ($errors->any())
-        <div class="alert alert-error" role="alert">
+        <x-ui.alert variant="error">
             <ul>
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-        </div>
+        </x-ui.alert>
     @endif
 
     <div class="card card-narrow">
@@ -53,19 +51,17 @@
                 </div>
             </div>
 
-            <label class="field">
-                <span class="label">Username</span>
-                <input class="input" type="text" value="{{ $user->username }}" disabled>
-            </label>
+            <x-ui.field label="Username" for="profile-username">
+                <input id="profile-username" class="input" type="text" value="{{ $user->username }}" disabled>
+            </x-ui.field>
 
-            <label class="field">
-                <span class="label">Role</span>
-                <input class="input" type="text" value="{{ $user->roleLabel() }}" disabled>
-            </label>
+            <x-ui.field label="Role" for="profile-role">
+                <input id="profile-role" class="input" type="text" value="{{ $user->roleLabel() }}" disabled>
+            </x-ui.field>
 
-            <label class="field">
-                <span class="label">Full name</span>
+            <x-ui.field label="Full name" for="profile-fullname" name="fullname">
                 <input
+                    id="profile-fullname"
                     class="input"
                     type="text"
                     name="fullname"
@@ -73,11 +69,11 @@
                     maxlength="50"
                     required
                 >
-            </label>
+            </x-ui.field>
 
-            <label class="field">
-                <span class="label">Email</span>
+            <x-ui.field label="Email" for="profile-email" name="email">
                 <input
+                    id="profile-email"
                     class="input"
                     type="email"
                     name="email"
@@ -85,20 +81,19 @@
                     maxlength="100"
                     placeholder="Optional"
                 >
-            </label>
+            </x-ui.field>
 
-            <label class="field">
-                <span class="label">Theme</span>
-                <select class="select" name="theme" required>
+            <x-ui.field label="Theme" for="profile-theme" name="theme">
+                <select id="profile-theme" class="select" name="theme" required>
                     <option value="light" @selected(old('theme', $user->theme) === 'light')>Light</option>
                     <option value="dark" @selected(old('theme', $user->theme) === 'dark')>Dark</option>
                     <option value="system" @selected(old('theme', $user->theme) === 'system')>System</option>
                 </select>
-            </label>
+            </x-ui.field>
 
             <div class="form-actions">
-                <button class="btn btn-primary" type="submit">Save changes</button>
-                <a class="btn" href="{{ route('password.change') }}">Change password</a>
+                <x-ui.button variant="primary" type="submit">Save changes</x-ui.button>
+                <x-ui.button :href="route('password.change')">Change password</x-ui.button>
             </div>
         </form>
     </div>

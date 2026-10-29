@@ -11,18 +11,15 @@
         $statusTones = ['' => 'neutral', 'active' => 'active', 'inactive' => 'inactive'];
     @endphp
 
-    <div class="page-header">
-        <div>
-            <span class="page-eyebrow">Administration</span>
-            <h1>User Management</h1>
-            <p>Accounts and roles. Only administrators can manage users.</p>
-        </div>
-
-        <button class="btn btn-primary" type="button" wire:click="openCreate">
-            <x-icon name="plus" :size="17" />
-            Add user
-        </button>
-    </div>
+    <x-ui.page-header
+        eyebrow="Administration"
+        title="User Management"
+        description="Accounts and roles. Only administrators can manage users."
+    >
+        <x-slot:actions>
+            <x-ui.button variant="primary" icon="plus" wire:click="openCreate">Add user</x-ui.button>
+        </x-slot:actions>
+    </x-ui.page-header>
 
     @if (session('temporary_password'))
         <div class="temp-password" role="status">
@@ -32,30 +29,25 @@
             </div>
             <div class="temp-password-value">
                 <code>{{ session('temporary_password') }}</code>
-                <button class="btn btn-sm" type="button" data-copy-password>Copy</button>
+                <x-ui.button variant="secondary" size="sm" type="button" data-copy-password>Copy</x-ui.button>
             </div>
         </div>
     @endif
 
     @if ($statusMessage)
-        <div class="alert alert-success" role="status">{{ $statusMessage }}</div>
+        <x-ui.alert variant="success">{{ $statusMessage }}</x-ui.alert>
     @endif
 
     <div class="card users-panel">
         <div class="users-toolbar">
-            <div class="users-search">
-                <x-icon name="search" :size="18" />
-                <input
-                    class="input"
-                    type="search"
-                    wire:model.live.debounce.300ms="search"
-                    placeholder="Search name, username or email..."
-                    aria-label="Search users"
-                >
-            </div>
+            <x-ui.search
+                wire:model.live.debounce.300ms="search"
+                placeholder="Search name, username or email..."
+                label="Search users"
+            />
 
             <div class="users-filters">
-                <x-filter-select
+                <x-ui.dropdown
                     :label="$roleOptions[$role] ?? 'All roles'"
                     :value="$role"
                     :options="$roleOptions"
@@ -65,7 +57,7 @@
                     select="selectRole"
                 />
 
-                <x-filter-select
+                <x-ui.dropdown
                     :label="$statusOptions[$status] ?? 'All statuses'"
                     :value="$status"
                     :options="$statusOptions"
@@ -97,60 +89,42 @@
                                     <x-user-avatar :user="$user" :size="34" />
                                     <div class="user-cell-text">
                                         <strong>{{ $user->fullname }}</strong>
-                                        <span>
-                                            {{ $user->username }}
+                                        <span class="user-cell-meta">
+                                            <span class="user-cell-username">{{ $user->username }}</span>
                                             @if ($user->userid === $currentUserId)
-                                                <span class="you-badge">You</span>
+                                                <x-ui.badge variant="solid" size="sm">You</x-ui.badge>
                                             @endif
                                         </span>
                                     </div>
                                 </div>
                             </td>
                             <td class="{{ $user->email ? '' : 'cell-muted' }}">{{ $user->email ?: 'Not set' }}</td>
-                            <td>
-                                <span class="role-badge role-{{ strtolower($user->role) }}">{{ $user->roleLabel() }}</span>
-                            </td>
-                            <td>
-                                <span class="status-pill {{ $user->active ? 'is-active' : 'is-inactive' }}">
-                                    <span class="status-dot"></span>
-                                    {{ $user->active ? 'Active' : 'Inactive' }}
-                                </span>
-                            </td>
+                            <td><x-ui.role-badge :role="$user->role" /></td>
+                            <td><x-ui.status-badge :active="$user->active" /></td>
                             <td class="cell-muted">
                                 {{ $user->last_login_at?->timezone('Asia/Jakarta')->format('jS M Y, H:i') ?? 'Never' }}
                             </td>
                             <td>
                                 <div class="row-actions">
-                                    <button
-                                        class="icon-btn"
-                                        type="button"
+                                    <x-ui.icon-button
+                                        icon="pencil"
+                                        label="Edit {{ $user->fullname }}"
                                         wire:click="openEdit({{ $user->userid }})"
-                                        title="Edit {{ $user->fullname }}"
-                                        aria-label="Edit {{ $user->fullname }}"
-                                    >
-                                        <x-icon name="pencil" :size="16" />
-                                    </button>
+                                    />
 
                                     @if ($user->userid !== $currentUserId)
-                                        <button
-                                            class="icon-btn"
-                                            type="button"
+                                        <x-ui.icon-button
+                                            icon="key"
+                                            label="Reset password for {{ $user->fullname }}"
                                             wire:click="confirmReset({{ $user->userid }})"
-                                            title="Reset password for {{ $user->fullname }}"
-                                            aria-label="Reset password for {{ $user->fullname }}"
-                                        >
-                                            <x-icon name="key" :size="16" />
-                                        </button>
+                                        />
 
-                                        <button
-                                            class="icon-btn {{ $user->active ? 'icon-btn-danger' : 'icon-btn-success' }}"
-                                            type="button"
+                                        <x-ui.icon-button
+                                            :icon="$user->active ? 'user-x' : 'user-check'"
+                                            :variant="$user->active ? 'danger' : 'success'"
+                                            :label="($user->active ? 'Deactivate' : 'Activate').' '.$user->fullname"
                                             wire:click="confirmToggle({{ $user->userid }})"
-                                            title="{{ $user->active ? 'Deactivate' : 'Activate' }} {{ $user->fullname }}"
-                                            aria-label="{{ $user->active ? 'Deactivate' : 'Activate' }} {{ $user->fullname }}"
-                                        >
-                                            <x-icon :name="$user->active ? 'user-x' : 'user-check'" :size="16" />
-                                        </button>
+                                        />
                                     @endif
                                 </div>
                             </td>
@@ -173,165 +147,123 @@
                 @endif
             </span>
 
-            @if ($users->hasPages())
-                <div class="pagination">
-                    <button
-                        class="page-btn"
-                        type="button"
-                        wire:click="previousPage"
-                        @disabled($users->onFirstPage())
-                    >
-                        Previous
-                    </button>
-
-                    @foreach ($users->getUrlRange(max(1, $users->currentPage() - 1), min($users->lastPage(), $users->currentPage() + 1)) as $page => $url)
-                        <button
-                            class="page-btn {{ $page === $users->currentPage() ? 'is-active' : '' }}"
-                            type="button"
-                            wire:click="gotoPage({{ $page }})"
-                        >
-                            {{ $page }}
-                        </button>
-                    @endforeach
-
-                    <button
-                        class="page-btn"
-                        type="button"
-                        wire:click="nextPage"
-                        @disabled(! $users->hasMorePages())
-                    >
-                        Next
-                    </button>
-                </div>
-            @endif
+            <x-ui.pagination :paginator="$users" />
         </div>
     </div>
 
     @if ($showCreate)
-        <x-modal
+        <x-ui.modal
             title="Add user"
             subtitle="The user signs in with a temporary password and must change it."
             close="closeCreate"
         >
             <form wire:submit="createUser" class="form">
-                <label class="field">
-                    <span class="label">Full name</span>
-                    <input class="input" type="text" wire:model="fullname" maxlength="50" autofocus>
-                    @error('fullname') <span class="field-error">{{ $message }}</span> @enderror
-                </label>
+                <x-ui.field label="Full name" for="create-fullname" name="fullname">
+                    <input id="create-fullname" class="input" type="text" wire:model="fullname" maxlength="50" autofocus>
+                </x-ui.field>
 
-                <label class="field">
-                    <span class="label">Username</span>
-                    <input class="input mono" type="text" wire:model="username" maxlength="50" autocomplete="off">
-                    <span class="field-hint">3-50 letters, digits, dots, dashes or underscores.</span>
-                    @error('username') <span class="field-error">{{ $message }}</span> @enderror
-                </label>
+                <x-ui.field label="Username" for="create-username" name="username" hint="3-50 letters, digits, dots, dashes or underscores.">
+                    <input id="create-username" class="input mono" type="text" wire:model="username" maxlength="50" autocomplete="off">
+                </x-ui.field>
 
-                <label class="field">
-                    <span class="label">Email</span>
-                    <input class="input" type="email" wire:model="email" maxlength="100" placeholder="Optional">
-                    @error('email') <span class="field-error">{{ $message }}</span> @enderror
-                </label>
+                <x-ui.field label="Email" for="create-email" name="email">
+                    <input id="create-email" class="input" type="email" wire:model="email" maxlength="100" placeholder="Optional">
+                </x-ui.field>
 
-                <div class="field">
-                    <span class="label">Role</span>
-                    <div class="form-filter-select">
-                        <x-filter-select
-                            :label="\App\Domain\User\Role::label($formRole)"
-                            :value="$formRole"
-                            :options="$formRoleOptions"
-                            :tones="$roleTones"
-                            :open="$openFormRole"
-                            toggle="toggleFormRole"
-                            select="selectFormRole"
-                            placement="up"
-                        />
-                    </div>
-                    @error('formRole') <span class="field-error">{{ $message }}</span> @enderror
-                </div>
+                <x-ui.field label="Role" for="create-role" name="formRole">
+                    <x-ui.dropdown
+                        id="create-role"
+                        class="ui-dropdown-full"
+                        :label="\App\Domain\User\Role::label($formRole)"
+                        :value="$formRole"
+                        :options="$formRoleOptions"
+                        :tones="$roleTones"
+                        :open="$openFormRole"
+                        toggle="toggleFormRole"
+                        select="selectFormRole"
+                        placement="up"
+                    />
+                </x-ui.field>
 
                 <div class="modal-foot">
-                    <button class="btn" type="button" wire:click="closeCreate">Cancel</button>
-                    <button class="btn btn-primary" type="submit" wire:loading.attr="disabled">Create user</button>
+                    <x-ui.button variant="secondary" type="button" wire:click="closeCreate">Cancel</x-ui.button>
+                    <x-ui.button variant="primary" type="submit" wire:loading.attr="disabled">Create user</x-ui.button>
                 </div>
             </form>
-        </x-modal>
+        </x-ui.modal>
     @endif
 
     @if ($showEdit)
-        <x-modal
+        <x-ui.modal
             :title="'Edit '.$editingUsername"
             subtitle="Update the name, email address and role."
             close="closeEdit"
         >
             <form wire:submit="saveEdit" class="form">
-                <label class="field">
-                    <span class="label">Username</span>
-                    <input class="input mono" type="text" value="{{ $editingUsername }}" disabled>
-                </label>
+                <x-ui.field label="Username" for="edit-username">
+                    <input id="edit-username" class="input mono" type="text" value="{{ $editingUsername }}" disabled>
+                </x-ui.field>
 
-                <label class="field">
-                    <span class="label">Full name</span>
-                    <input class="input" type="text" wire:model="fullname" maxlength="50" autofocus>
-                    @error('fullname') <span class="field-error">{{ $message }}</span> @enderror
-                </label>
+                <x-ui.field label="Full name" for="edit-fullname" name="fullname">
+                    <input id="edit-fullname" class="input" type="text" wire:model="fullname" maxlength="50" autofocus>
+                </x-ui.field>
 
-                <label class="field">
-                    <span class="label">Email</span>
-                    <input class="input" type="email" wire:model="email" maxlength="100" placeholder="Optional">
-                    @error('email') <span class="field-error">{{ $message }}</span> @enderror
-                </label>
+                <x-ui.field label="Email" for="edit-email" name="email">
+                    <input id="edit-email" class="input" type="email" wire:model="email" maxlength="100" placeholder="Optional">
+                </x-ui.field>
 
-                <div class="field">
-                    <span class="label">Role</span>
-                    <div class="form-filter-select">
-                        <x-filter-select
-                            :label="\App\Domain\User\Role::label($formRole)"
-                            :value="$formRole"
-                            :options="$formRoleOptions"
-                            :tones="$roleTones"
-                            :open="$openFormRole"
-                            toggle="toggleFormRole"
-                            select="selectFormRole"
-                            placement="up"
-                            :disabled="$editingIsSelf"
-                        />
-                    </div>
-                    @if ($editingIsSelf)
-                        <span class="field-hint">You cannot change your own role.</span>
-                    @endif
-                    @error('formRole') <span class="field-error">{{ $message }}</span> @enderror
-                </div>
+                <x-ui.field
+                    label="Role"
+                    for="edit-role"
+                    name="formRole"
+                    :hint="$editingIsSelf ? 'You cannot change your own role.' : null"
+                >
+                    <x-ui.dropdown
+                        id="edit-role"
+                        class="ui-dropdown-full"
+                        :label="\App\Domain\User\Role::label($formRole)"
+                        :value="$formRole"
+                        :options="$formRoleOptions"
+                        :tones="$roleTones"
+                        :open="$openFormRole"
+                        toggle="toggleFormRole"
+                        select="selectFormRole"
+                        placement="up"
+                        :disabled="$editingIsSelf"
+                    />
+                </x-ui.field>
 
                 <div class="modal-foot">
-                    <button class="btn" type="button" wire:click="closeEdit">Cancel</button>
-                    <button class="btn btn-primary" type="submit" wire:loading.attr="disabled">Save changes</button>
+                    <x-ui.button variant="secondary" type="button" wire:click="closeEdit">Cancel</x-ui.button>
+                    <x-ui.button variant="primary" type="submit" wire:loading.attr="disabled">Save changes</x-ui.button>
                 </div>
             </form>
-        </x-modal>
+        </x-ui.modal>
     @endif
 
     @if ($showReset)
-        <x-modal title="Reset password" close="closeReset">
+        <x-ui.confirm
+            title="Reset password"
+            close="closeReset"
+            confirm="resetPassword"
+            confirm-label="Reset password"
+            variant="primary"
+        >
             <p>
                 Reset the password for <strong>{{ $resetName }}</strong>? A new temporary password
                 will be generated and shown once.
             </p>
             @error('reset') <p class="field-error">{{ $message }}</p> @enderror
-
-            <div class="modal-foot">
-                <button class="btn" type="button" wire:click="closeReset">Cancel</button>
-                <button class="btn btn-primary" type="button" wire:click="resetPassword" wire:loading.attr="disabled">
-                    Reset password
-                </button>
-            </div>
-        </x-modal>
+        </x-ui.confirm>
     @endif
 
     @if ($showToggle)
-        <x-modal
+        <x-ui.confirm
             :title="$toggleToActive ? 'Activate user' : 'Deactivate user'"
             close="closeToggle"
+            confirm="toggleActive"
+            :confirm-label="$toggleToActive ? 'Activate' : 'Deactivate'"
+            :variant="$toggleToActive ? 'success' : 'danger'"
         >
             <p>
                 {{ $toggleToActive ? 'Activate' : 'Deactivate' }}
@@ -343,13 +275,6 @@
                 @endif
             </p>
             @error('toggle') <p class="field-error">{{ $message }}</p> @enderror
-
-            <div class="modal-foot">
-                <button class="btn" type="button" wire:click="closeToggle">Cancel</button>
-                <button class="btn btn-primary" type="button" wire:click="toggleActive" wire:loading.attr="disabled">
-                    {{ $toggleToActive ? 'Activate' : 'Deactivate' }}
-                </button>
-            </div>
-        </x-modal>
+        </x-ui.confirm>
     @endif
 </div>

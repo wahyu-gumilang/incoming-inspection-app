@@ -1,55 +1,63 @@
-# Incoming Inspection QC - Laravel application
+# Incoming Inspection QC System
 
-This directory contains the PHP application for the Incoming Inspection QC System.
+PHP 8.5, Laravel 13, Blade and Livewire 4 application for PT. Chubb Safes Indonesia.
 
-Read the repository roadmap in ../PLAN.md and the coding guide in ../CLAUDE.md before making
-changes.
+The system records incoming inspections against Form No. 7.4.3-F1. The dashboard, item list,
+authentication, application shell, profile settings and user management are implemented.
+Master data, AQL administration, inspections and PDF output are the next phases.
 
 ## Requirements
 
-- PHP 8.5
-- Composer
-- MariaDB 10.4 or MySQL
-- Node.js only if the frontend assets need to be rebuilt
+- PHP 8.5 with the MySQL extensions.
+- MySQL or MariaDB. Development uses XAMPP MariaDB 10.4.
+- Composer.
 
-## Local setup
+## Setup
 
-1. Copy .env.example to .env.
-2. Set the database connection to the local csi_db database.
-3. Run composer install.
-4. Run php85 artisan key:generate.
-5. Run ./serve to start the application.
-6. Open /login. The item list at /items requires a signed-in user.
+```bash
+cd laravel
+cp .env.example .env
+php85 artisan key:generate
+php85 artisan db:setup --status
+# After backing up csi_db:
+php85 artisan db:setup --force
+./serve
+```
 
-## Local commands
+`db:setup` loads `database/sql/baseline.sql`, applies the numbered SQL migrations and records
+them in `schema_migrations`. It refuses a non-test database unless `--force` is passed. Back up
+the database before the first setup.
 
-| Command | Purpose |
+Test database:
+
+```bash
+DB_DATABASE=csi_db_test php85 artisan db:setup --fresh --seed
+```
+
+## Tests and formatting
+
+```bash
+cd laravel
+php85 vendor/bin/phpunit
+php85 vendor/bin/pint
+```
+
+## Application areas
+
+| Area | Path |
 |---|---|
-| ./serve | Start the application. |
-| php85 -S 127.0.0.1:8000 -t public server.php | Start without the serve script. |
-| php85 vendor/bin/phpunit | Run the test suite. |
-| php85 vendor/bin/pint | Format the PHP code. |
-| php85 vendor/bin/pint --test | Check formatting without writing. |
+| Authentication | `/login` |
+| Dashboard | `/` |
+| Items | `/items` |
+| User management (admin) | `/users` |
+| UI component preview (admin) | `/ui-kit` |
+| Profile | `/profile` |
+| Help | `/help` |
 
-Do not use php artisan serve or php artisan test with the portable PHP runtime. Laravel
-re-executes PHP_BINARY and the child process loses the portable library path, php.ini and
-extensions.
+The reusable interface components live in `resources/views/components/ui` and are documented
+in `../CLAUDE.md`. Global component styles are in `public/css/components.css`.
 
-## Structure
+## Project rules
 
-| Path | Purpose |
-|---|---|
-| app/Domain | Pure business rules. |
-| app/Repositories | Database access for legacy and composite-key tables. |
-| app/Services or app/Actions | Use cases and transactions. |
-| app/Http | Controllers, requests and middleware. |
-| resources/views | Blade views and Livewire components. |
-| database/sql | Legacy baseline, SQL migrations and fixtures. |
-| tests/Unit | Pure business rule tests. |
-| tests/Feature | Page and database tests. |
-
-## Status
-
-The application is in the migration phase. Login, logout, session authentication, roles and
-the application shell are in place. The item list is the first data screen. Master data,
-inspections and reporting are still in progress.
+Read `../CLAUDE.md` and `../PLAN.md` before changing code. This application is the only
+product codebase; the legacy Node and Angular code has been removed.

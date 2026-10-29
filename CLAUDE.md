@@ -13,8 +13,8 @@ evaluate and store incoming inspections of materials and parts received from sup
 The official reference is Form No. 7.4.3-F1, Incoming Inspection Check List. The printed
 PDF must follow the layout of that form.
 
-The final application is a PHP application. The Node/Express backend and the Angular
-frontend are legacy reference code. Do not add product features to them.
+The application is a PHP application. The legacy Node/Express backend and Angular frontend
+were removed on 2026-10-29. Do not reintroduce them.
 
 ## 2. Target stack
 
@@ -30,22 +30,24 @@ frontend are legacy reference code. Do not add product features to them.
 | Local server | PHP 8.5 built-in server. XAMPP supplies MariaDB and phpMyAdmin. |
 | Deployment | WAMP with Apache and PHP 8.5. |
 
-The legacy stack is Node.js with Express 5 and Angular 22. It remains available for
-comparison and for porting tested business rules. It is not the target architecture.
+The application is the only product codebase. Its SQL schema and migrations live in
+`laravel/database/sql`. Business rules are documented in this guide and PLAN.md.
 
 ## 3. Migration state
 
-- The new application lives in the laravel directory.
-- The legacy API lives in backend.
-- The legacy UI lives in frontend.
+- The application lives in the laravel directory. It is the only product codebase.
+- The legacy Node and Angular source folders were removed on 2026-10-29. Their SQL was
+  preserved in laravel/database/sql and their business rules are documented here and in
+  PLAN.md.
 - The first PHP proof of concept is GET /items. It reads inventtable and searches item id
   and name through Livewire.
 - Authentication, the application shell, profile settings and the basic dashboard are
   implemented in PHP. The login page is final and includes a submit loading state, a
   remembered username and browser password-manager support.
+- The reusable UI kit lives in resources/views/components/ui with global styles in
+  public/css/components.css. User Management is the reference consumer. The admin-only
+  preview is at /ui-kit.
 - Master data, AQL administration, inspections and PDF are not yet implemented in PHP.
-- Keep the legacy folders until the PHP application reaches parity and the owner approves
-  the cutover.
 
 ## 4. QC workflow
 
@@ -72,11 +74,8 @@ inspecttable.
 
 | Path | Purpose |
 |---|---|
-| laravel | New Laravel 13 application. This is the only place for new product work. |
-| backend | Legacy Node/Express API. Reference only. |
-| frontend | Legacy Angular application. Reference only. |
-| docs | Reference documents, design material and the migration plan. |
-| docs/design/mockups | Old design mockups. Reference only until the new design is approved. |
+| laravel | The Laravel 13 application. This is the only product codebase. |
+| docs | Reference documents, SQL schema and the migration plan. |
 | PLAN.md | Roadmap and source of truth for phases and decisions. |
 | CLAUDE.md | This coding guide. |
 
@@ -93,10 +92,11 @@ Inside laravel, follow standard Laravel structure:
 | app/Livewire | Livewire components when a separate class is needed. |
 | resources/views | Blade views and single-file Livewire components. |
 | resources/views/components | Reusable Blade components such as the app navbar and icons. |
-| resources/css and resources/js | Vite entry assets. The application currently serves public/css and public/js directly. |
+| resources/views/components/ui | The x-ui component library: buttons, alerts, badges, fields, search, dropdown, modal, confirm, pagination and empty state. |
 | public/css and public/js | Styles and browser scripts loaded by the Blade layouts. |
+| public/css/components.css | Shared component styles. Page-specific styles are loaded per page. |
 | storage/app/public/avatars | Uploaded profile photos. Never commit them. |
-| database/sql | Legacy baseline, SQL migrations and fixtures. |
+| database/sql | Canonical baseline, SQL migrations and fixtures. |
 | tests/Unit | Pure business rule tests. |
 | tests/Feature | Page and database tests. |
 
@@ -260,9 +260,9 @@ controllers, Livewire components or Blade views.
 ## 8. Database rules
 
 - The application database is the existing csi_db.
-- The schema is based on backend/db/baseline.sql and the SQL files in backend/db/migrations.
-- The PHP copies used by the application live in laravel/database/sql. Keep them in sync with
-  backend/db until cutover, and add every new migration to both directories.
+- The schema is defined by laravel/database/sql/baseline.sql and the numbered migrations in
+  laravel/database/sql/migrations. docs/schema.sql is the generated reference.
+- Add every new migration to laravel/database/sql/migrations and apply it with db:setup.
 - Store profile photos under storage/app/public/avatars and serve them through the avatars
   route. Never commit uploaded files.
 - Rebuild csi_db_test with DB_DATABASE=csi_db_test php85 artisan db:setup --fresh --seed.
@@ -389,20 +389,39 @@ controllers, Livewire components or Blade views.
 - Validate in the component or a Form Request before writing.
 - Show loading, empty and error states.
 - Use server-side pagination for large lists.
-- Do not call the legacy REST API from the PHP application.
+- Do not call an external REST API from the PHP application.
 - Do not put business rules in JavaScript.
 - JavaScript is allowed for menu state, theme, focus, transitions and browser-only
   behaviour.
 
 ## 11. UI and design
 
-- The old mockups in docs/design/mockups are a reference only. The login page and the
-  authenticated app shell are the current design.
+- The reusable UI kit is in resources/views/components/ui and public/css/components.css.
+  Use it for every authenticated screen instead of rebuilding buttons, alerts, badges,
+  fields, search bars, dropdowns, modals, confirmations, pagination or empty states.
+- Available components:
+  - x-ui.button, with variant primary, secondary, ghost, danger or success; size md or sm;
+    optional icon, block and href.
+  - x-ui.icon-button for compact table actions.
+  - x-ui.alert with variant success, error, warning or info.
+  - x-ui.badge, x-ui.role-badge and x-ui.status-badge.
+  - x-ui.page-header with eyebrow, title, description and an actions slot.
+  - x-ui.field with label, for, name and optional hint. It reads Livewire validation errors
+    from the name property.
+  - x-ui.search. It forwards wire:model and other input attributes to the search input.
+  - x-ui.dropdown, a keyboard-accessible custom select with label, value, options, tones,
+    open, toggle, select, placement, disabled and id.
+  - x-ui.modal and x-ui.confirm for dialogs and destructive actions.
+  - x-ui.pagination for Livewire paginators.
+  - x-ui.empty-state for empty lists.
+  - x-icon, x-user-avatar and x-app-navbar remain the low-level shared components.
+- The admin-only preview is at /ui-kit. Add new components there so their variants can be
+  reviewed together.
 - The login page design was approved and finalized on 2026-10-27. The submit loading
   indicator, remembered username, browser password-manager integration and Remember me option
   were approved on 2026-10-28. The Caps Lock warning was removed. Do not change its layout,
   background, card, copy or interactions without a new owner request.
-- Do not finalize styling for other pages before the new mockups are approved.
+- Use the UI kit and its tokens for new screens. Do not introduce a second visual system.
 - The login page uses the Chubbsafes blue and dark glass palette. The authenticated shell uses
   an ink and neutral palette with an orange accent. The logo keeps the brand color.
 - The login page uses Inter. The authenticated shell uses Manrope, bundled at
@@ -522,7 +541,8 @@ PLAN.md and CLAUDE.md must stay clean and easy to scan.
 - Check the real schema in docs/schema.sql or the SQL files before writing a query.
 - Keep changes inside the requested scope.
 - Match the existing code style and Laravel conventions.
-- Do not add features to the legacy Node or Angular code.
+- Do not reintroduce Node, Angular or any non-PHP product runtime. The application is full
+  PHP from the interface to the business rules.
 - When the paper form and the schema disagree, use the schema for storage and the paper form
   for layout. Record the gap as an open question instead of inventing a column.
 - Before saying a change is complete, run the tests and formatting check, open the page, and
@@ -533,7 +553,7 @@ PLAN.md and CLAUDE.md must stay clean and easy to scan.
 
 | Topic | Question | Current handling |
 |---|---|---|
-| Design | What is the approved final UI direction? | Old mockups are reference only. Build functional screens first. |
+| Design | What is the approved final UI direction? | The login page is final. The authenticated shell and the x-ui component library are the design system. |
 | PHP patch | Is 8.5.12 required for development as well as production? | Development uses 8.5.4. Production will use 8.5.12. |
 | Development server | Should development use the PHP built-in server or XAMPP Apache with PHP 8.5? | Built-in server until the owner approves an Apache change. |
 | AQL plan | Is the current S-1 zero-defect plan the official practice? | Provisional. Confirm with Quality. |

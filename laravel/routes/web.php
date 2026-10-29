@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemsController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UiKitController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,9 @@ Route::middleware(['auth', 'active'])->group(function (): void {
         Route::get('/users', [UserManagementController::class, 'index'])
             ->middleware('role:ADMIN')
             ->name('users.index');
+        Route::get('/ui-kit', [UiKitController::class, 'index'])
+            ->middleware('role:ADMIN')
+            ->name('ui-kit.index');
         Route::get('/help', [ModuleController::class, 'help'])->name('help.index');
         Route::get('/avatars/{filename}', [AvatarController::class, 'show'])->name('avatars.show');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

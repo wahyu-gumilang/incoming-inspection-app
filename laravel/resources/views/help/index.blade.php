@@ -3,14 +3,15 @@
 @section('title', 'Help Center')
 
 @section('content')
-    <div class="page-header">
-        <div>
-            <span class="page-eyebrow">Support</span>
-            <h1>Help Center</h1>
-            <p>Quick guidance for access and incoming inspection.</p>
-        </div>
-        <a class="btn" href="{{ route('dashboard') }}">Back to dashboard</a>
-    </div>
+    <x-ui.page-header
+        eyebrow="Support"
+        title="Help Center"
+        description="Quick guidance for access and incoming inspection."
+    >
+        <x-slot:actions>
+            <x-ui.button :href="route('dashboard')">Back to dashboard</x-ui.button>
+        </x-slot:actions>
+    </x-ui.page-header>
 
     <div class="help-grid">
         <div class="card help-card">

@@ -4,12 +4,11 @@
             <h1>Items and standards</h1>
             <p>Search the item master and inspect its standards.</p>
         </div>
-        <input
-            type="search"
+        <x-ui.search
             wire:model.live.debounce.300ms="search"
             placeholder="Search part number or name"
-            aria-label="Search items"
-        >
+            label="Search items"
+        />
     </div>
 
     <table class="items-table">

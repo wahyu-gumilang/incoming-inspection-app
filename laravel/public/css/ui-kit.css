@@ -1,0 +1,55 @@
+.ui-kit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.ui-kit-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px;
+}
+
+.ui-kit-section h2 {
+    font-size: 15px;
+    letter-spacing: -0.02em;
+}
+
+.ui-kit-note {
+    margin-top: -8px;
+    color: var(--text-3);
+    font-size: 11.5px;
+}
+
+.ui-kit-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.ui-kit-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ui-kit-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.ui-kit-pagination > span {
+    color: var(--text-3);
+    font-size: 11.5px;
+}
+
+@media (max-width: 900px) {
+    .ui-kit-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

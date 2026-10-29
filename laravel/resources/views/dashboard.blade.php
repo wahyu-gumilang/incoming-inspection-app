@@ -3,13 +3,14 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="page-header">
-        <div>
-            <h1>Dashboard</h1>
-            <p>Welcome back, {{ auth()->user()->fullname }}.</p>
-        </div>
-        <a class="btn btn-primary" href="{{ route('items.index') }}">Browse items</a>
-    </div>
+    <x-ui.page-header
+        title="Dashboard"
+        :description="'Welcome back, '.auth()->user()->fullname.'.'"
+    >
+        <x-slot:actions>
+            <x-ui.button variant="primary" :href="route('items.index')">Browse items</x-ui.button>
+        </x-slot:actions>
+    </x-ui.page-header>
 
     <div class="stat-grid">
         <div class="card stat">

@@ -3,13 +3,11 @@
 @section('title', $title)
 
 @section('content')
-    <div class="page-header">
-        <div>
-            <span class="page-eyebrow">Module</span>
-            <h1>{{ $title }}</h1>
-            <p>{{ $description }}</p>
-        </div>
-    </div>
+    <x-ui.page-header
+        eyebrow="Module"
+        :title="$title"
+        :description="$description"
+    />
 
     <div class="card module-placeholder">
         <span class="module-placeholder-icon">
@@ -20,6 +18,6 @@
             This module is wired into the new navigation. The page is ready for its feature work
             in the next phase of the PHP migration.
         </p>
-        <a class="btn btn-primary" href="{{ route('dashboard') }}">Back to dashboard</a>
+        <x-ui.button variant="primary" :href="route('dashboard')">Back to dashboard</x-ui.button>
     </div>
 @endsection

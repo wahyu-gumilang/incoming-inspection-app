@@ -7,6 +7,7 @@
     <link rel="preload" href="{{ asset('fonts/manrope-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}?v={{ filemtime(public_path('css/navbar.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/components.css') }}?v={{ filemtime(public_path('css/components.css')) }}">
     @stack('styles')
     @livewireStyles
     <script>
@@ -30,7 +31,7 @@
 
     <main class="page">
         @if (session('status'))
-            <div class="alert alert-success" role="status">{{ session('status') }}</div>
+            <x-ui.alert variant="success">{{ session('status') }}</x-ui.alert>
         @endif
 
         @yield('content')

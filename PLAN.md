@@ -39,15 +39,15 @@ The owner confirmed the final technology direction:
 | Framework | Laravel 13. |
 | User interface | Laravel Blade with Livewire 4. Server-rendered PHP with minimal browser JavaScript. |
 | Database | MariaDB 10.4 in XAMPP for development. MySQL or MariaDB in WAMP for deployment. |
-| PDF | A PHP PDF library, either mPDF or DomPDF. Puppeteer and other Node-based tools are not part of the final stack. |
+| PDF | A PHP PDF library, either mPDF or DomPDF. |
 | Development | XAMPP MariaDB and phpMyAdmin, with PHP 8.5 CLI for the application. |
 | Deployment | WAMP with Apache and PHP 8.5. |
-| Legacy code | The Node/Express backend and the Angular frontend are kept as a reference until the PHP application reaches parity. |
-| Design | The old mockups are a reference only. The login page is final. The authenticated shell uses the two-tier navbar from 2026-10-28. Other screens follow its tokens. |
+| Legacy code | The Node/Express backend and the Angular frontend were removed on 2026-10-29. The PHP application is the only product codebase. |
+| Design | The login page is final. The authenticated shell uses the two-tier navbar from 2026-10-28, and the reusable x-ui component library is the design system for new screens. |
 
-The current PHP proof of concept is in the laravel directory. It already reads real data
-from csi_db. The legacy application remains in backend and frontend for comparison and for
-the business rules that have already been tested.
+The PHP application is in the laravel directory and is the only product codebase. Its SQL
+schema and migrations live in laravel/database/sql. The legacy sources were removed to keep
+the repository full PHP; their business rules are documented in CLAUDE.md and this plan.
 
 ### 2.1 Login page decisions
 
@@ -98,52 +98,39 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | ✓ Done | Authentication and shell | Session login against usertable, persistent Remember me with a remembered username and browser password-manager support, roles, forced password change, profile settings, login rate limit and a functional Blade shell. The login page design was approved and finalized on 2026-10-27. The submit loading state, locked inputs and Remember me option were approved on 2026-10-28. The Caps Lock warning was removed. Master data is next. |
 | ✓ Done | Application shell and navigation | Attached two-tier header with logo, pill search, live weather, date, avatar menu and centered module navigation. Manrope, Lucide outline icons, light and dark themes and responsive layouts. |
 | ✓ Done | User Management | Admin-only list with search, role and status filters, pagination, create, edit, activate/deactivate, reset password and self-protection. Temporary passwords are generated once. |
-| ✗ Planned | Master data | Items, standards, vendors and users. |
+| ✓ Done | UI component library | Reusable x-ui components for buttons, alerts, badges, fields, search, dropdowns, modals, confirmations, pagination and empty states. Global styles, a User Management refactor and an admin preview at /ui-kit. |
+| ✗ Planned | Master data | Items, standards and vendors. |
 | ✗ Planned | AQL administration | AQL plans and plan rows. |
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
 | ✗ Planned | Dashboard | Basic database counts are shown. KPI cards, NG chart and recent inspections still need the inspection data. |
 | ✗ Planned | Reporting | Submit and check workflow, PDF output. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management and the database setup command with 65 tests and 266 assertions. Judgement and AQL tests are next. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit and the database setup command with 67 tests and 270 assertions. Judgement and AQL tests are next. |
 
 Local addresses while the migration is in progress:
 
 | Application | Address |
 |---|---|
 | PHP application (csi_db) | http://localhost:8000/login |
-| Legacy Angular application | http://localhost:4200 |
-| Legacy Node API | http://localhost:5000 |
-| Design mockups | http://localhost:8080/index.html |
+| UI component preview (admin) | http://localhost:8000/ui-kit |
 
-### 3.2 Legacy prototype
+### 3.2 Legacy source removal
 
-The legacy application is not the final product. It is a working reference. It already
-contains:
-
-- Session authentication with users, roles, deactivation and forced password change.
-- Items and standards management.
-- Vendor management, vendor lookup and CSV import.
-- AQL plans, AQL rows, lookup and default plan selection.
-- Inspection list, inspection creation, delivery columns and the read-only check sheet.
-- The delivery dialog with three steps: delivery and sample, measurements, result.
-- Dashboard statistics.
-- Backend unit tests and database integration tests.
-- Frontend unit tests, component tests and route tests.
-
-No new product features should be added to backend or frontend. Only critical fixes are
-allowed there until the PHP application is complete.
+The Node/Express backend and Angular frontend were removed on 2026-10-29. The repository is
+full PHP. The database schema is preserved in laravel/database/sql and docs/schema.sql, and
+the business rules are documented in CLAUDE.md. Do not reintroduce the old runtimes.
 
 ### 3.3 Reusable assets
 
 | Asset | Location | Reuse |
 |---|---|---|
-| Database schema | docs/schema.sql and backend/db/baseline.sql | Keep the existing tables and columns for the PHP application. |
-| SQL migrations | backend/db/migrations and laravel/database/sql/migrations | Keep both copies in sync until cutover. `db:setup` applies the laravel copy. |
-| Test fixtures | backend/db/seeds/test-fixtures.sql and laravel/database/sql/fixtures | Reuse for the PHP test database. |
-| OK and NG rules | backend/services/judgement.js | Port the rules and test cases to PHP. |
-| AQL rules | backend/services/aql.js | Port the rules and test cases to PHP. |
+| Database schema | docs/schema.sql and laravel/database/sql/baseline.sql | Keep the existing tables and columns for the PHP application. |
+| SQL migrations | laravel/database/sql/migrations | `db:setup` applies these files. |
+| Test fixtures | laravel/database/sql/fixtures | Reuse for the PHP test database. |
+| OK and NG rules | Documented in CLAUDE.md | Implement and test them in PHP. |
+| AQL rules | Documented in CLAUDE.md | Implement and test them in PHP. |
 | Paper form | docs/chek sheet-qhse.pdf | Source of truth for the PDF layout. |
 | Filled example | docs/chek sheet-qhse (cara isi).pdf | Source of truth for how the form is used. |
-| Old mockups | docs/design/mockups | Reference only until the owner approves the new design direction. |
+| UI components | laravel/resources/views/components/ui | Reuse for every authenticated page. The admin preview is /ui-kit. |
 
 ## 4. Target architecture
 
@@ -161,8 +148,8 @@ The final application is a Laravel monolith with server-rendered pages.
 - JavaScript is limited to browser behaviour such as menu state, theme, focus and
   transitions. It must not contain business rules.
 
-There is no separate REST API in the target application. The legacy REST API remains
-available only as a reference.
+There is no separate REST API in the target application. The application is a full PHP
+monolith; do not add a Node or Angular service.
 
 ### 4.2 Request flow
 
@@ -195,10 +182,8 @@ Browser request:
 
 | Path | Purpose |
 |---|---|
-| laravel | New PHP application. |
-| backend | Legacy Node API. Reference only. |
-| frontend | Legacy Angular application. Reference only. |
-| docs | Reference files, design material and this roadmap. |
+| laravel | The PHP application. This is the only product codebase. |
+| docs | Reference files, SQL schema and this roadmap. |
 
 ### 4.5 Local development
 
@@ -353,8 +338,9 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Two-tier application header with logo, pill search, live weather, date, avatar menu and centered module navigation. |
 | ✓ Done | User menu with Account Option, Help Center and a persistent Light/Dark/System theme control. |
 | ✓ Done | Admin user management: list/search/filter, create with a temporary password, edit, activate/deactivate, reset password and self-protection. |
+| ✓ Done | Reusable x-ui component library, global component styles, User Management refactor and an admin-only preview at /ui-kit. |
 | ✓ Done | Functional Blade shell with the new navbar, avatar menu and theme support. Other page designs will follow the new tokens. |
-| ✓ Done | Feature tests for login, logout, roles, inactive users, forced password change, loading state, Remember me, the remembered username, the navbar, the user menu, Help Center, theme persistence, profile photos and user management. |
+| ✓ Done | Feature tests for login, logout, roles, inactive users, forced password change, loading state, Remember me, the remembered username, the navbar, the user menu, Help Center, theme persistence, profile photos, user management and the UI kit. |
 
 ### Phase P2 - Master data
 
@@ -366,7 +352,7 @@ from Quality, as recorded in Section 9.
 | ✗ Planned | Standard create, update and delete with the existing validation rules. |
 | ✗ Planned | Vendor list, lookup, create, rename, delete and CSV import. |
 | ✗ Planned | AQL plan list, plan detail, row editing and default plan selection. |
-| ✗ Planned | Port the item, vendor and AQL tests from the legacy backend. |
+| ✗ Planned | Add PHP tests for the item, vendor and AQL rules documented in CLAUDE.md. |
 
 ### Phase P3 - Inspections
 
@@ -404,7 +390,7 @@ from Quality, as recorded in Section 9.
 | ✗ Planned | Full test suite and manual QC walkthrough against the paper form. |
 | ✗ Planned | WAMP deployment with Apache, PHP 8.5 and the production database. |
 | ✗ Planned | Backup and restore procedure. |
-| ✗ Planned | Remove the legacy backend and frontend directories after owner sign-off. |
+| ✓ Done | Remove the legacy backend and frontend directories. Done on 2026-10-29; the repository is full PHP. |
 | ✗ Planned | Update this plan and CLAUDE.md to reflect the final codebase. |
 
 ## 7. Testing and quality
@@ -444,7 +430,7 @@ Deployment checklist:
 
 | Topic | Open question | Current handling |
 |---|---|---|
-| Design | The old mockups are being reviewed again. | The login page is final as of 2026-10-27. The authenticated shell uses the attached two-tier header as of 2026-10-28. Build other screens with its tokens. |
+| Design | How should new screens look? | The login page is final. The authenticated shell and the x-ui component library are the design system. Use /ui-kit as the reference. |
 | Weather | Which location should the navbar weather show? | Open-Meteo with Jakarta coordinates, cached for 15 minutes. Confirm the plant location. |
 | Remember me | Where is the password stored? | The application never stores it. It remembers the username in an encrypted HttpOnly cookie and lets Edge or Chrome save and autofill the password. |
 | PHP patch | XAMPP has PHP 8.2.12. The development runtime is 8.5.4. Production should be 8.5.12. | Use the portable PHP 8.5 runtime for development and install 8.5.12 for deployment. |
@@ -466,4 +452,4 @@ The migration is done when:
 3. The AQL sample size, acceptance number and rejection number are correct.
 4. A checker can check the inspection and the PDF matches Form 7.4.3-F1.
 5. The application runs on WAMP with PHP 8.5 and the production database.
-6. The test suite is green and the legacy backend and frontend are no longer needed.
+6. The test suite is green and no legacy Node or Angular code remains.
