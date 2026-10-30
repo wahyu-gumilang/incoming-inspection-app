@@ -116,6 +116,53 @@ class ItemRepository
         return DB::table('inventtable')->where('itemid', $itemid)->exists();
     }
 
+    public function findStandard(string $itemid, string $type, string $inspectitem): ?object
+    {
+        return DB::table('inventinspectitem')
+            ->where('itemid', $itemid)
+            ->where('inspecttype', $type)
+            ->where('inspectitem', $inspectitem)
+            ->first();
+    }
+
+    public function standardExists(string $itemid, string $type, string $inspectitem): bool
+    {
+        return DB::table('inventinspectitem')
+            ->where('itemid', $itemid)
+            ->whereRaw('TRIM(inspecttype) = ?', [trim($type)])
+            ->whereRaw('TRIM(inspectitem) = ?', [trim($inspectitem)])
+            ->exists();
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function createStandard(array $data): void
+    {
+        DB::table('inventinspectitem')->insert($data);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function updateStandard(string $itemid, string $type, string $inspectitem, array $data): int
+    {
+        return DB::table('inventinspectitem')
+            ->where('itemid', $itemid)
+            ->where('inspecttype', $type)
+            ->where('inspectitem', $inspectitem)
+            ->update($data);
+    }
+
+    public function deleteStandard(string $itemid, string $type, string $inspectitem): int
+    {
+        return DB::table('inventinspectitem')
+            ->where('itemid', $itemid)
+            ->where('inspecttype', $type)
+            ->where('inspectitem', $inspectitem)
+            ->delete();
+    }
+
     private function standardCountQuery(?string $type = null): Builder
     {
         return DB::table('inventinspectitem as standard')

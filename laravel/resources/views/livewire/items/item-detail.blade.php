@@ -69,7 +69,20 @@
                         </span>
                     </div>
 
-                    <span class="item-standard-count">{{ $standards->count() }}</span>
+                    <span class="item-standard-actions">
+                        <span class="item-standard-count">{{ $standards->count() }}</span>
+
+                        @if ($canManage && in_array($key, ['STD', 'CERTIFIKAT', 'VISUAL', 'FITTING'], true))
+                            <x-ui.button
+                                variant="ghost"
+                                size="sm"
+                                icon="plus"
+                                wire:click="openStandardCreate('{{ $key }}')"
+                            >
+                                Add
+                            </x-ui.button>
+                        @endif
+                    </span>
                 </div>
 
                 @if ($standards->isEmpty())
@@ -88,6 +101,9 @@
                                     @if ($key === 'STD')
                                         <th>Min</th>
                                         <th>Max</th>
+                                    @endif
+                                    @if ($canManage)
+                                        <th class="item-standard-action-head">Actions</th>
                                     @endif
                                 </tr>
                             </thead>
@@ -124,6 +140,24 @@
                                             <td class="item-standard-number">{{ $minimum ?? '—' }}</td>
                                             <td class="item-standard-number">{{ $maximum ?? '—' }}</td>
                                         @endif
+
+                                        @if ($canManage)
+                                            <td class="item-standard-action-cell">
+                                                <span class="item-standard-row-actions">
+                                                    <x-ui.icon-button
+                                                        icon="pencil"
+                                                        :label="'Edit '.trim((string) $standard->inspectitem)"
+                                                        wire:click="openStandardEdit({{ \Illuminate\Support\Js::from($standard->inspecttype) }}, {{ \Illuminate\Support\Js::from($standard->inspectitem) }})"
+                                                    />
+                                                    <x-ui.icon-button
+                                                        icon="trash-2"
+                                                        variant="danger"
+                                                        :label="'Delete '.trim((string) $standard->inspectitem)"
+                                                        wire:click="confirmStandardDelete({{ \Illuminate\Support\Js::from($standard->inspecttype) }}, {{ \Illuminate\Support\Js::from($standard->inspectitem) }})"
+                                                    />
+                                                </span>
+                                            </td>
+                                        @endif
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -158,5 +192,149 @@
                 </div>
             </form>
         </x-ui.modal>
+    @endif
+
+    @if ($showStandard)
+        @php
+            $standardSection = $sections[$standardType] ?? [
+                'label' => ucfirst(strtolower($standardType)),
+                'description' => 'Inspection requirement',
+                'icon' => 'package',
+                'tone' => 'other',
+            ];
+        @endphp
+
+        <x-ui.modal
+            :title="($editingStandard ? 'Edit ' : 'Add ').$standardSection['label'].' standard'"
+            :subtitle="'Part number '.$item->itemid.' · '.$standardSection['description']"
+            close="closeStandard"
+        >
+            <form wire:submit="saveStandard" class="form">
+                <div class="standard-form-type type-{{ $standardSection['tone'] }}">
+                    <span class="standard-form-type-icon">
+                        <x-icon :name="$standardSection['icon']" :size="18" />
+                    </span>
+                    <span class="standard-form-type-copy">
+                        <strong>{{ $standardSection['label'] }}</strong>
+                        <small>{{ $standardSection['description'] }}</small>
+                    </span>
+                    <span class="standard-form-type-key">{{ $standardType }}</span>
+                </div>
+
+                <x-ui.field
+                    label="Characteristic"
+                    for="standard-item"
+                    name="standardItem"
+                    :hint="$editingStandard ? 'The characteristic is part of the standard key. Delete and recreate it to change the key.' : null"
+                >
+                    <input
+                        id="standard-item"
+                        class="input"
+                        type="text"
+                        wire:model="standardItem"
+                        maxlength="100"
+                        autocomplete="off"
+                        @disabled($editingStandard)
+                    >
+                </x-ui.field>
+
+                @if ($standardType === 'STD')
+                    <x-ui.field label="Standard value" for="standard-value" name="standardValue">
+                        <input
+                            id="standard-value"
+                            class="input mono"
+                            type="number"
+                            step="0.01"
+                            wire:model="standardValue"
+                        >
+                    </x-ui.field>
+
+                    <x-ui.field label="Tolerance text" for="standard-tolerance" name="tolerance" hint="Example: ±0.4">
+                        <input
+                            id="standard-tolerance"
+                            class="input"
+                            type="text"
+                            wire:model="tolerance"
+                            maxlength="50"
+                        >
+                    </x-ui.field>
+
+                    <div class="standard-form-grid">
+                        <x-ui.field label="Tolerance plus" for="standard-plus" name="tolerancePlus">
+                            <input
+                                id="standard-plus"
+                                class="input mono"
+                                type="number"
+                                step="0.01"
+                                wire:model="tolerancePlus"
+                            >
+                        </x-ui.field>
+
+                        <x-ui.field label="Tolerance minus" for="standard-minus" name="toleranceMinus">
+                            <input
+                                id="standard-minus"
+                                class="input mono"
+                                type="number"
+                                step="0.01"
+                                wire:model="toleranceMinus"
+                            >
+                        </x-ui.field>
+                    </div>
+                @else
+                    <x-ui.field label="Standard / requirement" for="standard-text" name="standardText">
+                        <input
+                            id="standard-text"
+                            class="input"
+                            type="text"
+                            wire:model="standardText"
+                            maxlength="100"
+                        >
+                    </x-ui.field>
+
+                    <x-ui.field label="Tolerance / note" for="standard-tolerance" name="tolerance">
+                        <input
+                            id="standard-tolerance"
+                            class="input"
+                            type="text"
+                            wire:model="tolerance"
+                            maxlength="50"
+                            placeholder="Optional"
+                        >
+                    </x-ui.field>
+                @endif
+
+                <div class="modal-foot">
+                    <x-ui.button variant="secondary" type="button" icon="x" wire:click="closeStandard">Cancel</x-ui.button>
+                    <x-ui.button variant="primary" type="submit" icon="save" wire:loading.attr="disabled">
+                        {{ $editingStandard ? 'Save standard' : 'Add standard' }}
+                    </x-ui.button>
+                </div>
+            </form>
+        </x-ui.modal>
+    @endif
+
+    @if ($showDeleteStandard)
+        @php
+            $deleteSection = $sections[$deleteStandardType] ?? [
+                'label' => ucfirst(strtolower($deleteStandardType)),
+            ];
+        @endphp
+
+        <x-ui.confirm
+            title="Delete standard"
+            close="closeStandardDelete"
+            confirm="deleteStandard"
+            confirm-label="Delete"
+            confirm-icon="trash-2"
+            variant="danger"
+        >
+            <p>
+                Delete <strong>{{ $deleteStandardItem }}</strong> from the
+                <strong>{{ $deleteSection['label'] }}</strong> section? This cannot be undone.
+            </p>
+            @error('standardDelete')
+                <p class="field-error">{{ $message }}</p>
+            @enderror
+        </x-ui.confirm>
     @endif
 </div>

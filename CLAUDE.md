@@ -48,7 +48,7 @@ The application is the only product codebase. Its SQL schema and migrations live
   public/css/components.css. User Management is the reference consumer. The admin-only
   preview is at /ui-kit.
 - Items master data is implemented: list, search, standards filter, pagination, detail,
-  create and rename. Standard CRUD, vendors, AQL administration, inspections and PDF remain.
+  create, rename and standard CRUD. Vendors, AQL administration, inspections and PDF remain.
 
 ## 4. QC workflow
 

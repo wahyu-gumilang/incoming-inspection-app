@@ -469,6 +469,94 @@
     font-weight: 800;
 }
 
+.item-standard-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.item-standard-actions .btn {
+    min-height: 30px;
+    color: var(--type-color);
+}
+
+.item-standard-action-head {
+    width: 96px;
+    text-align: right;
+}
+
+.item-standard-action-cell {
+    width: 96px;
+}
+
+.item-standard-row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.standard-form-type {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, var(--type-color) 20%, var(--border));
+    border-radius: 14px;
+    background: linear-gradient(90deg, var(--type-soft), transparent 80%);
+}
+
+.standard-form-type-icon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid color-mix(in srgb, var(--type-color) 20%, transparent);
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--type-color) 10%, var(--surface));
+    color: var(--type-color);
+}
+
+.standard-form-type-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.standard-form-type-copy strong {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.standard-form-type-copy small {
+    overflow: hidden;
+    color: var(--text-3);
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.standard-form-type-key {
+    margin-left: auto;
+    padding: 3px 7px;
+    border: 1px solid color-mix(in srgb, var(--type-color) 18%, var(--border));
+    border-radius: 7px;
+    background: color-mix(in srgb, var(--type-color) 7%, var(--surface));
+    color: var(--type-color);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+}
+
+.standard-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
 .item-standard-empty {
     display: flex;
     align-items: center;
@@ -485,7 +573,7 @@
 }
 
 .item-standard-table {
-    min-width: 620px;
+    min-width: 700px;
     font-size: 12px;
 }
 
@@ -565,6 +653,14 @@
 
     .item-standard-head {
         padding: 14px 16px;
+    }
+
+    .item-standard-actions {
+        gap: 6px;
+    }
+
+    .standard-form-grid {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .item-standard-table th,
