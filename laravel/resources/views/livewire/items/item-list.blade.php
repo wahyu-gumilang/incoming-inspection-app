@@ -89,7 +89,7 @@
                     description="Try another part number or name, or clear the standards filter."
                 >
                     <x-slot:actions>
-                        <x-ui.button variant="secondary" wire:click="resetFilters">Clear filters</x-ui.button>
+                        <x-ui.button variant="secondary" icon="rotate-ccw" wire:click="resetFilters">Clear filters</x-ui.button>
                     </x-slot:actions>
                 </x-ui.empty-state>
             </div>
@@ -186,8 +186,8 @@
                 </x-ui.field>
 
                 <div class="modal-foot">
-                    <x-ui.button variant="secondary" type="button" wire:click="closeCreate">Cancel</x-ui.button>
-                    <x-ui.button variant="primary" type="submit" wire:loading.attr="disabled">Create item</x-ui.button>
+                    <x-ui.button variant="secondary" type="button" icon="x" wire:click="closeCreate">Cancel</x-ui.button>
+                    <x-ui.button variant="primary" type="submit" icon="plus" wire:loading.attr="disabled">Create item</x-ui.button>
                 </div>
             </form>
         </x-ui.modal>

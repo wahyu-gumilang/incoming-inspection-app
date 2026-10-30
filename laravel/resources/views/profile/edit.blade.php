@@ -92,8 +92,8 @@
             </x-ui.field>
 
             <div class="form-actions">
-                <x-ui.button variant="primary" type="submit">Save changes</x-ui.button>
-                <x-ui.button :href="route('password.change')">Change password</x-ui.button>
+                <x-ui.button variant="primary" type="submit" icon="save">Save changes</x-ui.button>
+                <x-ui.button :href="route('password.change')" icon="key">Change password</x-ui.button>
             </div>
         </form>
     </div>

@@ -9,17 +9,17 @@
             <p class="ui-kit-note">Primary, secondary, ghost, danger and success actions.</p>
 
             <div class="ui-kit-row">
-                <x-ui.button variant="primary">Primary</x-ui.button>
-                <x-ui.button>Secondary</x-ui.button>
-                <x-ui.button variant="ghost">Ghost</x-ui.button>
-                <x-ui.button variant="danger">Delete</x-ui.button>
-                <x-ui.button variant="success">Approve</x-ui.button>
+                <x-ui.button variant="primary" icon="check">Primary</x-ui.button>
+                <x-ui.button icon="settings">Secondary</x-ui.button>
+                <x-ui.button variant="ghost" icon="search">Ghost</x-ui.button>
+                <x-ui.button variant="danger" icon="trash-2">Delete</x-ui.button>
+                <x-ui.button variant="success" icon="check">Approve</x-ui.button>
             </div>
 
             <div class="ui-kit-row">
                 <x-ui.button variant="primary" icon="plus">Add item</x-ui.button>
                 <x-ui.button size="sm" icon="download">Export</x-ui.button>
-                <x-ui.button variant="primary" href="{{ route('dashboard') }}">Link button</x-ui.button>
+                <x-ui.button variant="primary" href="{{ route('dashboard') }}" icon-after="arrow-up-right">Link button</x-ui.button>
             </div>
 
             <div class="ui-kit-row">
@@ -111,8 +111,8 @@
             <p class="ui-kit-note">Modal forms and destructive-action confirmation.</p>
 
             <div class="ui-kit-row">
-                <x-ui.button variant="primary" wire:click="openModal">Open modal</x-ui.button>
-                <x-ui.button variant="danger" wire:click="openConfirm">Open confirmation</x-ui.button>
+                <x-ui.button variant="primary" icon="maximize-2" wire:click="openModal">Open modal</x-ui.button>
+                <x-ui.button variant="danger" icon="alert-triangle" wire:click="openConfirm">Open confirmation</x-ui.button>
             </div>
         </section>
 
@@ -151,8 +151,8 @@
             <p>Modal content uses the same fields, buttons and spacing as the rest of the app.</p>
 
             <div class="modal-foot">
-                <x-ui.button wire:click="closeModal">Cancel</x-ui.button>
-                <x-ui.button variant="primary" wire:click="closeModal">Save example</x-ui.button>
+                <x-ui.button icon="x" wire:click="closeModal">Cancel</x-ui.button>
+                <x-ui.button variant="primary" icon="save" wire:click="closeModal">Save example</x-ui.button>
             </div>
         </x-ui.modal>
     @endif

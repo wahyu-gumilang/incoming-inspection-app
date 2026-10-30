@@ -68,7 +68,7 @@
             </label>
 
             <div class="form-actions">
-                <button class="btn btn-primary" type="submit">Update password</button>
+                <x-ui.button variant="primary" type="submit" icon="key">Update password</x-ui.button>
             </div>
         </form>
     </div>

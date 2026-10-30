@@ -110,6 +110,70 @@
             <path d="M12 5v14"></path>
             @break
 
+        @case('user-plus')
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <line x1="19" x2="19" y1="8" y2="14"></line>
+            <line x1="22" x2="16" y1="11" y2="11"></line>
+            @break
+
+        @case('copy')
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+            @break
+
+        @case('save')
+            <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path>
+            <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path>
+            <path d="M7 3v4a1 1 0 0 0 1 1h7"></path>
+            @break
+
+        @case('trash-2')
+            <path d="M3 6h18"></path>
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+            <line x1="10" x2="10" y1="11" y2="17"></line>
+            <line x1="14" x2="14" y1="11" y2="17"></line>
+            @break
+
+        @case('chevron-left')
+            <path d="m15 18-6-6 6-6"></path>
+            @break
+
+        @case('arrow-right')
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+            @break
+
+        @case('arrow-up-right')
+            <path d="M7 7h10v10"></path>
+            <path d="M7 17 17 7"></path>
+            @break
+
+        @case('rotate-ccw')
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+            @break
+
+        @case('download')
+            <path d="M12 15V3"></path>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <path d="m7 10 5 5 5-5"></path>
+            @break
+
+        @case('alert-triangle')
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path>
+            <path d="M12 9v4"></path>
+            <path d="M12 17h.01"></path>
+            @break
+
+        @case('maximize-2')
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" x2="14" y1="3" y2="10"></line>
+            <line x1="3" x2="10" y1="21" y2="14"></line>
+            @break
+
         @case('pencil')
             <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
             <path d="m15 5 4 4"></path>

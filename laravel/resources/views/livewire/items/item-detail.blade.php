@@ -153,8 +153,8 @@
                 </x-ui.field>
 
                 <div class="modal-foot">
-                    <x-ui.button variant="secondary" type="button" wire:click="closeEdit">Cancel</x-ui.button>
-                    <x-ui.button variant="primary" type="submit" wire:loading.attr="disabled">Save name</x-ui.button>
+                    <x-ui.button variant="secondary" type="button" icon="x" wire:click="closeEdit">Cancel</x-ui.button>
+                    <x-ui.button variant="primary" type="submit" icon="save" wire:loading.attr="disabled">Save name</x-ui.button>
                 </div>
             </form>
         </x-ui.modal>

@@ -8,7 +8,7 @@
         :description="'Welcome back, '.auth()->user()->fullname.'.'"
     >
         <x-slot:actions>
-            <x-ui.button variant="primary" :href="route('items.index')">Browse items</x-ui.button>
+            <x-ui.button variant="primary" :href="route('items.index')" icon-after="arrow-right">Browse items</x-ui.button>
         </x-slot:actions>
     </x-ui.page-header>
 

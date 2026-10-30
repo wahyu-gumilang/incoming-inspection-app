@@ -18,6 +18,6 @@
             This module is wired into the new navigation. The page is ready for its feature work
             in the next phase of the PHP migration.
         </p>
-        <x-ui.button variant="primary" :href="route('dashboard')">Back to dashboard</x-ui.button>
+        <x-ui.button variant="primary" :href="route('dashboard')" icon="arrow-left">Back to dashboard</x-ui.button>
     </div>
 @endsection

@@ -19,7 +19,7 @@
     >
         <x-slot:actions>
             <x-ui.badge variant="warning">Admin access</x-ui.badge>
-            <x-ui.button variant="primary" icon="plus" wire:click="openCreate">Add user</x-ui.button>
+            <x-ui.button variant="primary" icon="user-plus" wire:click="openCreate">Add user</x-ui.button>
         </x-slot:actions>
     </x-ui.page-header>
 
@@ -31,7 +31,7 @@
             </div>
             <div class="temp-password-value">
                 <code>{{ session('temporary_password') }}</code>
-                <x-ui.button variant="secondary" size="sm" type="button" data-copy-password>Copy</x-ui.button>
+                <x-ui.button variant="secondary" size="sm" type="button" icon="copy" data-copy-password>Copy</x-ui.button>
             </div>
         </div>
     @endif
@@ -235,8 +235,8 @@
                 </x-ui.field>
 
                 <div class="modal-foot">
-                    <x-ui.button variant="secondary" type="button" wire:click="closeCreate">Cancel</x-ui.button>
-                    <x-ui.button variant="primary" type="submit" wire:loading.attr="disabled">Create user</x-ui.button>
+                    <x-ui.button variant="secondary" type="button" icon="x" wire:click="closeCreate">Cancel</x-ui.button>
+                    <x-ui.button variant="primary" type="submit" icon="plus" wire:loading.attr="disabled">Create user</x-ui.button>
                 </div>
             </form>
         </x-ui.modal>
@@ -283,8 +283,8 @@
                 </x-ui.field>
 
                 <div class="modal-foot">
-                    <x-ui.button variant="secondary" type="button" wire:click="closeEdit">Cancel</x-ui.button>
-                    <x-ui.button variant="primary" type="submit" wire:loading.attr="disabled">Save changes</x-ui.button>
+                    <x-ui.button variant="secondary" type="button" icon="x" wire:click="closeEdit">Cancel</x-ui.button>
+                    <x-ui.button variant="primary" type="submit" icon="save" wire:loading.attr="disabled">Save changes</x-ui.button>
                 </div>
             </form>
         </x-ui.modal>
@@ -296,6 +296,7 @@
             close="closeReset"
             confirm="resetPassword"
             confirm-label="Reset password"
+            confirm-icon="key"
             variant="primary"
         >
             <p>
@@ -312,6 +313,7 @@
             close="closeToggle"
             confirm="toggleActive"
             :confirm-label="$toggleToActive ? 'Activate' : 'Deactivate'"
+            :confirm-icon="$toggleToActive ? 'user-check' : 'user-x'"
             :variant="$toggleToActive ? 'success' : 'danger'"
         >
             <p>

@@ -8,6 +8,7 @@
             wire:click="previousPage"
             @disabled($paginator->onFirstPage())
         >
+            <x-icon name="chevron-left" :size="14" />
             Previous
         </button>
 
@@ -28,6 +29,7 @@
             @disabled(! $paginator->hasMorePages())
         >
             Next
+            <x-icon name="chevron-right" :size="14" />
         </button>
     </nav>
 @endif
