@@ -126,6 +126,18 @@ class UserManager extends Component
         $this->resetPage();
     }
 
+    public function applyStatFilter(string $stat): void
+    {
+        if (! in_array($stat, ['all', 'active', 'inactive'], true)) {
+            return;
+        }
+
+        $this->status = $stat === 'all' ? '' : $stat;
+        $this->openRole = false;
+        $this->openStatus = false;
+        $this->resetPage();
+    }
+
     public function toggleFormRole(): void
     {
         $this->openFormRole = ! $this->openFormRole;
@@ -300,15 +312,29 @@ class UserManager extends Component
 
     public function render(): View
     {
+        $repository = app(UserRepository::class);
+
         return view('livewire.users.user-manager', [
-            'users' => app(UserRepository::class)->paginate(
+            'users' => $repository->paginate(
                 $this->search,
                 $this->role,
                 $this->status,
                 $this->perPage,
             ),
+            'stats' => $repository->stats(),
+            'activeStat' => $this->activeStat(),
             'currentUserId' => auth()->id(),
         ]);
+    }
+
+    private function activeStat(): ?string
+    {
+        return match ($this->status) {
+            '' => 'all',
+            'active' => 'active',
+            'inactive' => 'inactive',
+            default => null,
+        };
     }
 
     /**

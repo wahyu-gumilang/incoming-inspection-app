@@ -10,6 +10,23 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserRepository
 {
+    /**
+     * @return array{total: int, active: int, inactive: int, roles: array<string, int>}
+     */
+    public function stats(): array
+    {
+        return [
+            'total' => User::query()->count(),
+            'active' => User::query()->where('active', true)->count(),
+            'inactive' => User::query()->where('active', false)->count(),
+            'roles' => User::query()
+                ->selectRaw('role, count(*) as aggregate')
+                ->groupBy('role')
+                ->pluck('aggregate', 'role')
+                ->all(),
+        ];
+    }
+
     public function paginate(
         string $search = '',
         string $role = '',

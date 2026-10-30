@@ -64,6 +64,17 @@
         </section>
 
         <section class="card ui-kit-section">
+            <h2>Stat cards</h2>
+            <p class="ui-kit-note">Compact summaries for dashboards and list pages.</p>
+
+            <div class="ui-stat-grid">
+                <x-ui.stat tone="blue" icon="users" label="Total users" value="128" note="Accounts in the system" />
+                <x-ui.stat tone="green" icon="check" label="Active" value="119" note="Can sign in now" />
+                <x-ui.stat tone="orange" icon="shield" label="Admins" value="4" note="Full management access" />
+            </div>
+        </section>
+
+        <section class="card ui-kit-section">
             <h2>Fields and search</h2>
             <p class="ui-kit-note">Labels, hints, validation messages and the search input.</p>
 

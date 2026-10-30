@@ -1,11 +1,12 @@
-<div>
+<div class="users-page">
     @php
         $roleOptions = ['' => 'All roles'];
+        $formRoleOptions = [];
         foreach (\App\Domain\User\Role::all() as $roleOption) {
-            $roleOptions[$roleOption] = \App\Domain\User\Role::label($roleOption);
+            $roleLabel = \App\Domain\User\Role::label($roleOption);
+            $roleOptions[$roleOption] = $roleLabel.' ('.number_format((int) ($stats['roles'][$roleOption] ?? 0)).')';
+            $formRoleOptions[$roleOption] = $roleLabel;
         }
-        $formRoleOptions = $roleOptions;
-        unset($formRoleOptions['']);
         $statusOptions = ['' => 'All statuses', 'active' => 'Active', 'inactive' => 'Inactive'];
         $roleTones = ['' => 'neutral', \App\Domain\User\Role::INSPECTOR => 'inspector', \App\Domain\User\Role::CHECKER => 'checker', \App\Domain\User\Role::ADMIN => 'admin'];
         $statusTones = ['' => 'neutral', 'active' => 'active', 'inactive' => 'inactive'];
@@ -17,6 +18,7 @@
         description="Accounts and roles. Only administrators can manage users."
     >
         <x-slot:actions>
+            <x-ui.badge variant="warning">Admin access</x-ui.badge>
             <x-ui.button variant="primary" icon="plus" wire:click="openCreate">Add user</x-ui.button>
         </x-slot:actions>
     </x-ui.page-header>
@@ -37,6 +39,53 @@
     @if ($statusMessage)
         <x-ui.alert variant="success">{{ $statusMessage }}</x-ui.alert>
     @endif
+
+    <div class="ui-stat-grid">
+        <x-ui.stat
+            tone="blue"
+            icon="users"
+            label="Total users"
+            :value="number_format($stats['total'])"
+            note="Accounts in the system"
+            class="is-interactive {{ $activeStat === 'all' ? 'is-active' : '' }}"
+            role="button"
+            tabindex="0"
+            wire:click="applyStatFilter('all')"
+            wire:keydown.enter="applyStatFilter('all')"
+            wire:keydown.space.prevent="applyStatFilter('all')"
+            aria-pressed="{{ $activeStat === 'all' ? 'true' : 'false' }}"
+        />
+
+        <x-ui.stat
+            tone="green"
+            icon="user-check"
+            label="Active users"
+            :value="number_format($stats['active'])"
+            note="Can sign in now"
+            class="is-interactive {{ $activeStat === 'active' ? 'is-active' : '' }}"
+            role="button"
+            tabindex="0"
+            wire:click="applyStatFilter('active')"
+            wire:keydown.enter="applyStatFilter('active')"
+            wire:keydown.space.prevent="applyStatFilter('active')"
+            aria-pressed="{{ $activeStat === 'active' ? 'true' : 'false' }}"
+        />
+
+        <x-ui.stat
+            tone="red"
+            icon="user-x"
+            label="Inactive users"
+            :value="number_format($stats['inactive'])"
+            note="Blocked from signing in"
+            class="is-interactive {{ $activeStat === 'inactive' ? 'is-active' : '' }}"
+            role="button"
+            tabindex="0"
+            wire:click="applyStatFilter('inactive')"
+            wire:keydown.enter="applyStatFilter('inactive')"
+            wire:keydown.space.prevent="applyStatFilter('inactive')"
+            aria-pressed="{{ $activeStat === 'inactive' ? 'true' : 'false' }}"
+        />
+    </div>
 
     <div class="card users-panel">
         <div class="users-toolbar">

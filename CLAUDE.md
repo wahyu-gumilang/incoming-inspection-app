@@ -47,7 +47,8 @@ The application is the only product codebase. Its SQL schema and migrations live
 - The reusable UI kit lives in resources/views/components/ui with global styles in
   public/css/components.css. User Management is the reference consumer. The admin-only
   preview is at /ui-kit.
-- Master data, AQL administration, inspections and PDF are not yet implemented in PHP.
+- Items master data is implemented: list, search, standards filter, pagination, detail,
+  create and rename. Standard CRUD, vendors, AQL administration, inspections and PDF remain.
 
 ## 4. QC workflow
 
@@ -92,7 +93,7 @@ Inside laravel, follow standard Laravel structure:
 | app/Livewire | Livewire components when a separate class is needed. |
 | resources/views | Blade views and single-file Livewire components. |
 | resources/views/components | Reusable Blade components such as the app navbar and icons. |
-| resources/views/components/ui | The x-ui component library: buttons, alerts, badges, fields, search, dropdown, modal, confirm, pagination and empty state. |
+| resources/views/components/ui | The x-ui component library: buttons, alerts, badges, stat cards, fields, search, dropdown, modal, confirm, pagination and empty state. |
 | public/css and public/js | Styles and browser scripts loaded by the Blade layouts. |
 | public/css/components.css | Shared component styles. Page-specific styles are loaded per page. |
 | storage/app/public/avatars | Uploaded profile photos. Never commit them. |
@@ -401,10 +402,11 @@ controllers, Livewire components or Blade views.
   fields, search bars, dropdowns, modals, confirmations, pagination or empty states.
 - Available components:
   - x-ui.button, with variant primary, secondary, ghost, danger or success; size md or sm;
-    optional icon, block and href.
+    optional icon, iconAfter, block and href.
   - x-ui.icon-button for compact table actions.
   - x-ui.alert with variant success, error, warning or info.
   - x-ui.badge, x-ui.role-badge and x-ui.status-badge.
+  - x-ui.stat, a compact summary card with label, value, note, icon and tone (blue, orange, green, red or violet).
   - x-ui.page-header with eyebrow, title, description and an actions slot.
   - x-ui.field with label, for, name and optional hint. It reads Livewire validation errors
     from the name property.
@@ -465,7 +467,7 @@ Implemented on 2026-10-28.
 | Palette | Ink and neutral surfaces with an orange accent. The light page background is #e9edf2; the dark page background is #070b12. |
 | Type | Manrope for the authenticated shell. Use tabular numbers for weather, dates and metrics. |
 | Forms | Use the gray --form-border-focus and --form-ring tokens for inputs, selects, textareas and buttons. Do not use the near-black brand for input focus. The users filters and the form role select use x-filter-select with a notched panel and coloured option text. |
-| Navigation | Dashboard, Inspection Form, AQL Table, Vendor, Reports and User Management. User Management is ADMIN only. |
+| Navigation | Dashboard, Items, Inspection Form, AQL Table, Vendor, Reports and User Management. User Management is ADMIN only. |
 | User menu | Compact disclosure panel (max 280px) with a sharp upward notch under the avatar. The profile header shows only the name and role. Account Option contains User Setting, Help Center and Sign out. A second divider precedes the theme control. |
 | Avatar | Show usertable.avatar_path through the avatars route when present; otherwise show the user's initials. Upload and remove on the profile page. Never commit uploaded photos. |
 | Theme | Light, Dark and System are a segmented click control. It posts to profile.theme, saves usertable.theme and applies immediately. Revert and show an error if the save fails. |
@@ -483,7 +485,7 @@ Implemented on 2026-10-28.
 - Login page tests cover the loading state markup, remember token, remembered username, failed login and inactive users.
 - Navbar tests cover the primary menu, admin-only user management, module placeholders, the search query, the user menu, Help Center and theme persistence.
 - Profile tests cover avatar upload, removal, validation and serving.
-- User management tests cover admin access, search and filters, create with a temporary password, edit, self-protection, activation and password reset.
+- User management tests cover admin access, search and filters, stat-card filter synchronization, create with a temporary password, edit, self-protection, activation and password reset.
 - Test success paths and the main error paths.
 - Test exactly on each limit and 0.01 outside each limit.
 - Test Min, Max, zero tolerance, negative tolerance, qualitative tolerance and empty values.

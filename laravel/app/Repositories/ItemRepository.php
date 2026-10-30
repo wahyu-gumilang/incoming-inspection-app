@@ -4,43 +4,125 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ItemRepository
 {
-    /**
-     * Search the legacy item master and count its standards in one query.
-     *
-     * @return Collection<int, object>
-     */
-    public function search(?string $term, int $limit = 25): Collection
-    {
-        $term = trim((string) $term);
+    private const TYPES = ['STD', 'CERTIFIKAT', 'VISUAL', 'FITTING'];
 
-        return DB::table('inventtable as item')
-            ->select(['item.itemid', 'item.name', 'item.inspectqty'])
-            ->selectSub(
-                DB::table('inventinspectitem as standard')
-                    ->selectRaw('count(*)')
-                    ->whereColumn('standard.itemid', 'item.itemid'),
-                'standards_count',
-            )
-            ->when($term !== '', function ($query) use ($term): void {
+    /**
+     * @return LengthAwarePaginator<int, object>
+     */
+    public function paginate(string $term = '', string $standards = 'all', int $perPage = 20): LengthAwarePaginator
+    {
+        $term = trim($term);
+
+        $query = DB::table('inventtable as item')
+            ->select(['item.itemid', 'item.name'])
+            ->selectSub($this->standardCountQuery(), 'standards_count');
+
+        foreach (self::TYPES as $type) {
+            $query->selectSub(
+                $this->standardCountQuery($type),
+                strtolower($type).'_count',
+            );
+        }
+
+        $query
+            ->when($term !== '', function (Builder $query) use ($term): void {
                 $like = '%'.$term.'%';
 
-                $query->where(function ($query) use ($like): void {
+                $query->where(function (Builder $query) use ($like): void {
                     $query->where('item.itemid', 'like', $like)
                         ->orWhere('item.name', 'like', $like);
                 });
             })
-            ->orderBy('item.itemid')
-            ->limit($limit)
+            ->when($standards === 'with', function (Builder $query): void {
+                $query->whereExists(function (Builder $query): void {
+                    $query->selectRaw('1')
+                        ->from('inventinspectitem as standard')
+                        ->whereColumn('standard.itemid', 'item.itemid');
+                });
+            })
+            ->when($standards === 'without', function (Builder $query): void {
+                $query->whereNotExists(function (Builder $query): void {
+                    $query->selectRaw('1')
+                        ->from('inventinspectitem as standard')
+                        ->whereColumn('standard.itemid', 'item.itemid');
+                });
+            })
+            ->orderBy('item.itemid');
+
+        return $query->paginate($perPage);
+    }
+
+    /**
+     * @return array{total: int, with: int, without: int}
+     */
+    public function stats(): array
+    {
+        $total = DB::table('inventtable')->count();
+
+        $with = DB::table('inventtable as item')
+            ->whereExists(function (Builder $query): void {
+                $query->selectRaw('1')
+                    ->from('inventinspectitem as standard')
+                    ->whereColumn('standard.itemid', 'item.itemid');
+            })
+            ->count();
+
+        return [
+            'total' => $total,
+            'with' => $with,
+            'without' => $total - $with,
+        ];
+    }
+
+    public function find(string $itemid): ?object
+    {
+        return DB::table('inventtable as item')
+            ->select(['item.itemid', 'item.name'])
+            ->selectSub($this->standardCountQuery(), 'standards_count')
+            ->where('item.itemid', $itemid)
+            ->first();
+    }
+
+    /**
+     * @return Collection<int, object>
+     */
+    public function standardsFor(string $itemid): Collection
+    {
+        return DB::table('inventinspectitem')
+            ->select([
+                'itemid',
+                'inspecttype',
+                'inspectitem',
+                'standard_txt',
+                'standard',
+                'tolerance',
+                'tolerance_plus',
+                'tolerance_minus',
+            ])
+            ->where('itemid', $itemid)
+            ->orderByRaw('TRIM(inspecttype), inspectitem')
             ->get();
     }
 
-    public function count(): int
+    public function exists(string $itemid): bool
     {
-        return DB::table('inventtable')->count();
+        return DB::table('inventtable')->where('itemid', $itemid)->exists();
+    }
+
+    private function standardCountQuery(?string $type = null): Builder
+    {
+        return DB::table('inventinspectitem as standard')
+            ->selectRaw('count(*)')
+            ->whereColumn('standard.itemid', 'item.itemid')
+            ->when($type !== null, function (Builder $query) use ($type): void {
+                $query->whereRaw('TRIM(standard.inspecttype) = ?', [$type]);
+            });
     }
 }

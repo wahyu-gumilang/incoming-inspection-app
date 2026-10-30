@@ -20,6 +20,7 @@ class NavbarTest extends TestCase
             ->get('/')
             ->assertOk()
             ->assertSee('Dashboard')
+            ->assertSee('Items')
             ->assertSee('Inspection Form')
             ->assertSee('AQL Table')
             ->assertSee('Vendor')

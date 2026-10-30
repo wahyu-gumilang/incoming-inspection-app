@@ -12,4 +12,11 @@ class ItemsController extends Controller
     {
         return view('items.index');
     }
+
+    public function show(string $itemid): View
+    {
+        return view('items.show', [
+            'itemid' => $itemid,
+        ]);
+    }
 }

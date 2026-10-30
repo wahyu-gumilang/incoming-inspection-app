@@ -24,6 +24,7 @@ Route::middleware(['auth', 'active'])->group(function (): void {
     Route::middleware('password.changed')->group(function (): void {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/items', [ItemsController::class, 'index'])->name('items.index');
+        Route::get('/items/{itemid}', [ItemsController::class, 'show'])->name('items.show');
         Route::get('/inspections', [ModuleController::class, 'inspections'])->name('inspections.index');
         Route::get('/aql', [ModuleController::class, 'aql'])->name('aql.index');
         Route::get('/vendors', [ModuleController::class, 'vendors'])->name('vendors.index');

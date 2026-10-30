@@ -64,6 +64,24 @@ class UserManagementTest extends TestCase
             ->assertSet('openStatus', false);
     }
 
+    public function test_stat_cards_apply_and_sync_user_filters(): void
+    {
+        $admin = $this->makeUser(['role' => Role::ADMIN]);
+
+        Livewire::actingAs($admin)
+            ->test(UserManager::class)
+            ->set('role', Role::CHECKER)
+            ->call('applyStatFilter', 'active')
+            ->assertSet('role', Role::CHECKER)
+            ->assertSet('status', 'active')
+            ->call('applyStatFilter', 'inactive')
+            ->assertSet('role', Role::CHECKER)
+            ->assertSet('status', 'inactive')
+            ->call('applyStatFilter', 'all')
+            ->assertSet('role', Role::CHECKER)
+            ->assertSet('status', '');
+    }
+
     public function test_form_role_dropdown_selects_a_role(): void
     {
         $admin = $this->makeUser(['role' => Role::ADMIN]);
