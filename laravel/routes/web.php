@@ -9,6 +9,7 @@ use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UiKitController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\VendorManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/login', [LoginController::class, 'show'])->name('login');
@@ -27,7 +28,7 @@ Route::middleware(['auth', 'active'])->group(function (): void {
         Route::get('/items/{itemid}', [ItemsController::class, 'show'])->name('items.show');
         Route::get('/inspections', [ModuleController::class, 'inspections'])->name('inspections.index');
         Route::get('/aql', [ModuleController::class, 'aql'])->name('aql.index');
-        Route::get('/vendors', [ModuleController::class, 'vendors'])->name('vendors.index');
+        Route::get('/vendors', [VendorManagementController::class, 'index'])->name('vendors.index');
         Route::get('/reports', [ModuleController::class, 'reports'])->name('reports.index');
         Route::get('/users', [UserManagementController::class, 'index'])
             ->middleware('role:ADMIN')

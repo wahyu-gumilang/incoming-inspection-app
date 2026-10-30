@@ -51,7 +51,7 @@ class NavbarTest extends TestCase
     {
         $user = $this->makeUser();
 
-        foreach (['/inspections', '/aql', '/vendors', '/reports'] as $path) {
+        foreach (['/inspections', '/aql', '/reports'] as $path) {
             $this->actingAs($user)
                 ->get($path)
                 ->assertOk()

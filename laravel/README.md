@@ -3,8 +3,8 @@
 PHP 8.5, Laravel 13, Blade and Livewire 4 application for PT. Chubb Safes Indonesia.
 
 The system records incoming inspections against Form No. 7.4.3-F1. The dashboard, items
-master data, authentication, application shell, profile settings and user management are
-implemented. Standards, vendors, AQL administration, inspections and PDF output are the next
+master data with standards, vendors, authentication, application shell, profile settings and
+user management are implemented. AQL administration, inspections and PDF output are the next
 phases.
 
 ## Requirements

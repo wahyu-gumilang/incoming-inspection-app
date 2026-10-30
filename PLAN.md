@@ -100,12 +100,12 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | ✓ Done | User Management | Admin-only list with search, role and status filters, pagination, create, edit, activate/deactivate, reset password and self-protection. Temporary passwords are generated once. |
 | ✓ Done | UI component library | Reusable x-ui components for buttons, alerts, badges, stat cards, fields, search, dropdowns, modals, confirmations, pagination and empty states. Global styles, a User Management refactor and an admin preview at /ui-kit. |
 | ✓ Done | Items master data | List, search, standards filter, pagination, detail with grouped standards, create, rename and standard CRUD. |
-| ✗ Planned | Vendors | Vendor management and CSV import. |
+| ✓ Done | Vendors | Vendor list, search, create, rename, delete protection and CSV import. |
 | ✗ Planned | AQL administration | AQL plans and plan rows. |
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
 | ✗ Planned | Dashboard | Basic database counts are shown. KPI cards, NG chart and recent inspections still need the inspection data. |
 | ✗ Planned | Reporting | Submit and check workflow, PDF output. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit and the database setup command with 79 tests and 328 assertions. Judgement and AQL tests are next. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit and the database setup command with 86 tests and 357 assertions. Judgement and AQL tests are next. |
 
 Local addresses while the migration is in progress:
 
@@ -351,10 +351,11 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Item detail with standards grouped by STD, CERTIFIKAT, VISUAL and FITTING. |
 | ✓ Done | Item create and rename. |
 | ✓ Done | Standard create, update and delete with the existing validation rules. |
-| ✗ Planned | Vendor list, lookup, create, rename, delete and CSV import. |
+| ✓ Done | Vendor list, lookup, create, rename, delete with usage protection and CSV import. |
 | ✗ Planned | AQL plan list, plan detail, row editing and default plan selection. |
 | ✓ Done | PHP tests for the item list, detail, create, rename, standard CRUD, filter state and role visibility. |
-| ✗ Planned | Vendor and AQL rule tests documented in CLAUDE.md. |
+| ✓ Done | Vendor CRUD, usage protection and CSV import tests. |
+| ✗ Planned | AQL rule tests documented in CLAUDE.md. |
 
 ### Phase P3 - Inspections
 

@@ -48,7 +48,8 @@ The application is the only product codebase. Its SQL schema and migrations live
   public/css/components.css. User Management is the reference consumer. The admin-only
   preview is at /ui-kit.
 - Items master data is implemented: list, search, standards filter, pagination, detail,
-  create, rename and standard CRUD. Vendors, AQL administration, inspections and PDF remain.
+  create, rename and standard CRUD. Vendors are implemented with CRUD, usage protection and
+  CSV import. AQL administration, inspections and PDF remain.
 
 ## 4. QC workflow
 
@@ -424,6 +425,11 @@ controllers, Livewire components or Blade views.
   were approved on 2026-10-28. The Caps Lock warning was removed. Do not change its layout,
   background, card, copy or interactions without a new owner request.
 - Use the UI kit and its tokens for new screens. Do not introduce a second visual system.
+- Table rule: the `thead` font size must never be smaller than the `tbody` font size. Prefer
+  the shared `.items-table` typography and avoid per-table header sizes that shrink the header.
+  The shared table size is 11.5px with 0.04em header tracking. Keep primary name cells at a
+  moderate weight (around 650), not heavy display weights. Use the application font for table
+  identifiers and values; use tabular numerals instead of a monospace family.
 - The login page uses the Chubbsafes blue and dark glass palette. The authenticated shell uses
   an ink and neutral palette with an orange accent. The logo keeps the brand color.
 - The login page uses Inter. The authenticated shell uses Manrope, bundled at

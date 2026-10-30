@@ -26,15 +26,6 @@ class ModuleController extends Controller
         );
     }
 
-    public function vendors(): View
-    {
-        return $this->placeholder(
-            'Vendor',
-            'Supplier master data, lookup and CSV import.',
-            'building',
-        );
-    }
-
     public function reports(): View
     {
         return $this->placeholder(

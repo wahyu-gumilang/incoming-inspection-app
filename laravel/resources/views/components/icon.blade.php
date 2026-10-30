@@ -174,6 +174,19 @@
             <line x1="3" x2="10" y1="21" y2="14"></line>
             @break
 
+        @case('upload')
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" x2="12" y1="3" y2="15"></line>
+            @break
+
+        @case('file-up')
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path>
+            <path d="M14 2v6h6"></path>
+            <path d="M12 18v-6"></path>
+            <path d="m9 15 3-3 3 3"></path>
+            @break
+
         @case('pencil')
             <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
             <path d="m15 5 4 4"></path>
