@@ -1,0 +1,91 @@
+<div class="dialog-head">
+  <div>
+    <h2>{{ user.fullname }}</h2>
+    <p class="sub">
+      @{{ user.username }} · usernames can't be changed. Users are deactivated, never deleted.
+    </p>
+  </div>
+  <button
+    mat-icon-button
+    (click)="cancel()"
+    aria-label="Close"
+    [disabled]="saving || resetting"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div class="dialog-body">
+  @if (showResetPassword) {
+    <div class="temp-pw" role="alert">
+      <div class="temp-pw-text">
+        <span>Share this temporary password:</span>
+        <code>{{ showResetPassword }}</code>
+        <span class="hint">Shown only now. The user signs in with it and must change it.</span>
+      </div>
+      <button mat-flat-button color="primary" (click)="done()">Copy &amp; close</button>
+    </div>
+  } @else {
+    <div class="form-fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Full name</mat-label>
+        <input matInput [(ngModel)]="fullname" required maxlength="50" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email (optional)</mat-label>
+        <input matInput [(ngModel)]="email" email placeholder="user@example.com" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Role</mat-label>
+        <mat-select [(ngModel)]="role" [disabled]="isSelf">
+          @for (opt of roleOptions; track opt.value) {
+            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-checkbox [(ngModel)]="active" [disabled]="isSelf">Active (can sign in)</mat-checkbox>
+
+      @if (isSelf) {
+        <p class="hint self-note">You can't change your own role or deactivate yourself.</p>
+      }
+    </div>
+
+    <div class="reset-row">
+      <span class="sub">Forgot the password?</span>
+      <button
+        mat-stroked-button
+        color="warn"
+        (click)="resetPassword()"
+        [disabled]="resetting"
+      >
+        <mat-icon>lock_reset</mat-icon>
+        @if (resetting) {
+          Resetting…
+        } @else {
+          Reset password
+        }
+      </button>
+    </div>
+  }
+</div>
+
+<div class="dialog-foot">
+  @if (!showResetPassword) {
+    <button mat-button (click)="cancel()" [disabled]="saving || resetting">Cancel</button>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="save()"
+      [disabled]="saving || resetting || !fullname.trim()"
+    >
+      @if (saving) {
+        Saving…
+      } @else {
+        Save
+      }
+    </button>
+  }
+</div>

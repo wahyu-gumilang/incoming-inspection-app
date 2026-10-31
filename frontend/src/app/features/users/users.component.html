@@ -1,0 +1,187 @@
+<div class="users-page">
+  <div class="page-header">
+    <div>
+      <h1>Users</h1>
+      <p class="subtitle">
+        Accounts and roles. Only administrators see this page. Click a user to edit or
+        reset the password.
+      </p>
+    </div>
+    <div class="header-actions">
+      <button mat-flat-button color="primary" (click)="openCreateDialog()">
+        <mat-icon>person_add</mat-icon>
+        Add user
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-field">
+      <mat-label>Search users</mat-label>
+      <input
+        matInput
+        [ngModel]="search()"
+        (ngModelChange)="onSearch($event)"
+        placeholder="Search name or username…"
+      />
+      <mat-icon matPrefix>search</mat-icon>
+      @if (search()) {
+        <button matSuffix mat-icon-button (click)="onSearch('')" aria-label="Clear search">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    <div class="filter-chips" role="group" aria-label="Filter by role">
+      <button
+        mat-stroked-button
+        [class.active]="roleFilter() === ''"
+        (click)="onRoleFilter('')"
+      >
+        All roles
+      </button>
+      @for (opt of roleOptions; track opt.value) {
+        <button
+          mat-stroked-button
+          [class.active]="roleFilter() === opt.value"
+          (click)="onRoleFilter(opt.value)"
+        >
+          {{ opt.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-indicator />
+  } @else {
+    <div class="table-container">
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th class="sortable" (click)="onSort('fullname')">
+              User
+              @if (sort() === 'fullname') {
+                <mat-icon class="sort-icon">
+                  {{ order() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              }
+            </th>
+            <th class="sortable" (click)="onSort('username')">
+              Username
+              @if (sort() === 'username') {
+                <mat-icon class="sort-icon">
+                  {{ order() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              }
+            </th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="sortable" (click)="onSort('last_login_at')">
+              Last sign-in
+              @if (sort() === 'last_login_at') {
+                <mat-icon class="sort-icon">
+                  {{ order() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              }
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.userid) {
+            <tr
+              class="clickable"
+              [class.row-inactive]="!user.active"
+              (click)="openEditDialog(user)"
+              [matTooltip]="user.active ? 'Edit user' : 'Deactivated'"
+            >
+              <td>
+                <div class="user-cell">
+                  <span class="avatar">{{ user.fullname.charAt(0).toUpperCase() }}</span>
+                  <div class="user-name">
+                    <b>{{ user.fullname }}</b>
+                    @if (isSelf(user)) {
+                      <span class="chip chip-neutral">You</span>
+                    }
+                  </div>
+                </div>
+              </td>
+              <td class="mono">{{ user.username }}</td>
+              <td>
+                <span
+                  class="chip"
+                  [class.chip-admin]="user.role === 'ADMIN'"
+                  [class.chip-checker]="user.role === 'CHECKER'"
+                  [class.chip-inspector]="user.role === 'INSPECTOR'"
+                  [class.chip-neutral]="!user.active"
+                >
+                  {{ roleLabel(user) }}
+                </span>
+              </td>
+              <td>
+                @if (!user.active) {
+                  <span class="chip chip-neutral"><span class="dot"></span>Inactive</span>
+                } @else if (user.must_change_password) {
+                  <span class="chip chip-warn"><span class="dot"></span>Must change password</span>
+                } @else {
+                  <span class="chip chip-ok"><span class="dot"></span>Active</span>
+                }
+              </td>
+              <td class="subtle">{{ formatLastLogin(user.last_login_at) }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-row">
+                <div class="empty-state">
+                  <mat-icon>groups</mat-icon>
+                  <p>No users found</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <button
+          mat-button
+          [disabled]="page() <= 1"
+          (click)="onPageChange(1)"
+          matTooltip="First page"
+        >
+          <mat-icon>first_page</mat-icon>
+        </button>
+        <button
+          mat-button
+          [disabled]="page() <= 1"
+          (click)="onPageChange(page() - 1)"
+          matTooltip="Previous page"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <span class="page-info">
+          Page {{ page() }} of {{ totalPages() || 1 }}
+          ({{ total() }} total)
+        </span>
+
+        <button
+          mat-button
+          [disabled]="page() >= totalPages()"
+          (click)="onPageChange(page() + 1)"
+          matTooltip="Next page"
+        >
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+        <button
+          mat-button
+          [disabled]="page() >= totalPages()"
+          (click)="onPageChange(totalPages())"
+          matTooltip="Last page"
+        >
+          <mat-icon>last_page</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
+</div>

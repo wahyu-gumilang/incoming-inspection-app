@@ -1,0 +1,26 @@
+<?php
+
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ItemsController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/login', [LoginController::class, 'show'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.store');
+Route::post('/logout', [LoginController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
+
+Route::middleware(['auth', 'active'])->group(function (): void {
+    Route::get('/change-password', [PasswordController::class, 'show'])->name('password.change');
+    Route::post('/change-password', [PasswordController::class, 'update'])->name('password.update');
+
+    Route::middleware('password.changed')->group(function (): void {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/items', [ItemsController::class, 'index'])->name('items.index');
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    });
+});

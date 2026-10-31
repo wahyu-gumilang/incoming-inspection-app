@@ -1,0 +1,187 @@
+<div class="items-page">
+  <div class="page-header">
+    <div>
+      <h1>Items &amp; standards</h1>
+      <p class="subtitle">
+        Parts and their dimension, visual, fitting and certificate standards.
+        Standards are added after the item exists.
+      </p>
+    </div>
+    <div class="header-actions">
+      @if (auth.isAdmin()) {
+        <button mat-flat-button color="primary" (click)="openCreateDialog()">
+          <mat-icon>add</mat-icon>
+          Add item
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-field">
+      <mat-label>Search items</mat-label>
+      <input
+        matInput
+        [ngModel]="search()"
+        (ngModelChange)="onSearch($event)"
+        placeholder="Part no. or name"
+      />
+      <mat-icon matPrefix>search</mat-icon>
+      @if (search()) {
+        <button matSuffix mat-icon-button (click)="onSearch('')" aria-label="Clear search">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    <div class="filter-chips" role="group" aria-label="Filter by standards">
+      <button
+        mat-stroked-button
+        [class.active]="hasStandards() === undefined"
+        (click)="onFilterStandards(undefined)"
+      >
+        All
+      </button>
+      <button
+        mat-stroked-button
+        [class.active]="hasStandards() === true"
+        (click)="onFilterStandards(true)"
+      >
+        With standards
+      </button>
+      <button
+        mat-stroked-button
+        [class.active]="hasStandards() === false"
+        (click)="onFilterStandards(false)"
+      >
+        Without standards
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-indicator />
+  } @else {
+    <div class="table-container">
+      <table class="item-table">
+        <thead>
+          <tr>
+            <th class="sortable" (click)="onSort('itemid')">
+              Part No.
+              @if (sort() === 'itemid') {
+                <mat-icon class="sort-icon">
+                  {{ order() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              }
+            </th>
+            <th class="sortable" (click)="onSort('name')">
+              Part Name
+              @if (sort() === 'name') {
+                <mat-icon class="sort-icon">
+                  {{ order() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              }
+            </th>
+            <th>Standards</th>
+            <th class="actions-header">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.itemid) {
+            <tr class="clickable" (click)="openStandards(item)">
+              <td>
+                <span class="item-id">{{ item.itemid }}</span>
+              </td>
+              <td>{{ item.name }}</td>
+              <td>
+                <span class="std-counts">
+                  @for (count of typeCounts(item); track count.key) {
+                    <span
+                      class="type-chip"
+                      [class.chip-brand]="count.key === 'STD'"
+                      [class.chip-warn]="count.key === 'STD' && item.warningCount > 0"
+                      matTooltip="{{ count.label }} standards"
+                    >
+                      {{ count.count }} {{ count.label }}
+                    </span>
+                  }
+                  @if (typeCounts(item).length === 0) {
+                    <span class="subtle">No standards</span>
+                  }
+                </span>
+              </td>
+              <td class="actions-cell" (click)="$event.stopPropagation()">
+                @if (auth.isAdmin()) {
+                  <button
+                    mat-icon-button
+                    matTooltip="Edit item"
+                    (click)="openEditDialog(item)"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                }
+                <button
+                  mat-icon-button
+                  matTooltip="View standards"
+                  (click)="openStandards(item)"
+                >
+                  <mat-icon>table_chart</mat-icon>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="empty-row">
+                <div class="empty-state">
+                  <mat-icon>inventory_2</mat-icon>
+                  <p>No items found</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <button
+          mat-button
+          [disabled]="page() <= 1"
+          (click)="onPageChange(1)"
+          matTooltip="First page"
+        >
+          <mat-icon>first_page</mat-icon>
+        </button>
+        <button
+          mat-button
+          [disabled]="page() <= 1"
+          (click)="onPageChange(page() - 1)"
+          matTooltip="Previous page"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <span class="page-info">
+          Page {{ page() }} of {{ totalPages() || 1 }}
+          ({{ total() }} total)
+        </span>
+
+        <button
+          mat-button
+          [disabled]="page() >= totalPages()"
+          (click)="onPageChange(page() + 1)"
+          matTooltip="Next page"
+        >
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+        <button
+          mat-button
+          [disabled]="page() >= totalPages()"
+          (click)="onPageChange(totalPages())"
+          matTooltip="Last page"
+        >
+          <mat-icon>last_page</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
+</div>

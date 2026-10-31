@@ -1,0 +1,56 @@
+// One easing and three durations for every transition in the app (request of 2026-10-02).
+:root {
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur: 220ms;
+  --dur-slow: 320ms;
+}
+
+// Route changes use the browser's View Transitions (provideRouter(withViewTransitions())).
+// Only the page area animates; the navbar has its own name so it stays put.
+::view-transition-old(page) {
+  animation: page-out var(--dur-fast) var(--ease) both;
+}
+
+::view-transition-new(page) {
+  animation: page-in var(--dur) var(--ease) both;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+// Theme switch: colours fade instead of jumping.
+body,
+.surface-transition {
+  transition:
+    background-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  ::view-transition-old(page),
+  ::view-transition-new(page) {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}

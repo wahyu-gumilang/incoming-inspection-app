@@ -1,0 +1,69 @@
+<h2 mat-dialog-title>Import vendors from CSV</h2>
+
+<mat-dialog-content>
+  <p class="import-description">
+    Upload a CSV file with vendor data. The file should have columns
+    <code>vendaccount</code> and <code>name</code>, separated by comma or semicolon.
+    Existing vendor codes will be skipped.
+  </p>
+
+  <div
+    class="file-drop-zone"
+    tabindex="0"
+    role="button"
+    (click)="fileInput.click()"
+    (keydown.enter)="fileInput.click()"
+    (keydown.space)="fileInput.click()"
+  >
+    <input
+      #fileInput
+      type="file"
+      accept=".csv,.txt"
+      (change)="onFileSelected($event)"
+      hidden
+    />
+    @if (selectedFile) {
+      <div class="file-info">
+        <mat-icon>description</mat-icon>
+        <span>{{ selectedFile.name }}</span>
+        <span class="file-size">({{ (selectedFile.size / 1024).toFixed(1) }} KB)</span>
+      </div>
+    } @else {
+      <div class="file-placeholder">
+        <mat-icon>cloud_upload</mat-icon>
+        <span>Click to select a CSV file</span>
+      </div>
+    }
+  </div>
+
+  @if (result; as r) {
+    <div class="import-result">
+      @if (r.errors.length > 0) {
+        <div class="result-errors">
+          <h3>Errors</h3>
+          <ul>
+            @for (err of r.errors; track err) {
+              <li>{{ err }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()" [disabled]="uploading">Cancel</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="upload()"
+    [disabled]="!selectedFile || uploading"
+  >
+    @if (uploading) {
+      Uploading...
+    } @else {
+      Import
+    }
+  </button>
+</mat-dialog-actions>
