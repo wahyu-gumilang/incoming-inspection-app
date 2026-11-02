@@ -1,0 +1,223 @@
+.inspection-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.inspection-header-card {
+    padding: 20px;
+}
+
+.inspection-header-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.inspection-section-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.inspection-section-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 55%, var(--surface)), var(--surface));
+}
+
+.inspection-section-heading h2 {
+    margin-bottom: 3px;
+    font-size: 15px;
+    letter-spacing: -0.02em;
+}
+
+.inspection-section-heading p {
+    font-size: 11.5px;
+}
+
+.inspection-table-wrap {
+    overflow-x: auto;
+}
+
+.inspection-table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+    font-size: 11.5px;
+}
+
+.inspection-table th,
+.inspection-table td {
+    padding: 7px 9px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.inspection-table th {
+    background: color-mix(in srgb, var(--surface-2) 65%, var(--surface));
+    color: var(--text-3);
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.inspection-table thead tr:first-child th {
+    color: var(--text-2);
+    font-size: 11px;
+}
+
+.inspection-table tbody tr:last-child td,
+.inspection-table tbody tr:last-child th {
+    border-bottom: 0;
+}
+
+.inspection-table tbody tr:hover {
+    background: color-mix(in srgb, var(--brand) 3%, var(--surface));
+}
+
+.inspection-delivery-table {
+    min-width: 1180px;
+}
+
+.inspection-delivery-table th:first-child {
+    width: 150px;
+    text-transform: none;
+}
+
+.inspection-delivery-table td {
+    min-width: 105px;
+}
+
+.inspection-delivery-table tbody th {
+    background: var(--surface-2);
+    color: var(--text-2);
+    font-size: 10.5px;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.inspection-calculated-row td {
+    background: color-mix(in srgb, var(--brand) 4%, var(--surface));
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}
+
+.inspection-input {
+    width: 100%;
+    min-width: 66px;
+    height: 30px;
+    padding: 4px 7px;
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 11px;
+}
+
+.inspection-input:focus {
+    border-color: var(--form-border-focus);
+    outline: 2px solid var(--form-ring);
+    outline-offset: 0;
+}
+
+select.inspection-input {
+    min-width: 82px;
+}
+
+.inspection-lines-table {
+    min-width: 1250px;
+}
+
+.inspection-lines-table th:first-child,
+.inspection-lines-table td:first-child {
+    width: 42px;
+    text-align: center;
+}
+
+.inspection-lines-table thead tr:first-child th {
+    text-align: center;
+}
+
+.inspection-line-number {
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}
+
+.inspection-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    padding: 3px 6px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+.inspection-status.is-ok {
+    border-color: color-mix(in srgb, var(--ok) 25%, transparent);
+    background: var(--ok-bg);
+    color: var(--ok);
+}
+
+.inspection-status.is-ng {
+    border-color: color-mix(in srgb, var(--ng) 25%, transparent);
+    background: var(--ng-bg);
+    color: var(--ng);
+}
+
+.inspection-status.is-empty {
+    color: var(--text-3);
+}
+
+.inspection-muted {
+    padding: 22px 20px;
+    color: var(--text-3);
+    font-size: 11.5px;
+}
+
+.inspection-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 12px;
+}
+
+@media (max-width: 1000px) {
+    .inspection-header-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .inspection-header-card {
+        padding: 16px;
+    }
+
+    .inspection-header-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .inspection-section-heading {
+        padding: 14px 16px;
+    }
+
+    .inspection-table th,
+    .inspection-table td {
+        padding: 6px 8px;
+    }
+
+    .inspection-actions .btn {
+        width: 100%;
+    }
+}

@@ -1,0 +1,281 @@
+.aql-page {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 0;
+    background: transparent;
+}
+
+.report-sheet-scroll {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+.report-sheet-scroll:focus-visible {
+    outline: 3px solid var(--form-ring);
+    outline-offset: 2px;
+}
+
+.report-sheet-hint {
+    display: none;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 10px;
+    color: var(--text-3);
+    font-size: 11px;
+}
+
+.report-sheet-hint .icon {
+    color: var(--brand);
+}
+
+.aql-sheet {
+    width: 100%;
+    max-width: 1320px;
+    min-width: 1180px;
+    padding: 18px 22px 16px;
+    border: 1px solid #d7d7d7;
+    background: #ffffff;
+    color: #111111;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+}
+
+.aql-form-header {
+    display: grid;
+    grid-template-columns: 1.9fr 4.7fr 3.4fr;
+    border: 1px solid #222222;
+}
+
+.aql-form-number,
+.aql-form-title {
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #222222;
+}
+
+.aql-form-number {
+    padding: 10px 14px;
+    font-size: 11.5px;
+    white-space: nowrap;
+}
+
+.aql-form-title {
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    padding: 5px 12px;
+    text-align: center;
+}
+
+.aql-form-title strong {
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+}
+
+.aql-form-title span {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.aql-form-meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.aql-form-meta > * {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 21px;
+    padding: 2px 4px;
+    border-left: 1px solid #222222;
+    border-bottom: 1px solid #222222;
+    font-size: 9.5px;
+    font-weight: 700;
+}
+
+.aql-form-meta > :nth-child(-n + 3) {
+    border-left: 1px solid #222222;
+}
+
+.aql-form-meta > :nth-child(3n + 1) {
+    border-left: 0;
+}
+
+.aql-form-meta > :nth-child(n + 4) {
+    border-bottom: 0;
+    font-size: 10px;
+}
+
+.aql-form-part {
+    display: grid;
+    grid-template-columns: 1.1fr 1.1fr 1.1fr;
+    gap: 36px;
+    padding: 12px 0 9px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.aql-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.aql-form-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    background: #ffffff;
+    color: #111111;
+}
+
+.aql-form-table th,
+.aql-form-table td {
+    height: 20px;
+    padding: 1px 3px;
+    border: 1px solid #222222;
+    font-size: 10.5px;
+    line-height: 1.15;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.aql-form-table th {
+    background: #e6e5e5;
+    font-weight: 700;
+}
+
+.aql-group-row th {
+    height: 23px;
+    font-size: 11px;
+}
+
+.aql-number {
+    font-weight: 700;
+}
+
+.aql-actual {
+    background: #e6e5e5;
+}
+
+.aql-section-label {
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.aql-section-empty {
+    background: #ffffff;
+}
+
+.aql-section-tall {
+    height: auto;
+}
+
+.aql-bottom-label {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.aql-measuring {
+    background: #8bc34a;
+}
+
+.aql-sign-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-top: 14px;
+}
+
+.aql-sign-table td {
+    height: 22px;
+    padding: 3px;
+    border: 1px solid #222222;
+    font-size: 9.5px;
+    text-align: center;
+}
+
+.aql-sign-label {
+    font-weight: 700;
+}
+
+.aql-note {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin-top: 8px;
+    color: #111111;
+    font-size: 9.5px;
+    font-weight: 600;
+}
+
+.aql-note strong {
+    font-weight: 700;
+}
+
+@media (max-width: 1220px) {
+    .aql-page {
+        justify-content: flex-start;
+    }
+
+    .aql-sheet {
+        margin: 0 16px;
+        padding-inline: 24px;
+    }
+
+    .report-sheet-hint {
+        display: flex;
+    }
+}
+
+@media (max-width: 720px) {
+    .report-page-header .page-header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .report-page-header .page-header-actions .btn {
+        flex: 1 1 auto;
+    }
+
+    .aql-sheet {
+        margin: 0;
+        padding-inline: 16px;
+    }
+
+    .report-sheet-hint {
+        font-size: 10.5px;
+    }
+}
+
+@media print {
+    .app-navbar-wrap,
+    .page-header,
+    .report-sheet-hint {
+        display: none;
+    }
+
+    .report-sheet-scroll {
+        overflow: visible;
+        padding: 0;
+    }
+
+    .aql-page {
+        padding: 0;
+        background: #ffffff;
+    }
+
+    .aql-sheet {
+        max-width: none;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+    }
+}

@@ -49,7 +49,8 @@ The application is the only product codebase. Its SQL schema and migrations live
   preview is at /ui-kit.
 - Items master data is implemented: list, search, standards filter, pagination, detail,
   create, rename and standard CRUD. Vendors are implemented with CRUD, usage protection and
-  CSV import. AQL administration, inspections and PDF remain.
+  CSV import. The AQL input form and filled check-sheet output in Reports are implemented.
+  AQL plan administration, submission/checking and PDF remain.
 
 ## 4. QC workflow
 

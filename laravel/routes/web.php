@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AqlController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\AvatarController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemsController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\UiKitController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\VendorManagementController;
@@ -27,9 +29,10 @@ Route::middleware(['auth', 'active'])->group(function (): void {
         Route::get('/items', [ItemsController::class, 'index'])->name('items.index');
         Route::get('/items/{itemid}', [ItemsController::class, 'show'])->name('items.show');
         Route::get('/inspections', [ModuleController::class, 'inspections'])->name('inspections.index');
-        Route::get('/aql', [ModuleController::class, 'aql'])->name('aql.index');
+        Route::get('/aql', [AqlController::class, 'index'])->name('aql.index');
         Route::get('/vendors', [VendorManagementController::class, 'index'])->name('vendors.index');
-        Route::get('/reports', [ModuleController::class, 'reports'])->name('reports.index');
+        Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+        Route::get('/reports/{inspectnum}', [ReportsController::class, 'show'])->name('reports.show');
         Route::get('/users', [UserManagementController::class, 'index'])
             ->middleware('role:ADMIN')
             ->name('users.index');

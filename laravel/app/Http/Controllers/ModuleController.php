@@ -17,24 +17,6 @@ class ModuleController extends Controller
         );
     }
 
-    public function aql(): View
-    {
-        return $this->placeholder(
-            'AQL Table',
-            'Sampling plans, lot ranges and acceptance numbers for every inspection category.',
-            'table',
-        );
-    }
-
-    public function reports(): View
-    {
-        return $this->placeholder(
-            'Reports',
-            'Inspection reports, approval status and PDF printing.',
-            'reports',
-        );
-    }
-
     public function help(): View
     {
         return view('help.index');
