@@ -1,0 +1,745 @@
+.aql-plans-page {
+    position: relative;
+}
+
+.aql-plan-admin-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(3, 10, 22, 0.56);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: aql-plan-admin-fade 0.18s ease-out both;
+}
+
+.aql-plan-admin-dialog {
+    display: flex;
+    flex-direction: column;
+    width: min(1120px, 100%);
+    max-height: calc(100dvh - 48px);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.32);
+    animation: aql-plan-admin-rise 0.2s ease-out both;
+}
+
+.aql-plan-admin-dialog-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.aql-plan-admin-eyebrow {
+    color: var(--text-3);
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.aql-plan-admin-dialog-head h2 {
+    margin-top: 3px;
+    font-size: 20px;
+    letter-spacing: -0.03em;
+}
+
+.aql-plan-admin-dialog-body {
+    overflow-y: auto;
+    padding: 20px 24px 24px;
+}
+
+.aql-plan-detail-embedded-head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.aql-plan-detail-embedded-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.aql-plan-detail-kicker {
+    color: var(--text-3);
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.aql-plan-detail-embedded-title h2 {
+    overflow: hidden;
+    font-size: 18px;
+    letter-spacing: -0.03em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.aql-plan-detail-embedded-title p {
+    overflow: hidden;
+    color: var(--text-3);
+    font-size: 10.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@keyframes aql-plan-admin-fade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes aql-plan-admin-rise {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.985);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.aql-plans-page .btn-primary {
+    border-color: transparent;
+    background: linear-gradient(135deg, #b45309 0%, #0f766e 100%);
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(15, 118, 110, 0.22);
+}
+
+.aql-plans-page .btn-primary:hover {
+    border-color: transparent;
+    background: linear-gradient(135deg, #92400e 0%, #115e59 100%);
+    color: #ffffff;
+}
+
+[data-theme="dark"] .aql-plans-page .btn-primary {
+    background: linear-gradient(135deg, #fbbf24 0%, #2dd4bf 100%);
+    color: #06121f;
+    box-shadow: 0 10px 24px rgba(45, 212, 191, 0.16);
+}
+
+[data-theme="dark"] .aql-plans-page .btn-primary:hover {
+    background: linear-gradient(135deg, #f59e0b 0%, #14b8a6 100%);
+    color: #06121f;
+}
+
+.aql-plan-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.aql-plan-summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background:
+        radial-gradient(circle at 0% 0%, color-mix(in srgb, #b45309 7%, transparent), transparent 55%),
+        linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 55%, var(--surface)), var(--surface));
+    box-shadow: var(--shadow);
+}
+
+.aql-plan-summary-label {
+    color: var(--text-3);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.aql-plan-summary-item strong {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 24px;
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.aql-plan-summary-item small {
+    overflow: hidden;
+    color: var(--text-3);
+    font-size: 10.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.aql-plan-summary-default strong {
+    color: color-mix(in srgb, #0f766e 70%, var(--text));
+    font-size: 17px;
+    letter-spacing: -0.02em;
+}
+
+[data-theme="dark"] .aql-plan-summary-default strong {
+    color: #5eead4;
+}
+
+.aql-plans-panel {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 58%, var(--surface)), var(--surface) 190px);
+}
+
+.aql-plans-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 1;
+    height: 2px;
+    background: linear-gradient(90deg, #b45309, #0f766e, #2563eb);
+}
+
+.aql-plans-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.aql-plans-toolbar .ui-search {
+    flex: 1;
+    min-width: 240px;
+    max-width: 520px;
+}
+
+.aql-plans-count {
+    color: var(--text-3);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+
+.aql-plans-table-wrap {
+    overflow-x: auto;
+}
+
+.aql-plans-table {
+    min-width: 940px;
+    font-size: 11.5px;
+}
+
+.aql-plans-table th,
+.aql-plans-table td {
+    padding: 12px 20px;
+    vertical-align: middle;
+}
+
+.aql-plans-table th {
+    background: color-mix(in srgb, var(--surface-2) 70%, var(--surface));
+    color: var(--text-3);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.aql-plans-table tbody tr {
+    transition: background-color 0.18s ease;
+}
+
+.aql-plans-table tbody tr:hover {
+    background: linear-gradient(90deg, color-mix(in srgb, #0f766e 5%, var(--surface)), transparent 70%);
+}
+
+.aql-plans-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.aql-plan-main {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 230px;
+    max-width: 390px;
+}
+
+.aql-plan-name {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 12.5px;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.aql-plan-note {
+    overflow: hidden;
+    color: var(--text-3);
+    font-size: 10.5px;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.aql-plan-level {
+    display: inline-flex;
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--surface-sunk);
+    color: var(--text-2);
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.03em;
+}
+
+.aql-plan-aql {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.aql-plan-rows {
+    color: var(--text-2);
+    font-size: 11.5px;
+    white-space: nowrap;
+}
+
+.aql-plan-updated {
+    color: var(--text-3);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.aql-plan-actions-head {
+    width: 200px;
+    text-align: right;
+}
+
+.aql-plan-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.aql-plan-actions .btn {
+    white-space: nowrap;
+}
+
+.aql-plan-default-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-3);
+    font: inherit;
+    font-size: 10px;
+    font-weight: 750;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        border-color 0.16s ease,
+        background-color 0.16s ease,
+        color 0.16s ease;
+}
+
+.aql-plan-default-action:hover {
+    border-color: color-mix(in srgb, #0f766e 30%, var(--border));
+    background: color-mix(in srgb, #0f766e 7%, var(--surface));
+    color: #0f766e;
+}
+
+[data-theme="dark"] .aql-plan-default-action:hover {
+    color: #5eead4;
+}
+
+.aql-plan-muted {
+    color: var(--text-3);
+}
+
+.aql-plans-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-2) 45%, var(--surface));
+}
+
+.aql-plans-empty {
+    padding: 8px 20px 20px;
+}
+
+.aql-plans-empty .ui-empty-state {
+    border: 1px dashed var(--border-strong);
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at 50% 0%, color-mix(in srgb, #0f766e 7%, transparent), transparent 60%),
+        color-mix(in srgb, var(--surface-2) 55%, var(--surface));
+}
+
+.aql-plan-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.aql-plan-note-input {
+    height: auto;
+    min-height: 84px;
+    padding: 10px 12px;
+    resize: vertical;
+}
+
+.aql-plan-default-note {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 2px;
+    color: #0f766e;
+    font-size: 11.5px;
+    font-weight: 650;
+}
+
+[data-theme="dark"] .aql-plan-default-note {
+    color: #5eead4;
+}
+
+/* Plan detail */
+.aql-plan-detail-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: start;
+    padding: 20px;
+}
+
+.aql-plan-detail-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.aql-plan-detail-note {
+    max-width: 820px;
+    color: var(--text-2);
+    font-size: 11.5px;
+    line-height: 1.55;
+}
+
+.aql-plan-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.aql-plan-meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-sunk);
+    color: var(--text-2);
+    font-size: 10.5px;
+    font-weight: 650;
+}
+
+.aql-plan-meta-pill strong {
+    color: var(--text);
+    font-weight: 750;
+}
+
+.aql-plan-detail-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.aql-plan-rows-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.aql-plan-rows-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 55%, var(--surface)), var(--surface));
+}
+
+.aql-plan-rows-head h2 {
+    margin-bottom: 3px;
+    font-size: 15px;
+    letter-spacing: -0.02em;
+}
+
+.aql-plan-rows-head p {
+    font-size: 11.5px;
+}
+
+.aql-plan-rows-table {
+    min-width: 820px;
+    font-size: 11.5px;
+}
+
+.aql-plan-rows-table th,
+.aql-plan-rows-table td {
+    padding: 10px 16px;
+}
+
+.aql-plan-rows-table th:first-child,
+.aql-plan-rows-table td:first-child {
+    padding-left: 20px;
+}
+
+.aql-plan-rows-table th:last-child,
+.aql-plan-rows-table td:last-child {
+    padding-right: 20px;
+}
+
+.aql-plan-category {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.aql-plan-category.is-normal {
+    border-color: color-mix(in srgb, #2563eb 28%, transparent);
+    background: color-mix(in srgb, #2563eb 9%, var(--surface));
+    color: #1d4ed8;
+}
+
+.aql-plan-category.is-reduced {
+    border-color: color-mix(in srgb, #b45309 28%, transparent);
+    background: color-mix(in srgb, #b45309 9%, var(--surface));
+    color: #b45309;
+}
+
+.aql-plan-category.is-tightened {
+    border-color: color-mix(in srgb, #b42318 28%, transparent);
+    background: color-mix(in srgb, #b42318 9%, var(--surface));
+    color: #b42318;
+}
+
+[data-theme="dark"] .aql-plan-category.is-normal {
+    color: #93c5fd;
+}
+
+[data-theme="dark"] .aql-plan-category.is-reduced {
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .aql-plan-category.is-tightened {
+    color: #fca5a5;
+}
+
+.aql-plan-code {
+    color: var(--text-2);
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+}
+
+.aql-plan-number {
+    color: var(--text);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+}
+
+.aql-plan-lot {
+    color: var(--text-2);
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.aql-plan-row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+.aql-plan-rows-empty {
+    padding: 18px 20px 22px;
+}
+
+.aql-plan-rows-empty .ui-empty-state {
+    border: 1px dashed var(--border-strong);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--surface-2) 55%, var(--surface));
+}
+
+.aql-plan-row-form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.aql-plan-row-form-grid.is-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.aql-plan-lot-preview {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 11px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface-sunk);
+    color: var(--text-2);
+    font-size: 11px;
+}
+
+.aql-plan-lot-preview strong {
+    color: var(--text);
+    font-weight: 750;
+}
+
+@media (max-width: 900px) {
+    .aql-plan-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .aql-plan-summary-default {
+        grid-column: 1 / -1;
+    }
+
+    .aql-plan-detail-summary {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .aql-plan-detail-actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 720px) {
+    .aql-plan-admin-overlay {
+        padding: 0;
+    }
+
+    .aql-plan-admin-dialog {
+        width: 100%;
+        max-height: 100dvh;
+        border-radius: 0;
+    }
+
+    .aql-plan-admin-dialog-head {
+        padding: 16px;
+    }
+
+    .aql-plan-admin-dialog-body {
+        padding: 14px 16px 20px;
+    }
+
+    .aql-plan-detail-embedded-head {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+    }
+
+    .aql-plan-detail-embedded-head > .btn:first-child {
+        grid-column: 1 / -1;
+        justify-self: start;
+    }
+
+    .aql-plan-detail-embedded-title {
+        grid-column: 1;
+    }
+
+    .aql-plan-detail-embedded-head > .btn:last-child,
+    .aql-plan-detail-embedded-head > .badge {
+        grid-column: 2;
+    }
+
+    .aql-plan-summary {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .aql-plan-summary-default {
+        grid-column: auto;
+    }
+
+    .aql-plans-toolbar {
+        align-items: stretch;
+    }
+
+    .aql-plans-toolbar .ui-search {
+        max-width: none;
+        flex-basis: 100%;
+    }
+
+    .aql-plan-form-grid,
+    .aql-plan-row-form-grid,
+    .aql-plan-row-form-grid.is-two {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .aql-plans-table th,
+    .aql-plans-table td {
+        padding: 10px 16px;
+    }
+
+    .aql-plans-footer {
+        padding: 14px 16px;
+    }
+
+    .aql-plan-rows-head {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px 16px;
+    }
+
+    .aql-plan-rows-head .btn {
+        width: 100%;
+    }
+
+    .aql-plan-detail-summary {
+        padding: 16px;
+    }
+
+    .aql-plan-detail-actions .btn {
+        flex: 1;
+    }
+}

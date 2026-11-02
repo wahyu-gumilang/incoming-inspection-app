@@ -49,8 +49,8 @@ The application is the only product codebase. Its SQL schema and migrations live
   preview is at /ui-kit.
 - Items master data is implemented: list, search, standards filter, pagination, detail,
   create, rename and standard CRUD. Vendors are implemented with CRUD, usage protection and
-  CSV import. The AQL input form and filled check-sheet output in Reports are implemented.
-  AQL plan administration, submission/checking and PDF remain.
+  CSV import. The AQL input form, filled check-sheet output in Reports and AQL plan
+  administration are implemented. Submission/checking and PDF remain.
 
 ## 4. QC workflow
 
@@ -194,6 +194,10 @@ Required functions or methods:
 
 ### 7.4 AQL
 
+- AQL plans and plan rows are managed from the AQL Table page through the ADMIN/CHECKER
+  Manage plans dialog. There is no separate AQL plan page in the primary navigation.
+- Exactly one plan should be the default; deleting a default plan promotes another plan when possible.
+- A plan used by an inspection cannot be deleted, and plan rows may not overlap in the same category.
 - AQL values come from the inspection's AQL plan.
 - The lookup uses qty_receivedN and inspectcategoryN.
 - The server recalculates the values on every save. Client values are ignored.
@@ -479,7 +483,7 @@ Implemented on 2026-10-28.
 | Palette | Ink and neutral surfaces with an orange accent. The light page background is #e9edf2; the dark page background is #070b12. |
 | Type | Manrope for the authenticated shell. Use tabular numbers for weather, dates and metrics. |
 | Forms | Use the gray --form-border-focus and --form-ring tokens for inputs, selects, textareas and buttons. Do not use the near-black brand for input focus. The users filters and the form role select use x-filter-select with a notched panel and coloured option text. |
-| Navigation | Dashboard, Items, Inspection Form, AQL Table, Vendor, Reports and User Management. User Management is ADMIN only. |
+| Navigation | Dashboard, Inspection Form, AQL Table, Reports, Items, Vendor and User Management. User Management is ADMIN only. AQL plan administration is reachable from the AQL Table page for ADMIN and CHECKER. |
 | User menu | Compact disclosure panel (max 280px) with a sharp upward notch under the avatar. The profile header shows only the name and role. Account Option contains User Setting, Help Center and Sign out. A second divider precedes the theme control. |
 | Avatar | Show usertable.avatar_path through the avatars route when present; otherwise show the user's initials. Upload and remove on the profile page. Never commit uploaded photos. |
 | Theme | Light, Dark and System are a segmented click control. It posts to profile.theme, saves usertable.theme and applies immediately. Revert and show an error if the save fails. |

@@ -5,6 +5,12 @@
         description="Fill the inspection measurements, deliveries, and AQL results."
     >
         <x-slot:actions>
+            @if (auth()->user()?->isChecker())
+                <x-ui.button variant="secondary" icon="settings" wire:click="togglePlanAdmin">
+                    Manage plans
+                </x-ui.button>
+            @endif
+
             <x-ui.button variant="primary" icon="save" wire:click="save" wire:loading.attr="disabled">
                 Save inspection
             </x-ui.button>
@@ -360,4 +366,35 @@
             </x-ui.button>
         </div>
     </form>
+
+    @if ($showPlanAdmin && auth()->user()?->isChecker())
+        <div class="aql-plan-admin-overlay" wire:click.self="closePlanAdmin">
+            <div
+                class="aql-plan-admin-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Manage AQL plans"
+            >
+                <div class="aql-plan-admin-dialog-head">
+                    <div>
+                        <span class="aql-plan-admin-eyebrow">AQL Administration</span>
+                        <h2>Manage AQL plans</h2>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="icon-btn"
+                        wire:click="closePlanAdmin"
+                        aria-label="Close AQL plan administration"
+                    >
+                        <x-icon name="x" :size="18" />
+                    </button>
+                </div>
+
+                <div class="aql-plan-admin-dialog-body">
+                    <livewire:aql-plans.aql-plan-manager wire:key="aql-plan-manager" />
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

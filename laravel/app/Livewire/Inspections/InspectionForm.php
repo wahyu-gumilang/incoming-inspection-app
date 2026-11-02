@@ -24,6 +24,8 @@ class InspectionForm extends Component
 
     public ?string $openSelect = null;
 
+    public bool $showPlanAdmin = false;
+
     public string $instrument = '';
 
     public string $qfnum = '';
@@ -61,6 +63,19 @@ class InspectionForm extends Component
     public function updatedItemid(): void
     {
         $this->loadItem();
+    }
+
+    public function togglePlanAdmin(): void
+    {
+        abort_unless(auth()->user()?->isChecker(), 403);
+
+        $this->openSelect = null;
+        $this->showPlanAdmin = ! $this->showPlanAdmin;
+    }
+
+    public function closePlanAdmin(): void
+    {
+        $this->showPlanAdmin = false;
     }
 
     public function toggleSelect(string $select): void

@@ -19,12 +19,14 @@ class NavbarTest extends TestCase
         $this->actingAs($user)
             ->get('/')
             ->assertOk()
+            ->assertSeeInOrder(['Dashboard', 'Inspection Form', 'AQL Table', 'Reports', 'Items', 'Vendor'])
             ->assertSee('Dashboard')
             ->assertSee('Items')
             ->assertSee('Inspection Form')
             ->assertSee('AQL Table')
             ->assertSee('Vendor')
             ->assertSee('Reports')
+            ->assertDontSee('AQL Plans')
             ->assertDontSee('User Management')
             ->assertSee('Search items, part numbers...')
             ->assertSee('data-weather-badge', false)
@@ -44,7 +46,20 @@ class NavbarTest extends TestCase
         $this->actingAs($admin)
             ->get('/')
             ->assertOk()
+            ->assertDontSee('AQL Plans')
             ->assertSee('User Management');
+    }
+
+    public function test_checker_sees_the_primary_navigation_without_user_management(): void
+    {
+        $checker = $this->makeUser(['role' => Role::CHECKER]);
+
+        $this->actingAs($checker)
+            ->get('/')
+            ->assertOk()
+            ->assertDontSee('AQL Plans')
+            ->assertDontSee('User Management')
+            ->assertSee('AQL Table');
     }
 
     public function test_module_placeholders_are_available_to_signed_in_users(): void
