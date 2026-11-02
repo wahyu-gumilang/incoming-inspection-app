@@ -121,6 +121,7 @@
                     >
                         @if ($option['code'] ?? null)
                             <span class="ui-combobox-option-code">{{ $option['code'] }}</span>
+                            <span class="ui-combobox-option-divider" aria-hidden="true"></span>
                         @endif
 
                         <span class="ui-combobox-option-body">

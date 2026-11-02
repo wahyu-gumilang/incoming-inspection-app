@@ -47,6 +47,7 @@ class AqlPageTest extends TestCase
             ->call('toggleSelect', 'item')
             ->assertSet('openSelect', 'item')
             ->assertSee('data-value="000-228"', false)
+            ->assertSee('ui-combobox-option-divider', false)
             ->assertSee('selectItem($event.currentTarget.dataset.value)', false)
             ->assertSee('Handle Rhino Prima')
             ->call('selectItem', '000-228')

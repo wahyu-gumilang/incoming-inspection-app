@@ -616,20 +616,21 @@
 
 .ui-combobox-option-code {
     flex: none;
-    min-width: 52px;
-    padding: 3px 6px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--surface-sunk);
+    min-width: 48px;
     color: var(--text-2);
-    font-size: 9.5px;
+    font-size: 10px;
     font-weight: 750;
     letter-spacing: 0.04em;
-    text-align: center;
+}
+
+.ui-combobox-option-divider {
+    flex: none;
+    width: 1px;
+    height: 18px;
+    background: var(--border);
 }
 
 .ui-combobox-option.is-selected .ui-combobox-option-code {
-    border-color: color-mix(in srgb, var(--brand) 25%, var(--border));
     color: var(--brand);
 }
 
