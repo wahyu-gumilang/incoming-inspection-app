@@ -65,7 +65,11 @@ class InspectionForm extends Component
 
     public function toggleSelect(string $select): void
     {
-        if (! in_array($select, ['item', 'supplier', 'plan'], true)) {
+        $validHeader = in_array($select, ['item', 'supplier', 'plan'], true);
+        $validTable = preg_match('/^(category|judgment):[1-7]$/', $select) === 1
+            || preg_match('/^status:\d+:[1-7]$/', $select) === 1;
+
+        if (! $validHeader && ! $validTable) {
             return;
         }
 
@@ -93,6 +97,40 @@ class InspectionForm extends Component
         $this->planid = (int) $value;
         $this->resetValidation(['planid']);
         $this->recalculateAql();
+    }
+
+    public function selectCategory(string $value, int $column): void
+    {
+        if ($column < 1 || $column > 7 || ! in_array($value, ['', '0', '1', '2', '3'], true)) {
+            return;
+        }
+
+        $this->deliveries[$column]['category'] = $value;
+        $this->openSelect = null;
+        $this->resetValidation(["deliveries.{$column}.category"]);
+        $this->recalculateAql();
+    }
+
+    public function selectJudgment(string $value, int $column): void
+    {
+        if ($column < 1 || $column > 7 || ! in_array($value, ['0', '1', '2', '3'], true)) {
+            return;
+        }
+
+        $this->deliveries[$column]['judgment'] = $value;
+        $this->openSelect = null;
+        $this->resetValidation(["deliveries.{$column}.judgment"]);
+    }
+
+    public function selectOtherStatus(string $value, int $index, int $column): void
+    {
+        if (! isset($this->otherLines[$index]) || $column < 1 || $column > 7 || ! in_array($value, ['', '0', '1'], true)) {
+            return;
+        }
+
+        $this->otherLines[$index]['statuses'][$column] = $value;
+        $this->openSelect = null;
+        $this->resetValidation(["otherLines.{$index}.statuses.{$column}"]);
     }
 
     public function updatedPlanid(): void
@@ -289,6 +327,24 @@ class InspectionForm extends Component
         $categoryTones = [];
         $judgmentTones = [];
         $otherTones = [];
+        $categoryOptions = [
+            ['value' => '', 'label' => '—', 'meta' => 'Not selected'],
+            ['value' => '1', 'code' => 'N', 'label' => 'Normal'],
+            ['value' => '2', 'code' => 'R', 'label' => 'Reduce'],
+            ['value' => '3', 'code' => 'T', 'label' => 'Tightening'],
+            ['value' => '0', 'code' => '100%', 'label' => 'Full inspection'],
+        ];
+        $judgmentOptions = [
+            ['value' => '0', 'label' => '—', 'meta' => 'Not judged'],
+            ['value' => '1', 'code' => 'O', 'label' => 'Accepted'],
+            ['value' => '2', 'code' => 'X', 'label' => 'Rejected'],
+            ['value' => '3', 'code' => 'C', 'label' => 'Concession'],
+        ];
+        $statusOptions = [
+            ['value' => '', 'label' => '—', 'meta' => 'Not checked'],
+            ['value' => '1', 'code' => '✓', 'label' => 'OK'],
+            ['value' => '0', 'code' => '✕', 'label' => 'NG'],
+        ];
 
         foreach (range(1, 7) as $column) {
             $categoryTones[$column] = match ((string) ($this->deliveries[$column]['category'] ?? '')) {
@@ -335,6 +391,9 @@ class InspectionForm extends Component
             'categoryTones' => $categoryTones,
             'judgmentTones' => $judgmentTones,
             'otherTones' => $otherTones,
+            'categoryOptions' => $categoryOptions,
+            'judgmentOptions' => $judgmentOptions,
+            'statusOptions' => $statusOptions,
         ]);
     }
 

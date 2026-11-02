@@ -123,18 +123,20 @@
                             <th>Insp. Category</th>
                             @for ($column = 1; $column <= 7; $column++)
                                 <td>
-                                    <x-ui.select
+                                    <x-ui.combobox
+                                        id="inspection-category-{{ $column }}"
                                         size="sm"
+                                        floating
                                         :tone="$categoryTones[$column] ?? null"
-                                        wire:model.live="deliveries.{{ $column }}.category"
+                                        :options="$categoryOptions"
+                                        :value="$deliveries[$column]['category'] ?? ''"
+                                        placeholder="—"
+                                        :open="$openSelect === 'category:'.$column"
+                                        toggle="toggleSelect('category:{{ $column }}')"
+                                        select="selectCategory"
+                                        :select-key="$column"
                                         aria-label="Inspection category for delivery {{ $column }}"
-                                    >
-                                        <option value="">—</option>
-                                        <option value="1">N — Normal</option>
-                                        <option value="2">R — Reduce</option>
-                                        <option value="3">T — Tightening</option>
-                                        <option value="0">100% inspection</option>
-                                    </x-ui.select>
+                                    />
                                 </td>
                             @endfor
                         </tr>
@@ -183,17 +185,20 @@
                             <th>Judgment</th>
                             @for ($column = 1; $column <= 7; $column++)
                                 <td>
-                                    <x-ui.select
+                                    <x-ui.combobox
+                                        id="inspection-judgment-{{ $column }}"
                                         size="sm"
+                                        floating
                                         :tone="$judgmentTones[$column] ?? null"
-                                        wire:model="deliveries.{{ $column }}.judgment"
+                                        :options="$judgmentOptions"
+                                        :value="$deliveries[$column]['judgment'] ?? '0'"
+                                        placeholder="—"
+                                        :open="$openSelect === 'judgment:'.$column"
+                                        toggle="toggleSelect('judgment:{{ $column }}')"
+                                        select="selectJudgment"
+                                        :select-key="$column"
                                         aria-label="Judgment for delivery {{ $column }}"
-                                    >
-                                        <option value="0">—</option>
-                                        <option value="1">O — Accepted</option>
-                                        <option value="2">X — Rejected</option>
-                                        <option value="3">C — Concession</option>
-                                    </x-ui.select>
+                                    />
                                 </td>
                             @endfor
                         </tr>
@@ -325,16 +330,20 @@
                                             <input class="inspection-input" type="text" wire:model="otherLines.{{ $index }}.actuals.{{ $column }}" maxlength="100">
                                         </td>
                                         <td>
-                                            <x-ui.select
+                                            <x-ui.combobox
+                                                id="inspection-status-{{ $index }}-{{ $column }}"
                                                 size="sm"
+                                                floating
                                                 :tone="$otherTones[$index][$column] ?? null"
-                                                wire:model="otherLines.{{ $index }}.statuses.{{ $column }}"
+                                                :options="$statusOptions"
+                                                :value="$otherLines[$index]['statuses'][$column] ?? ''"
+                                                placeholder="—"
+                                                :open="$openSelect === 'status:'.$index.':'.$column"
+                                                toggle="toggleSelect('status:{{ $index }}:{{ $column }}')"
+                                                select="selectOtherStatus"
+                                                :select-key="$index.', '.$column"
                                                 aria-label="Result for {{ $line['inspectitem'] }} delivery {{ $column }}"
-                                            >
-                                                <option value="">—</option>
-                                                <option value="1">OK</option>
-                                                <option value="0">NG</option>
-                                            </x-ui.select>
+                                            />
                                         </td>
                                     @endfor
                                 </tr>

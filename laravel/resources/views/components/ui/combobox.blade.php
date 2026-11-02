@@ -5,10 +5,15 @@
     'open' => false,
     'toggle',
     'select',
+    'selectKey' => null,
     'searchable' => false,
     'disabled' => false,
     'id' => null,
     'icon' => null,
+    'ariaLabel' => null,
+    'size' => 'md',
+    'floating' => false,
+    'tone' => null,
 ])
 
 @php
@@ -23,8 +28,8 @@
 @endphp
 
 <div
-    {{ $attributes->merge(['class' => 'ui-combobox '.($open ? 'is-open' : '').' '.($disabled ? 'is-disabled' : '')]) }}
-    x-data="{ query: '' }"
+    {{ $attributes->merge(['class' => 'ui-combobox '.($size === 'sm' ? 'ui-combobox-sm' : '').' '.($floating ? 'ui-combobox-floating' : '').' '.($tone ? 'is-tone-'.$tone : '').' '.($open ? 'is-open' : '').' '.($disabled ? 'is-disabled' : '')]) }}
+    x-data="{ query: '', panelStyle: '' }"
     @if ($open && ! $disabled) wire:keydown.escape.window="{{ $toggle }}" @endif
 >
     @if ($open && ! $disabled)
@@ -34,7 +39,9 @@
     <button
         class="ui-combobox-trigger"
         type="button"
+        x-ref="trigger"
         @if ($id) id="{{ $id }}" @endif
+        @if ($ariaLabel) aria-label="{{ $ariaLabel }}" @endif
         wire:click="{{ $toggle }}"
         aria-haspopup="listbox"
         aria-expanded="{{ $open && ! $disabled ? 'true' : 'false' }}"
@@ -75,13 +82,25 @@
             <span class="ui-combobox-trigger-tag">{{ $selected['tag'] }}</span>
         @endif
 
-        <x-icon name="chevron-down" :size="16" class="ui-combobox-chevron" />
+        <x-icon name="chevron-down" :size="$size === 'sm' ? 14 : 16" class="ui-combobox-chevron" />
     </button>
 
     @if ($open && ! $disabled)
         <div
-            class="ui-dropdown-panel ui-combobox-panel"
+            class="ui-dropdown-panel ui-combobox-panel {{ $floating ? 'ui-combobox-floating-panel' : '' }}"
             @if ($id) id="{{ $id }}-panel" @endif
+            @if ($floating)
+                x-bind:style="panelStyle"
+                x-init="
+                    const rect = $refs.trigger.getBoundingClientRect();
+                    const width = Math.min(Math.max(rect.width, 210), window.innerWidth - 16);
+                    const left = Math.min(Math.max(8, rect.left), window.innerWidth - width - 8);
+                    const openUp = window.innerHeight - rect.bottom < 220 && rect.top > window.innerHeight - rect.bottom;
+                    panelStyle = openUp
+                        ? `bottom: ${window.innerHeight - rect.top + 6}px; top: auto; left: ${left}px; width: ${width}px`
+                        : `top: ${rect.bottom + 6}px; left: ${left}px; width: ${width}px`;
+                "
+            @endif
             role="listbox"
         >
             @if ($searchable)
@@ -115,7 +134,7 @@
                         role="option"
                         data-value="{{ $optionValue }}"
                         data-search="{{ $searchText }}"
-                        wire:click="{{ $select }}($event.currentTarget.dataset.value)"
+                        wire:click="{{ $select }}($event.currentTarget.dataset.value{{ $selectKey !== null ? ', '.$selectKey : '' }})"
                         aria-selected="{{ $isSelected ? 'true' : 'false' }}"
                         @if ($searchable) x-show="query === '' || $el.dataset.search.includes(query.toLowerCase())" @endif
                     >

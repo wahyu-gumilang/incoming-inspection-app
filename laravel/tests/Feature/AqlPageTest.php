@@ -36,11 +36,11 @@ class AqlPageTest extends TestCase
             ->get('/aql')
             ->assertOk()
             ->assertSee('ui-combobox', false)
+            ->assertDontSee('<select', false)
             ->assertSee('Choose an item...')
             ->assertSee('aria-controls="inspection-item-panel"', false)
-            ->assertSee('aria-label="Inspection category for delivery 1"', false)
-            ->assertSee('N — Normal')
-            ->assertSee('X — Rejected');
+            ->assertSee('inspection-category-1', false)
+            ->assertSee('aria-label="Inspection category for delivery 1"', false);
 
         Livewire::actingAs($user)
             ->test(InspectionForm::class)
@@ -62,6 +62,34 @@ class AqlPageTest extends TestCase
             ->assertSee('Current practice')
             ->call('selectPlan', '1')
             ->assertSet('planid', 1)
+            ->assertSet('openSelect', null);
+    }
+
+    public function test_delivery_selects_use_the_shared_combobox_and_update_values(): void
+    {
+        $user = $this->makeUser();
+
+        Livewire::actingAs($user)
+            ->test(InspectionForm::class)
+            ->set('itemid', '000-228')
+            ->call('toggleSelect', 'category:1')
+            ->assertSet('openSelect', 'category:1')
+            ->assertSee('data-value="1"', false)
+            ->assertSee('Normal')
+            ->assertSee('ui-combobox-option-divider', false)
+            ->assertSee('selectCategory($event.currentTarget.dataset.value, 1)', false)
+            ->call('selectCategory', '1', 1)
+            ->assertSet('deliveries.1.category', '1')
+            ->assertSet('openSelect', null)
+            ->call('toggleSelect', 'judgment:1')
+            ->assertSee('Accepted')
+            ->call('selectJudgment', '1', 1)
+            ->assertSet('deliveries.1.judgment', '1')
+            ->call('toggleSelect', 'status:0:1')
+            ->assertSee('OK')
+            ->assertSee('selectOtherStatus($event.currentTarget.dataset.value, 0, 1)', false)
+            ->call('selectOtherStatus', '1', 0, 1)
+            ->assertSet('otherLines.0.statuses.1', '1')
             ->assertSet('openSelect', null);
     }
 

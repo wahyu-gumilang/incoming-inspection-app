@@ -416,7 +416,8 @@ controllers, Livewire components or Blade views.
   - x-ui.select, a native select with the shared appearance, optional leading icon,
     compact size and status tones. Use it for dense tables and short option lists.
   - x-ui.combobox, a rich custom option list for long records. Options are arrays with
-    value, code, label, meta and tag, with searchable, open, toggle and select state.
+    value, code, label, meta and tag. It supports searchable, size, tone, floating,
+    select-key, open, toggle and select state for header and dense table selectors.
   - x-ui.dropdown, a keyboard-accessible custom select with label, value, options, tones,
     open, toggle, select, placement, disabled and id.
   - x-ui.modal and x-ui.confirm for dialogs and destructive actions.
