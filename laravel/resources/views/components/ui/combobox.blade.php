@@ -93,7 +93,7 @@
                 x-bind:style="panelStyle"
                 x-init="
                     const rect = $refs.trigger.getBoundingClientRect();
-                    const width = Math.min(Math.max(rect.width, 180), window.innerWidth - 16);
+                    const width = Math.min(Math.max(rect.width, 184), window.innerWidth - 16);
                     const left = Math.min(Math.max(8, rect.left), window.innerWidth - width - 8);
                     const openUp = window.innerHeight - rect.bottom < 220 && rect.top > window.innerHeight - rect.bottom;
                     panelStyle = openUp

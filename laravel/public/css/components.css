@@ -612,6 +612,14 @@
     display: none;
 }
 
+.ui-combobox-floating-panel .ui-combobox-option-label {
+    white-space: nowrap;
+}
+
+.ui-combobox-floating-panel .ui-combobox-check {
+    display: none;
+}
+
 .ui-combobox-search {
     display: flex;
     align-items: center;
