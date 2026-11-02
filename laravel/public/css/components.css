@@ -606,10 +606,42 @@
 
 .ui-dropdown-panel.ui-combobox-floating-panel {
     position: fixed;
+    padding: 5px;
 }
 
 .ui-dropdown-panel.ui-combobox-floating-panel::before {
     display: none;
+}
+
+.ui-combobox-floating-panel .ui-combobox-list {
+    max-height: min(280px, 48vh);
+}
+
+.ui-combobox-floating-panel .ui-combobox-option {
+    gap: 8px;
+    padding: 7px 8px;
+}
+
+.ui-combobox-floating-panel .ui-combobox-option-code {
+    min-width: 42px;
+    font-size: 9.5px;
+}
+
+.ui-combobox-floating-panel .ui-combobox-option-divider {
+    height: 16px;
+}
+
+.ui-combobox-floating-panel .ui-combobox-option-label {
+    font-size: 11.5px;
+}
+
+.ui-combobox-floating-panel .ui-combobox-option-meta {
+    font-size: 9.5px;
+}
+
+.ui-combobox-floating-panel .ui-combobox-tag {
+    padding: 2px 5px;
+    font-size: 8.5px;
 }
 
 .ui-combobox-search {
