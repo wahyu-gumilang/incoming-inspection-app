@@ -25,30 +25,44 @@
         <div class="card inspection-header-card">
             <div class="inspection-header-grid">
                 <x-ui.field label="Item" for="inspection-item" name="itemid">
-                    <x-ui.select id="inspection-item" icon="package" wire:model.live="itemid">
-                        <option value="">Choose an item...</option>
-                        @foreach ($items as $id => $name)
-                            <option value="{{ $id }}">{{ $id }} — {{ $name }}</option>
-                        @endforeach
-                    </x-ui.select>
+                    <x-ui.combobox
+                        id="inspection-item"
+                        icon="package"
+                        :options="$itemOptions"
+                        :value="$itemid"
+                        placeholder="Choose an item..."
+                        :open="$openSelect === 'item'"
+                        toggle="toggleSelect('item')"
+                        select="selectItem"
+                        searchable
+                    />
                 </x-ui.field>
 
                 <x-ui.field label="Supplier" for="inspection-vendor" name="accountnum">
-                    <x-ui.select id="inspection-vendor" icon="building" wire:model="accountnum">
-                        <option value="">Choose a supplier...</option>
-                        @foreach ($vendors as $id => $name)
-                            <option value="{{ $id }}">{{ $id }} — {{ $name }}</option>
-                        @endforeach
-                    </x-ui.select>
+                    <x-ui.combobox
+                        id="inspection-vendor"
+                        icon="building"
+                        :options="$vendorOptions"
+                        :value="$accountnum"
+                        placeholder="Choose a supplier..."
+                        :open="$openSelect === 'supplier'"
+                        toggle="toggleSelect('supplier')"
+                        select="selectSupplier"
+                        searchable
+                    />
                 </x-ui.field>
 
                 <x-ui.field label="AQL plan" for="inspection-plan" name="planid">
-                    <x-ui.select id="inspection-plan" icon="table" wire:model.live="planid">
-                        <option value="">Choose a plan...</option>
-                        @foreach ($plans as $plan)
-                            <option value="{{ $plan->planid }}">{{ $plan->name }} · {{ $plan->inspectlevel }} / {{ $plan->aql }}{{ $plan->isdefault ? ' · Default' : '' }}</option>
-                        @endforeach
-                    </x-ui.select>
+                    <x-ui.combobox
+                        id="inspection-plan"
+                        icon="table"
+                        :options="$planOptions"
+                        :value="$planid"
+                        placeholder="Choose a plan..."
+                        :open="$openSelect === 'plan'"
+                        toggle="toggleSelect('plan')"
+                        select="selectPlan"
+                    />
                 </x-ui.field>
 
                 <x-ui.field label="Measuring instrument" for="inspection-instrument" name="instrument">
@@ -111,6 +125,7 @@
                                 <td>
                                     <x-ui.select
                                         size="sm"
+                                        :tone="$categoryTones[$column] ?? null"
                                         wire:model.live="deliveries.{{ $column }}.category"
                                         aria-label="Inspection category for delivery {{ $column }}"
                                     >
@@ -170,6 +185,7 @@
                                 <td>
                                     <x-ui.select
                                         size="sm"
+                                        :tone="$judgmentTones[$column] ?? null"
                                         wire:model="deliveries.{{ $column }}.judgment"
                                         aria-label="Judgment for delivery {{ $column }}"
                                     >
@@ -311,6 +327,7 @@
                                         <td>
                                             <x-ui.select
                                                 size="sm"
+                                                :tone="$otherTones[$index][$column] ?? null"
                                                 wire:model="otherLines.{{ $index }}.statuses.{{ $column }}"
                                                 aria-label="Result for {{ $line['inspectitem'] }} delivery {{ $column }}"
                                             >

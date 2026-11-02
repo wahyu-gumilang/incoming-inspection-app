@@ -95,7 +95,7 @@ Inside laravel, follow standard Laravel structure:
 | app/Livewire | Livewire components when a separate class is needed. |
 | resources/views | Blade views and single-file Livewire components. |
 | resources/views/components | Reusable Blade components such as the app navbar and icons. |
-| resources/views/components/ui | The x-ui component library: buttons, alerts, badges, stat cards, fields, search, select, dropdown, modal, confirm, pagination and empty state. |
+| resources/views/components/ui | The x-ui component library: buttons, alerts, badges, stat cards, fields, search, select, combobox, dropdown, modal, confirm, pagination and empty state. |
 | public/css and public/js | Styles and browser scripts loaded by the Blade layouts. |
 | public/css/components.css | Shared component styles. Page-specific styles are loaded per page. |
 | storage/app/public/avatars | Uploaded profile photos. Never commit them. |
@@ -413,8 +413,10 @@ controllers, Livewire components or Blade views.
   - x-ui.field with label, for, name and optional hint. It reads Livewire validation errors
     from the name property.
   - x-ui.search. It forwards wire:model and other input attributes to the search input.
-  - x-ui.select, a native select with the shared appearance, optional leading icon and
-    compact size. Use it for long option lists where the custom dropdown is not practical.
+  - x-ui.select, a native select with the shared appearance, optional leading icon,
+    compact size and status tones. Use it for dense tables and short option lists.
+  - x-ui.combobox, a rich custom option list for long records. Options are arrays with
+    value, code, label, meta and tag, with searchable, open, toggle and select state.
   - x-ui.dropdown, a keyboard-accessible custom select with label, value, options, tones,
     open, toggle, select, placement, disabled and id.
   - x-ui.modal and x-ui.confirm for dialogs and destructive actions.

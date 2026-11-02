@@ -111,6 +111,24 @@
         </section>
 
         <section class="card ui-kit-section">
+            <h2>Rich combobox</h2>
+            <p class="ui-kit-note">A custom option list for records that need a code, name, meta line and optional tag.</p>
+
+            <x-ui.field label="AQL plan" for="kit-plan">
+                <x-ui.combobox
+                    id="kit-plan"
+                    icon="table"
+                    :options="$demoSelectOptions"
+                    :value="$demoSelect"
+                    placeholder="Choose a plan..."
+                    :open="$openDemoSelect"
+                    toggle="toggleDemoSelect"
+                    select="selectDemoSelect"
+                />
+            </x-ui.field>
+        </section>
+
+        <section class="card ui-kit-section">
             <h2>Dropdown</h2>
             <p class="ui-kit-note">A keyboard-accessible custom select with role tones.</p>
 

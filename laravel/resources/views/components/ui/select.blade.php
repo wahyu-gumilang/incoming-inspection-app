@@ -1,9 +1,10 @@
 @props([
     'size' => 'md',
     'icon' => null,
+    'tone' => null,
 ])
 
-<div class="ui-select {{ $size === 'sm' ? 'ui-select-sm' : '' }}">
+<div class="ui-select {{ $size === 'sm' ? 'ui-select-sm' : '' }} {{ $tone ? 'is-tone-'.$tone : '' }}">
     @if ($icon)
         <span class="ui-select-leading">
             <x-icon :name="$icon" :size="$size === 'sm' ? 14 : 16" />

@@ -18,7 +18,11 @@ class Preview extends Component
 
     public bool $openRole = false;
 
+    public bool $openDemoSelect = false;
+
     public string $role = Role::INSPECTOR;
+
+    public string $demoSelect = '2';
 
     public ?string $demoMessage = null;
 
@@ -67,6 +71,17 @@ class Preview extends Component
         $this->openRole = false;
     }
 
+    public function toggleDemoSelect(): void
+    {
+        $this->openDemoSelect = ! $this->openDemoSelect;
+    }
+
+    public function selectDemoSelect(string $value): void
+    {
+        $this->demoSelect = $value;
+        $this->openDemoSelect = false;
+    }
+
     public function render(): View
     {
         $page = $this->getPage();
@@ -82,6 +97,21 @@ class Preview extends Component
         return view('livewire.ui-kit.preview', [
             'paginator' => $paginator,
             'roleOptions' => Role::all(),
+            'demoSelectOptions' => [
+                [
+                    'value' => '1',
+                    'code' => 'S-1',
+                    'label' => 'Current practice',
+                    'meta' => 'Ac 0',
+                    'tag' => 'Default',
+                ],
+                [
+                    'value' => '2',
+                    'code' => 'II',
+                    'label' => 'ISO General Level II, AQL 2.5',
+                    'meta' => '2.5',
+                ],
+            ],
             'roleTones' => [
                 Role::INSPECTOR => 'inspector',
                 Role::CHECKER => 'checker',

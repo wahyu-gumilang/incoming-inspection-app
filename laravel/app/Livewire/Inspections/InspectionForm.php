@@ -22,6 +22,8 @@ class InspectionForm extends Component
 
     public ?int $planid = null;
 
+    public ?string $openSelect = null;
+
     public string $instrument = '';
 
     public string $qfnum = '';
@@ -59,6 +61,38 @@ class InspectionForm extends Component
     public function updatedItemid(): void
     {
         $this->loadItem();
+    }
+
+    public function toggleSelect(string $select): void
+    {
+        if (! in_array($select, ['item', 'supplier', 'plan'], true)) {
+            return;
+        }
+
+        $this->openSelect = $this->openSelect === $select ? null : $select;
+    }
+
+    public function selectItem(string $value): void
+    {
+        $this->openSelect = null;
+        $this->itemid = $value;
+        $this->resetValidation(['itemid']);
+        $this->loadItem();
+    }
+
+    public function selectSupplier(string $value): void
+    {
+        $this->openSelect = null;
+        $this->accountnum = $value;
+        $this->resetValidation(['accountnum']);
+    }
+
+    public function selectPlan(string $value): void
+    {
+        $this->openSelect = null;
+        $this->planid = (int) $value;
+        $this->resetValidation(['planid']);
+        $this->recalculateAql();
     }
 
     public function updatedPlanid(): void
@@ -220,8 +254,57 @@ class InspectionForm extends Component
         $plans = app(AqlPlanRepository::class)->plans();
         $statuses = $this->standardStatuses();
         $suggested = [];
+        $itemOptions = [];
+        $vendorOptions = [];
+        $planOptions = [];
+
+        foreach ($items as $id => $name) {
+            $itemOptions[] = [
+                'value' => (string) $id,
+                'code' => (string) $id,
+                'label' => (string) $name,
+            ];
+        }
+
+        foreach ($vendors as $id => $name) {
+            $vendorOptions[] = [
+                'value' => (string) $id,
+                'code' => (string) $id,
+                'label' => (string) $name,
+            ];
+        }
+
+        foreach ($plans as $plan) {
+            $level = trim((string) $plan->inspectlevel);
+
+            $planOptions[] = [
+                'value' => (string) $plan->planid,
+                'code' => $level !== '' ? $level : null,
+                'label' => (string) $plan->name,
+                'meta' => (string) $plan->aql,
+                'tag' => $plan->isdefault ? 'Default' : null,
+            ];
+        }
+
+        $categoryTones = [];
+        $judgmentTones = [];
+        $otherTones = [];
 
         foreach (range(1, 7) as $column) {
+            $categoryTones[$column] = match ((string) ($this->deliveries[$column]['category'] ?? '')) {
+                '1' => 'info',
+                '2', '3' => 'warn',
+                '0' => 'ng',
+                default => null,
+            };
+
+            $judgmentTones[$column] = match ((string) ($this->deliveries[$column]['judgment'] ?? '0')) {
+                '1' => 'ok',
+                '2' => 'ng',
+                '3' => 'warn',
+                default => null,
+            };
+
             $row = $this->aql[$column] ?? null;
 
             if ($row !== null) {
@@ -233,12 +316,25 @@ class InspectionForm extends Component
             }
         }
 
+        foreach ($this->otherLines as $index => $line) {
+            foreach (range(1, 7) as $column) {
+                $otherTones[$index][$column] = match ((string) ($line['statuses'][$column] ?? '')) {
+                    '1' => 'ok',
+                    '0' => 'ng',
+                    default => null,
+                };
+            }
+        }
+
         return view('livewire.inspections.inspection-form', [
-            'items' => $items,
-            'vendors' => $vendors,
-            'plans' => $plans,
+            'itemOptions' => $itemOptions,
+            'vendorOptions' => $vendorOptions,
+            'planOptions' => $planOptions,
             'standardStatuses' => $statuses,
             'suggested' => $suggested,
+            'categoryTones' => $categoryTones,
+            'judgmentTones' => $judgmentTones,
+            'otherTones' => $otherTones,
         ]);
     }
 
