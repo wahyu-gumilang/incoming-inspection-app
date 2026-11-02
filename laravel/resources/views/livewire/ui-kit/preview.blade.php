@@ -88,6 +88,29 @@
         </section>
 
         <section class="card ui-kit-section">
+            <h2>Native select</h2>
+            <p class="ui-kit-note">For long option lists. It shares the select appearance and supports a leading icon or compact size.</p>
+
+            <div class="ui-kit-stack">
+                <x-ui.field label="Inspection result" for="kit-result">
+                    <x-ui.select id="kit-result" icon="clipboard-check">
+                        <option value="">Choose a result...</option>
+                        <option value="1">OK</option>
+                        <option value="0">NG</option>
+                    </x-ui.select>
+                </x-ui.field>
+
+                <x-ui.field label="Compact select" for="kit-result-compact">
+                    <x-ui.select id="kit-result-compact" size="sm">
+                        <option value="">No result yet</option>
+                        <option value="1">OK</option>
+                        <option value="0">NG</option>
+                    </x-ui.select>
+                </x-ui.field>
+            </div>
+        </section>
+
+        <section class="card ui-kit-section">
             <h2>Dropdown</h2>
             <p class="ui-kit-note">A keyboard-accessible custom select with role tones.</p>
 

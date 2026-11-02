@@ -128,10 +128,6 @@
     outline-offset: 0;
 }
 
-select.inspection-input {
-    min-width: 82px;
-}
-
 .inspection-lines-table {
     min-width: 1250px;
 }

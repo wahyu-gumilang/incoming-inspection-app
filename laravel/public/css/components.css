@@ -298,6 +298,96 @@
     vertical-align: 1px;
 }
 
+.ui-select {
+    position: relative;
+    width: 100%;
+}
+
+.ui-select-native {
+    width: 100%;
+    height: 44px;
+    padding: 0 38px 0 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface-sunk);
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.3;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.ui-select-native:hover {
+    background: var(--surface);
+}
+
+.ui-select-native:focus {
+    border-color: var(--form-border-focus);
+    outline: 3px solid var(--form-ring);
+    outline-offset: 0;
+}
+
+.ui-select-leading,
+.ui-select-chevron {
+    position: absolute;
+    top: 50%;
+    color: var(--text-3);
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.ui-select-leading {
+    left: 14px;
+}
+
+.ui-select-chevron {
+    right: 13px;
+}
+
+.ui-select-native:focus ~ .ui-select-chevron,
+.ui-select:focus-within .ui-select-chevron {
+    color: var(--text-2);
+}
+
+.ui-select-sm .ui-select-native {
+    height: 30px;
+    padding: 0 26px 0 8px;
+    border-color: var(--border-strong);
+    border-radius: 7px;
+    background: var(--surface);
+    font-size: 11px;
+}
+
+.ui-select-sm .ui-select-leading {
+    left: 8px;
+}
+
+.ui-select-sm .ui-select-chevron {
+    right: 8px;
+}
+
+.ui-select-leading + .ui-select-native {
+    padding-left: 39px;
+}
+
+.ui-select-sm .ui-select-leading + .ui-select-native {
+    padding-left: 27px;
+}
+
+[data-theme="dark"] .ui-select-native {
+    background: var(--surface-sunk);
+}
+
+[data-theme="dark"] .ui-select-native:hover {
+    background: var(--surface-2);
+}
+
 .role-badge {
     display: inline-flex;
     align-items: center;

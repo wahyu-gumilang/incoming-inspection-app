@@ -25,33 +25,30 @@
         <div class="card inspection-header-card">
             <div class="inspection-header-grid">
                 <x-ui.field label="Item" for="inspection-item" name="itemid">
-                    <select id="inspection-item" class="select" wire:model.live="itemid">
+                    <x-ui.select id="inspection-item" icon="package" wire:model.live="itemid">
                         <option value="">Choose an item...</option>
                         @foreach ($items as $id => $name)
                             <option value="{{ $id }}">{{ $id }} — {{ $name }}</option>
                         @endforeach
-                    </select>
+                    </x-ui.select>
                 </x-ui.field>
 
                 <x-ui.field label="Supplier" for="inspection-vendor" name="accountnum">
-                    <select id="inspection-vendor" class="select" wire:model="accountnum">
+                    <x-ui.select id="inspection-vendor" icon="building" wire:model="accountnum">
                         <option value="">Choose a supplier...</option>
                         @foreach ($vendors as $id => $name)
                             <option value="{{ $id }}">{{ $id }} — {{ $name }}</option>
                         @endforeach
-                    </select>
+                    </x-ui.select>
                 </x-ui.field>
 
                 <x-ui.field label="AQL plan" for="inspection-plan" name="planid">
-                    <select id="inspection-plan" class="select" wire:model.live="planid">
+                    <x-ui.select id="inspection-plan" icon="table" wire:model.live="planid">
                         <option value="">Choose a plan...</option>
                         @foreach ($plans as $plan)
-                            <option value="{{ $plan->planid }}">
-                                {{ $plan->name }} · {{ $plan->inspectlevel }} / {{ $plan->aql }}
-                                {{ $plan->isdefault ? ' · Default' : '' }}
-                            </option>
+                            <option value="{{ $plan->planid }}">{{ $plan->name }} · {{ $plan->inspectlevel }} / {{ $plan->aql }}{{ $plan->isdefault ? ' · Default' : '' }}</option>
                         @endforeach
-                    </select>
+                    </x-ui.select>
                 </x-ui.field>
 
                 <x-ui.field label="Measuring instrument" for="inspection-instrument" name="instrument">
@@ -112,13 +109,17 @@
                             <th>Insp. Category</th>
                             @for ($column = 1; $column <= 7; $column++)
                                 <td>
-                                    <select class="inspection-input" wire:model.live="deliveries.{{ $column }}.category">
+                                    <x-ui.select
+                                        size="sm"
+                                        wire:model.live="deliveries.{{ $column }}.category"
+                                        aria-label="Inspection category for delivery {{ $column }}"
+                                    >
                                         <option value="">—</option>
                                         <option value="1">N — Normal</option>
                                         <option value="2">R — Reduce</option>
                                         <option value="3">T — Tightening</option>
                                         <option value="0">100% inspection</option>
-                                    </select>
+                                    </x-ui.select>
                                 </td>
                             @endfor
                         </tr>
@@ -167,12 +168,16 @@
                             <th>Judgment</th>
                             @for ($column = 1; $column <= 7; $column++)
                                 <td>
-                                    <select class="inspection-input" wire:model="deliveries.{{ $column }}.judgment">
+                                    <x-ui.select
+                                        size="sm"
+                                        wire:model="deliveries.{{ $column }}.judgment"
+                                        aria-label="Judgment for delivery {{ $column }}"
+                                    >
                                         <option value="0">—</option>
                                         <option value="1">O — Accepted</option>
                                         <option value="2">X — Rejected</option>
                                         <option value="3">C — Concession</option>
-                                    </select>
+                                    </x-ui.select>
                                 </td>
                             @endfor
                         </tr>
@@ -304,11 +309,15 @@
                                             <input class="inspection-input" type="text" wire:model="otherLines.{{ $index }}.actuals.{{ $column }}" maxlength="100">
                                         </td>
                                         <td>
-                                            <select class="inspection-input" wire:model="otherLines.{{ $index }}.statuses.{{ $column }}">
+                                            <x-ui.select
+                                                size="sm"
+                                                wire:model="otherLines.{{ $index }}.statuses.{{ $column }}"
+                                                aria-label="Result for {{ $line['inspectitem'] }} delivery {{ $column }}"
+                                            >
                                                 <option value="">—</option>
                                                 <option value="1">OK</option>
                                                 <option value="0">NG</option>
-                                            </select>
+                                            </x-ui.select>
                                         </td>
                                     @endfor
                                 </tr>
