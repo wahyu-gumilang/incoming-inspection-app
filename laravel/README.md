@@ -2,10 +2,10 @@
 
 PHP 8.5, Laravel 13, Blade and Livewire 4 application for PT. Chubb Safes Indonesia.
 
-The system records incoming inspections against Form No. 7.4.3-F1. The dashboard, items
-master data with standards, vendors, AQL input form, filled reports, authentication,
-application shell, profile settings and user management are implemented. AQL plan
-administration, submission/checking and PDF output are the next phases.
+The system records incoming inspections against Form No. 7.4.3-F1. It includes the
+dashboard, items master data with standards, vendors, AQL input form, filled reports,
+submit/check workflow, final PDF output, AQL plan administration, authentication,
+application shell, profile settings and user management.
 
 ## Requirements
 
@@ -49,14 +49,27 @@ php85 vendor/bin/pint
 |---|---|
 | Authentication | `/login` |
 | Dashboard | `/` |
+| AQL Table (inspection input and plan management) | `/aql` |
+| Reports (saved check sheets and final PDF) | `/reports` |
 | Items | `/items` |
+| Vendors | `/vendors` |
 | User management (admin) | `/users` |
 | UI component preview (admin) | `/ui-kit` |
 | Profile | `/profile` |
 | Help | `/help` |
 
-The reusable interface components live in `resources/views/components/ui` and are documented
-in `../CLAUDE.md`. Global component styles are in `public/css/components.css`.
+The old `/inspections` URL redirects to the AQL Table.
+
+## Inspection workflow
+
+1. Create or edit a draft inspection in the AQL Table.
+2. Submit it for checking. Draft and returned inspections remain editable.
+3. A checker or admin approves the submitted inspection or returns it with a reason.
+4. Checked inspections are locked and can be downloaded as the final PDF.
+
+AQL plans are managed from the **Manage plans** dialog on the AQL Table by ADMIN and CHECKER
+users. The reusable interface components live in `resources/views/components/ui` and are
+documented in `../CLAUDE.md`. Global component styles are in `public/css/components.css`.
 
 ## Project rules
 
