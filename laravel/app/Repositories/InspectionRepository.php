@@ -14,7 +14,7 @@ class InspectionRepository
     /**
      * @return LengthAwarePaginator<int, object>
      */
-    public function paginate(string $search = '', int $perPage = 20): LengthAwarePaginator
+    public function paginate(string $search = '', int $perPage = 20, ?string $status = null): LengthAwarePaginator
     {
         $search = trim($search);
 
@@ -41,9 +41,11 @@ class InspectionRepository
                         ->orWhere('inspection.name', 'like', $like);
                 });
             })
+            ->when($status !== null, fn ($query) => $query->where('inspection.inspectstatus', $status))
             ->orderByDesc('inspection.inspectdate')
             ->orderByDesc('inspection.inspectnum')
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function find(string $inspectnum): ?object

@@ -23,7 +23,19 @@
                     label="Search inspections"
                 />
 
+                <div class="reports-status-filter">
+                    <x-ui.select name="status" aria-label="Filter reports by status" onchange="this.form.submit()">
+                        @foreach ($statusOptions as $value => $label)
+                            <option value="{{ $value }}" @selected($status === $value)>{{ $label }}</option>
+                        @endforeach
+                    </x-ui.select>
+                </div>
+
                 <x-ui.button type="submit" icon="search">Search</x-ui.button>
+
+                @if ($search !== '' || $status !== '')
+                    <x-ui.button variant="ghost" icon="rotate-ccw" :href="route('reports.index')">Clear</x-ui.button>
+                @endif
             </form>
 
             <span class="reports-count">{{ number_format($inspections->total()) }} reports</span>
@@ -35,7 +47,13 @@
                     icon="clipboard-check"
                     title="No inspections found"
                     description="Completed AQL Table entries will appear here."
-                />
+                >
+                    @if ($search !== '' || $status !== '')
+                        <x-slot:actions>
+                            <x-ui.button variant="secondary" icon="rotate-ccw" :href="route('reports.index')">Clear filters</x-ui.button>
+                        </x-slot:actions>
+                    @endif
+                </x-ui.empty-state>
             </div>
         @else
             <div class="reports-table-wrap">
@@ -72,10 +90,10 @@
                                 </td>
                                 <td>
                                     @php
-                                        $status = \App\Domain\Inspection\InspectionStatus::normalize($inspection->inspectstatus);
+                                        $rowStatus = \App\Domain\Inspection\InspectionStatus::normalize($inspection->inspectstatus);
                                     @endphp
-                                    <x-ui.badge :variant="\App\Domain\Inspection\InspectionStatus::badgeVariant($status)">
-                                        {{ \App\Domain\Inspection\InspectionStatus::label($status) }}
+                                    <x-ui.badge :variant="\App\Domain\Inspection\InspectionStatus::badgeVariant($rowStatus)">
+                                        {{ \App\Domain\Inspection\InspectionStatus::label($rowStatus) }}
                                     </x-ui.badge>
                                 </td>
                                 <td class="reports-muted">{{ $inspection->inspectby ?: '—' }}</td>

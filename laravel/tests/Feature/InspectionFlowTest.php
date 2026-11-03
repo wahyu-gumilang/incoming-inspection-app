@@ -100,6 +100,46 @@ class InspectionFlowTest extends TestCase
             ->assertSee('Handle Rhino Prima');
     }
 
+    public function test_reports_page_can_filter_by_status(): void
+    {
+        $user = $this->makeUser();
+
+        DB::table('inspecttable')->insert([
+            [
+                'inspectnum' => 'INS-FILTER-DRAFT',
+                'inspectdate' => '2026-10-30',
+                'itemid' => '000-228',
+                'itemname' => 'Handle Rhino Prima',
+                'accountnum' => 'V-0001',
+                'name' => 'PT Sinar Logam Abadi',
+                'inspectstatus' => 'DRAFT',
+                'inspectby' => 'Test User',
+            ],
+            [
+                'inspectnum' => 'INS-FILTER-CHECKED',
+                'inspectdate' => '2026-10-30',
+                'itemid' => '000-228',
+                'itemname' => 'Handle Rhino Prima',
+                'accountnum' => 'V-0001',
+                'name' => 'PT Sinar Logam Abadi',
+                'inspectstatus' => 'CHECKED',
+                'inspectby' => 'Test User',
+            ],
+        ]);
+
+        $this->actingAs($user)
+            ->get('/reports?status=CHECKED')
+            ->assertOk()
+            ->assertSee('INS-FILTER-CHECKED')
+            ->assertDontSee('INS-FILTER-DRAFT');
+
+        $this->actingAs($user)
+            ->get('/reports?status=DRAFT')
+            ->assertOk()
+            ->assertSee('INS-FILTER-DRAFT')
+            ->assertDontSee('INS-FILTER-CHECKED');
+    }
+
     public function test_accepted_judgment_is_rejected_when_ng_exceeds_acceptance(): void
     {
         $user = $this->makeUser();

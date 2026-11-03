@@ -512,7 +512,7 @@ Implemented on 2026-10-28.
 - Write unit tests for the judgement engine and the AQL engine.
 - Write feature tests for every page and every write action.
 - Login page tests cover the loading state markup, remember token, remembered username, failed login and inactive users.
-- Navbar tests cover the primary menu, admin-only user management, module placeholders, the search query, the user menu, Help Center and theme persistence.
+- Navbar tests cover the primary menu, admin-only user management, the legacy /inspections redirect, the search query, the user menu, Help Center and theme persistence.
 - Profile tests cover avatar upload, removal, validation and serving.
 - User management tests cover admin access, search and filters, stat-card filter synchronization, create with a temporary password, edit, self-protection, activation and password reset.
 - Test success paths and the main error paths.

@@ -29,11 +29,16 @@
     align-items: center;
     gap: 10px;
     min-width: 260px;
-    max-width: 620px;
+    max-width: 780px;
 }
 
 .reports-search .ui-search {
     flex: 1;
+}
+
+.reports-status-filter {
+    flex: 0 0 170px;
+    min-width: 150px;
 }
 
 .reports-count {
@@ -144,6 +149,15 @@
     .reports-search {
         flex-basis: 100%;
         max-width: none;
+        flex-wrap: wrap;
+    }
+
+    .reports-search .ui-search {
+        flex-basis: 100%;
+    }
+
+    .reports-status-filter {
+        flex: 1 1 100%;
     }
 
     .reports-count {
