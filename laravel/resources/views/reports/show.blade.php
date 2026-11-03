@@ -4,6 +4,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/aql.css') }}?v={{ filemtime(public_path('css/aql.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/inspection-workflow.css') }}?v={{ filemtime(public_path('css/inspection-workflow.css')) }}">
 @endpush
 
 @section('content')
@@ -34,6 +35,8 @@
             <x-ui.button variant="primary" icon="printer" onclick="window.print()">Print</x-ui.button>
         </x-slot:actions>
     </x-ui.page-header>
+
+    <livewire:inspections.inspection-workflow :inspectnum="$inspection->inspectnum" />
 
     <div class="report-sheet-hint">
         <x-icon name="arrow-right" :size="16" />

@@ -50,7 +50,7 @@ The application is the only product codebase. Its SQL schema and migrations live
 - Items master data is implemented: list, search, standards filter, pagination, detail,
   create, rename and standard CRUD. Vendors are implemented with CRUD, usage protection and
   CSV import. The AQL input form, filled check-sheet output in Reports and AQL plan
-  administration are implemented. Submission/checking and PDF remain.
+  administration are implemented. Submission/checking is implemented; PDF remains.
 
 ## 4. QC workflow
 
@@ -231,7 +231,7 @@ confirmation. Keep them in one place and treat them as provisional.
 | inspectcategoryN | 0 = no mark or 100 percent, 1 = N Normal, 2 = R Reduced, 3 = T Tightening |
 | judgmentN | 0 = not judged, 1 = O Accepted, 2 = X Rejected, 3 = C Concession |
 | status_N | NULL = not measured, 1 = OK, 0 = NG |
-| inspectstatus | DRAFT, SUBMITTED, CHECKED. Legacy integer values are read-only. |
+| inspectstatus | DRAFT, SUBMITTED, CHECKED, RETURNED. Legacy integer values are read-only. |
 | usertable.role | INSPECTOR, CHECKER, ADMIN |
 
 Use PHP constants or enums. Do not write raw judgment or status numbers in services,
@@ -261,8 +261,21 @@ controllers, Livewire components or Blade views.
   expose it.
 - usertable.avatar_path is nullable. A non-null path points to storage/app/public and is
   served by the avatars route. Null falls back to the user's initials.
+- inspecttable.submitted_at, returned_at, checked_at, checkedbyid and return_note hold the
+  current workflow state. inspectbyid remains the inspector who created the report.
 - Legacy inspections with inspectstatus 1 are read-only.
 - oauth tables, orders and numseqtable belong to other systems. Do not modify them.
+
+### 7.8 Submit and check workflow
+
+- DRAFT and RETURNED inspections are editable by their inspector or a CHECKER/ADMIN.
+- SUBMITTED inspections are read-only and wait for a checker.
+- CHECKED inspections are final and read-only.
+- Only the owning inspector or a CHECKER/ADMIN can submit a draft or returned inspection.
+- Only CHECKER/ADMIN can approve or return a submitted inspection.
+- Returning requires a reason; resubmitting clears the previous checker and return note.
+- The report page shows the current status, timestamps, checker, return reason and the
+  role-appropriate actions.
 
 ## 8. Database rules
 

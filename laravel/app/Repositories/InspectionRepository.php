@@ -50,6 +50,13 @@ class InspectionRepository
         return DB::table('inspecttable')->where('inspectnum', $inspectnum)->first();
     }
 
+    public function updateWorkflow(string $inspectnum, array $values): void
+    {
+        $values['updated_at'] = now();
+
+        DB::table('inspecttable')->where('inspectnum', $inspectnum)->update($values);
+    }
+
     /**
      * @return Collection<int, object>
      */

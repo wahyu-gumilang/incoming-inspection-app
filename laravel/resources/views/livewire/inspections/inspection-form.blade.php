@@ -1,10 +1,22 @@
 <div class="inspection-page">
     <x-ui.page-header
         eyebrow="Inspection"
-        title="AQL Table"
-        description="Fill the inspection measurements, deliveries, and AQL results."
+        :title="$editing ? 'Edit AQL Table' : 'AQL Table'"
+        :description="$editing
+            ? 'Update a draft or returned inspection. Item, supplier, and AQL plan are locked.'
+            : 'Fill the inspection measurements, deliveries, and AQL results.'"
     >
         <x-slot:actions>
+            @if ($editing)
+                <x-ui.button
+                    variant="secondary"
+                    icon="arrow-left"
+                    :href="route('reports.show', ['inspectnum' => $inspectnum])"
+                >
+                    Back to report
+                </x-ui.button>
+            @endif
+
             @if (auth()->user()?->isChecker())
                 <x-ui.button variant="secondary" icon="settings" wire:click="togglePlanAdmin">
                     Manage plans
@@ -12,10 +24,16 @@
             @endif
 
             <x-ui.button variant="primary" icon="save" wire:click="save" wire:loading.attr="disabled">
-                Save inspection
+                {{ $editing ? 'Update inspection' : 'Save inspection' }}
             </x-ui.button>
         </x-slot:actions>
     </x-ui.page-header>
+
+    @if ($editing)
+        <x-ui.alert variant="info">
+            Editing inspection <strong>{{ $inspectnum }}</strong>. Submit it again after saving the corrections.
+        </x-ui.alert>
+    @endif
 
     @if ($errors->any())
         <x-ui.alert variant="error">
@@ -41,6 +59,7 @@
                         toggle="toggleSelect('item')"
                         select="selectItem"
                         searchable
+                        :disabled="$editing"
                     />
                 </x-ui.field>
 
@@ -55,6 +74,7 @@
                         toggle="toggleSelect('supplier')"
                         select="selectSupplier"
                         searchable
+                        :disabled="$editing"
                     />
                 </x-ui.field>
 
@@ -68,6 +88,7 @@
                         :open="$openSelect === 'plan'"
                         toggle="toggleSelect('plan')"
                         select="selectPlan"
+                        :disabled="$editing"
                     />
                 </x-ui.field>
 
@@ -362,7 +383,7 @@
 
         <div class="inspection-actions">
             <x-ui.button variant="primary" type="submit" icon="save" wire:loading.attr="disabled">
-                Save inspection
+                {{ $editing ? 'Update inspection' : 'Save inspection' }}
             </x-ui.button>
         </div>
     </form>

@@ -64,7 +64,9 @@ class InspectionFlowTest extends TestCase
             ->assertSee('INCOMING INSPECTION CHECK LIST')
             ->assertSee($inspection->inspectnum)
             ->assertSee('Handle Rhino Prima')
-            ->assertSee('PO-TEST');
+            ->assertSee('PO-TEST')
+            ->assertSee('Submit for checking')
+            ->assertSee('Draft');
     }
 
     public function test_reports_page_lists_saved_inspections(): void

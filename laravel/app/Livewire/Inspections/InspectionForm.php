@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Inspections;
 
+use App\Domain\Inspection\InspectionStatus;
 use App\Repositories\AqlPlanRepository;
+use App\Repositories\InspectionRepository;
 use App\Repositories\ItemRepository;
 use App\Services\InspectionCalculator;
 use App\Services\InspectionService;
@@ -16,6 +18,10 @@ use Livewire\Component;
 
 class InspectionForm extends Component
 {
+    public string $inspectnum = '';
+
+    public bool $editing = false;
+
     public string $itemid = '';
 
     public string $accountnum = '';
@@ -42,8 +48,14 @@ class InspectionForm extends Component
     /** @var array<int, array<string, mixed>> */
     public array $aql = [];
 
-    public function mount(): void
+    public function mount(?string $inspectnum = null): void
     {
+        if ($inspectnum !== null && $inspectnum !== '') {
+            $this->loadInspection($inspectnum);
+
+            return;
+        }
+
         $plan = app(AqlPlanRepository::class)->defaultPlan();
         $this->planid = $plan?->planid !== null ? (int) $plan->planid : null;
 
@@ -62,6 +74,10 @@ class InspectionForm extends Component
 
     public function updatedItemid(): void
     {
+        if ($this->editing) {
+            return;
+        }
+
         $this->loadItem();
     }
 
@@ -93,6 +109,10 @@ class InspectionForm extends Component
 
     public function selectItem(string $value): void
     {
+        if ($this->editing) {
+            return;
+        }
+
         $this->openSelect = null;
         $this->itemid = $value;
         $this->resetValidation(['itemid']);
@@ -101,6 +121,10 @@ class InspectionForm extends Component
 
     public function selectSupplier(string $value): void
     {
+        if ($this->editing) {
+            return;
+        }
+
         $this->openSelect = null;
         $this->accountnum = $value;
         $this->resetValidation(['accountnum']);
@@ -108,6 +132,10 @@ class InspectionForm extends Component
 
     public function selectPlan(string $value): void
     {
+        if ($this->editing) {
+            return;
+        }
+
         $this->openSelect = null;
         $this->planid = (int) $value;
         $this->resetValidation(['planid']);
@@ -279,24 +307,39 @@ class InspectionForm extends Component
             return;
         }
 
+        $payload = [
+            'itemid' => $this->itemid,
+            'accountnum' => $this->accountnum,
+            'instrument' => $this->instrument,
+            'qfnum' => $this->qfnum,
+            'planid' => (int) $this->planid,
+            'deliveries' => $this->deliveries,
+            'std' => $this->stdLines,
+            'other' => $this->otherLines,
+        ];
+
         try {
-            $inspectnum = app(InspectionService::class)->create([
-                'itemid' => $this->itemid,
-                'accountnum' => $this->accountnum,
-                'instrument' => $this->instrument,
-                'qfnum' => $this->qfnum,
-                'planid' => (int) $this->planid,
-                'deliveries' => $this->deliveries,
-                'std' => $this->stdLines,
-                'other' => $this->otherLines,
-            ], auth()->user());
+            if ($this->editing) {
+                $inspectnum = app(InspectionService::class)->update(
+                    $this->inspectnum,
+                    $payload,
+                    auth()->user(),
+                );
+            } else {
+                $inspectnum = app(InspectionService::class)->create($payload, auth()->user());
+            }
         } catch (DomainException $exception) {
             $this->addError('general', $exception->getMessage());
 
             return;
         }
 
-        session()->flash('status', 'Inspection '.$inspectnum.' saved as draft.');
+        session()->flash(
+            'status',
+            $this->editing
+                ? 'Inspection '.$inspectnum.' updated.'
+                : 'Inspection '.$inspectnum.' saved as draft.',
+        );
         $this->redirectRoute('reports.show', ['inspectnum' => $inspectnum], navigate: true);
     }
 
@@ -410,6 +453,108 @@ class InspectionForm extends Component
             'judgmentOptions' => $judgmentOptions,
             'statusOptions' => $statusOptions,
         ]);
+    }
+
+    private function loadInspection(string $inspectnum): void
+    {
+        $repository = app(InspectionRepository::class);
+        $inspection = $repository->find($inspectnum);
+
+        abort_if($inspection === null, 404);
+
+        $status = InspectionStatus::normalize($inspection->inspectstatus);
+
+        abort_unless(
+            InspectionStatus::isEditable($status),
+            403,
+            'Only draft or returned inspections can be edited.',
+        );
+
+        $user = auth()->user();
+
+        abort_if($user === null, 403);
+        abort_if(
+            ! $user->isChecker()
+                && $inspection->inspectbyid !== null
+                && (int) $inspection->inspectbyid !== (int) $user->userid,
+            403,
+            'You cannot edit this inspection.',
+        );
+
+        $this->inspectnum = $inspectnum;
+        $this->editing = true;
+        $this->itemid = (string) ($inspection->itemid ?? '');
+        $this->accountnum = (string) ($inspection->accountnum ?? '');
+        $this->planid = $inspection->aqlplanid !== null
+            ? (int) $inspection->aqlplanid
+            : app(AqlPlanRepository::class)->defaultPlan()?->planid;
+        $this->instrument = (string) ($inspection->instrument ?? '');
+        $this->qfnum = (string) ($inspection->qfnum ?? '');
+
+        foreach (range(1, 7) as $column) {
+            $qty = $inspection->{'qty_received'.$column};
+            $category = $inspection->{'inspectcategory'.$column};
+            $date = $inspection->{'deliverydate'.$column};
+
+            $this->deliveries[$column] = [
+                'po' => (string) ($inspection->{'purchordernum'.$column} ?? ''),
+                'date' => filled($date)
+                    ? Carbon::parse($date)->format('Y-m-d')
+                    : '',
+                'qty' => $qty !== null && (float) $qty > 0
+                    ? rtrim(rtrim(number_format((float) $qty, 2, '.', ''), '0'), '.')
+                    : '',
+                'category' => $qty !== null && (float) $qty > 0 ? (string) (int) $category : '',
+                'notgood' => (string) (int) ($inspection->{'notgood'.$column} ?? 0),
+                'judgment' => (string) (int) ($inspection->{'judgment'.$column} ?? 0),
+                'note' => (string) ($inspection->{'concessionnote'.$column} ?? ''),
+            ];
+        }
+
+        $this->stdLines = [];
+
+        foreach ($repository->lines($inspectnum) as $line) {
+            $actuals = [];
+
+            foreach (range(1, 7) as $column) {
+                $actuals[$column] = $line->{'actual_'.$column} ?? '';
+            }
+
+            $this->stdLines[] = [
+                'inspecttype' => 'STD',
+                'inspectitem' => trim((string) ($line->inspectitem ?? '')),
+                'standard_txt' => trim((string) ($line->standard_txt ?? '')),
+                'standard' => $line->standard,
+                'tolerance' => trim((string) ($line->tolerance_txt ?? '')),
+                'tolerance_plus' => $line->tolerance_plus ?? 0,
+                'tolerance_minus' => $line->tolerance_minus ?? 0,
+                'actuals' => $actuals,
+            ];
+        }
+
+        $this->otherLines = [];
+
+        foreach ($repository->otherLines($inspectnum) as $line) {
+            $actuals = [];
+            $statuses = [];
+
+            foreach (range(1, 7) as $column) {
+                $actuals[$column] = (string) ($line->{'actual_txt_'.$column} ?? '');
+                $statuses[$column] = $line->{'status_'.$column} === null
+                    ? ''
+                    : (string) (int) $line->{'status_'.$column};
+            }
+
+            $this->otherLines[] = [
+                'inspecttype' => trim((string) ($line->inspecttype ?? '')),
+                'inspectitem' => trim((string) ($line->inspectitem ?? '')),
+                'standard_txt' => trim((string) ($line->standard_txt ?? '')),
+                'actuals' => $actuals,
+                'statuses' => $statuses,
+            ];
+        }
+
+        $this->recalculateAql();
     }
 
     private function loadItem(): void

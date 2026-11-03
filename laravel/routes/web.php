@@ -30,6 +30,7 @@ Route::middleware(['auth', 'active'])->group(function (): void {
         Route::get('/items/{itemid}', [ItemsController::class, 'show'])->name('items.show');
         Route::get('/inspections', [ModuleController::class, 'inspections'])->name('inspections.index');
         Route::get('/aql', [AqlController::class, 'index'])->name('aql.index');
+        Route::get('/aql/{inspectnum}/edit', [AqlController::class, 'edit'])->name('aql.edit');
         Route::get('/vendors', [VendorManagementController::class, 'index'])->name('vendors.index');
         Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
         Route::get('/reports/{inspectnum}', [ReportsController::class, 'show'])->name('reports.show');

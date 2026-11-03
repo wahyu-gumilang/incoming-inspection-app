@@ -72,10 +72,10 @@
                                 </td>
                                 <td>
                                     @php
-                                        $status = strtoupper((string) $inspection->inspectstatus);
+                                        $status = \App\Domain\Inspection\InspectionStatus::normalize($inspection->inspectstatus);
                                     @endphp
-                                    <x-ui.badge :variant="$status === 'CHECKED' ? 'success' : ($status === 'SUBMITTED' ? 'warning' : 'info')">
-                                        {{ $status ?: 'DRAFT' }}
+                                    <x-ui.badge :variant="\App\Domain\Inspection\InspectionStatus::badgeVariant($status)">
+                                        {{ \App\Domain\Inspection\InspectionStatus::label($status) }}
                                     </x-ui.badge>
                                 </td>
                                 <td class="reports-muted">{{ $inspection->inspectby ?: '—' }}</td>

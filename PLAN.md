@@ -105,8 +105,9 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | ✓ Done | AQL administration | Plan list, plan detail, sampling row editing and default plan selection inside the AQL Table Manage plans dialog. |
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
 | ✗ Planned | Dashboard | Basic database counts are shown. KPI cards, NG chart and recent inspections still need the inspection data. |
-| ✗ Planned | Reporting | Submit and check workflow, PDF output. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit, AQL calculations, AQL plan administration, inspection saving and the report output with 108 tests and 485 assertions. |
+| ✓ Done | Inspection workflow | Draft/returned inspections can be edited, submitted by their inspector, and approved or returned with a reason by a CHECKER. |
+| ✗ Planned | Reporting | PDF output. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit, AQL calculations, AQL plan administration, inspection workflows, inspection saving and the report output with 117 tests and 522 assertions. |
 
 Local addresses while the migration is in progress:
 
@@ -228,7 +229,7 @@ not be modified.
 | inspectcategoryN | 0 = no mark or 100 percent inspection, 1 = N Normal, 2 = R Reduced, 3 = T Tightening |
 | judgmentN | 0 = not judged, 1 = O Accepted, 2 = X Rejected, 3 = C Concession |
 | status_N | NULL = not measured, 1 = OK, 0 = NG |
-| inspectstatus | DRAFT, SUBMITTED, CHECKED. Legacy integer values are shown as read-only. |
+| inspectstatus | DRAFT, SUBMITTED, CHECKED, RETURNED. Legacy integer values are shown as read-only. |
 | usertable.role | INSPECTOR, CHECKER, ADMIN |
 
 Code maps must live in one PHP constants or enum file and must be mirrored in the UI where
@@ -365,14 +366,14 @@ from Quality, as recorded in Section 9.
 | Status | Task |
 |---|---|
 | ✗ Planned | Inspection list with filters, paging, status and judgment. |
-| ✗ Planned | Create inspection from item and supplier; snapshot the standards on the server. |
-| ✗ Planned | Generate the inspection number under a row lock. |
-| ✗ Planned | Delivery step 1: purchase order, delivery date, quantity and category with live AQL values. |
-| ✗ Planned | Delivery step 2: actual values, live OK and NG, visual, fitting and certificate results. |
-| ✗ Planned | Delivery step 3: defective pieces, suggested judgment, human judgment and concession note. |
-| ✗ Planned | Server-side recalculation of all statuses and AQL values. |
-| ✗ Planned | Check sheet view in the Form 7.4.3-F1 structure. |
-| ✗ Planned | Read-only mode for submitted and checked inspections. |
+| ✓ Done | Create inspection from item and supplier; snapshot the standards on the server. |
+| ✓ Done | Generate the inspection number under a row lock. |
+| ✓ Done | Delivery step 1: purchase order, delivery date, quantity and category with live AQL values. |
+| ✓ Done | Delivery step 2: actual values, live OK and NG, visual, fitting and certificate results. |
+| ✓ Done | Delivery step 3: defective pieces, suggested judgment, human judgment and concession note. |
+| ✓ Done | Server-side recalculation of all statuses and AQL values. |
+| ✓ Done | Check sheet view in the Form 7.4.3-F1 structure. |
+| ✓ Done | Read-only mode for submitted and checked inspections. |
 | ✗ Planned | Dashboard with KPI cards, NG chart and recent inspections. |
 | ✗ Planned | Feature tests for every judgment rule, numbering, snapshot, permissions and transactions. |
 
@@ -380,14 +381,15 @@ from Quality, as recorded in Section 9.
 
 | Status | Task |
 |---|---|
-| ✗ Planned | Status flow DRAFT to SUBMITTED to CHECKED, with return from SUBMITTED to DRAFT. |
-| ✗ Planned | Submit action: requires the inspector, all used columns judged and a server-side recalculation. |
-| ✗ Planned | Check action: only CHECKER or ADMIN; records the checker and timestamp. |
-| ✗ Planned | Return action: requires a reason. |
+| ✓ Done | Status flow DRAFT to SUBMITTED to CHECKED, with return from SUBMITTED to RETURNED and resubmission. |
+| ✓ Done | Submit action: the owner or a checker submits a draft or returned inspection. |
+| ✓ Done | Check action: only CHECKER or ADMIN; records the checker and timestamp. |
+| ✓ Done | Return action: requires a reason and keeps the inspection editable by its inspector. |
 | ✗ Planned | PDF template for Form 7.4.3-F1 with a PHP PDF engine. |
 | ✗ Planned | A4 landscape, repeated table headers, page X of Y and a watermark for non-checked inspections. |
 | ✗ Planned | Print and download from the inspection page. |
-| ✗ Planned | Tests for the PDF response and the approval flow. |
+| ✓ Done | Tests for the approval flow. |
+| ✗ Planned | Tests for the PDF response. |
 
 ### Phase P5 - Cutover
 

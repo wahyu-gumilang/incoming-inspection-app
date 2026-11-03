@@ -1,0 +1,12 @@
+@extends('layouts.app')
+
+@section('title', 'Edit AQL Table')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/aql-form.css') }}?v={{ filemtime(public_path('css/aql-form.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/aql-plans.css') }}?v={{ filemtime(public_path('css/aql-plans.css')) }}">
+@endpush
+
+@section('content')
+    <livewire:inspections.inspection-form :inspectnum="$inspectnum" />
+@endsection
