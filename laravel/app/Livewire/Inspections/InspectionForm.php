@@ -181,9 +181,9 @@ class InspectionForm extends Component
         $this->recalculateAql();
     }
 
-    public function updatedDeliveries(mixed $value, string $key): void
+    public function updatedDeliveries(mixed $value, ?string $key = null): void
     {
-        if (str_ends_with($key, '.qty') || str_ends_with($key, '.category')) {
+        if ($key === null || str_ends_with($key, '.qty') || str_ends_with($key, '.category')) {
             $this->recalculateAql();
         }
     }

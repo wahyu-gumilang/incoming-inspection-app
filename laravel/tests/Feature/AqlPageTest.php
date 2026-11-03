@@ -93,6 +93,28 @@ class AqlPageTest extends TestCase
             ->assertSet('openSelect', null);
     }
 
+    public function test_replacing_the_delivery_array_recalculates_aql(): void
+    {
+        $user = $this->makeUser();
+
+        Livewire::actingAs($user)
+            ->test(InspectionForm::class)
+            ->set('deliveries', [
+                1 => [
+                    'po' => '',
+                    'date' => '',
+                    'qty' => '50',
+                    'category' => '1',
+                    'notgood' => '0',
+                    'judgment' => '0',
+                    'note' => '',
+                ],
+            ])
+            ->assertSet('aql.1.samplesize', 2)
+            ->assertSet('aql.1.acceptnum', 0)
+            ->assertSet('aql.1.rejectnum', 1);
+    }
+
     public function test_guest_is_redirected_from_the_aql_page(): void
     {
         $this->get('/aql')->assertRedirect('/login');
