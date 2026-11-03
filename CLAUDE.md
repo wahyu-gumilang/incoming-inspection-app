@@ -24,7 +24,7 @@ were removed on 2026-10-29. Do not reintroduce them.
 | Framework | Laravel 13. |
 | UI | Blade templates and Livewire 4. |
 | Database | MariaDB 10.4 in XAMPP for development, MySQL or MariaDB in WAMP for deployment. |
-| PDF | mPDF or DomPDF. The final choice is still open. |
+| PDF | DomPDF. Final checked inspections can be downloaded from the report page. |
 | Tests | Pest or PHPUnit, with Laravel feature tests. |
 | Formatting | Laravel Pint. |
 | Local server | PHP 8.5 built-in server. XAMPP supplies MariaDB and phpMyAdmin. |
@@ -50,7 +50,7 @@ The application is the only product codebase. Its SQL schema and migrations live
 - Items master data is implemented: list, search, standards filter, pagination, detail,
   create, rename and standard CRUD. Vendors are implemented with CRUD, usage protection and
   CSV import. The AQL input form, filled check-sheet output in Reports and AQL plan
-  administration are implemented. Submission/checking is implemented; PDF remains.
+  administration are implemented. Submission/checking and final PDF download are implemented.
 
 ## 4. QC workflow
 
@@ -592,5 +592,5 @@ PLAN.md and CLAUDE.md must stay clean and easy to scan.
 | Per-column sign-off | Should QF number, inspector and checker be per delivery column? | One set per inspection for now. |
 | Decimal precision | Should standard and actual columns use four decimals? | Keep decimal(18,2) and use stored numbers. |
 | Tolerance typos | Which value is correct when text and numbers disagree? | Use stored numbers and flag the standard. |
-| PDF engine | mPDF or DomPDF? | Decide with a real form prototype. |
+| PDF engine | DomPDF is the selected engine. | Keep public/css/pdf.css and the PDF response tests in sync with the form template. |
 | WAMP | Which WAMP build and PHP patch will production use? | Confirm before deployment. |

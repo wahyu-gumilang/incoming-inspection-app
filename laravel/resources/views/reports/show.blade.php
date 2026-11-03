@@ -12,6 +12,7 @@
         $calculator = app(\App\Services\InspectionCalculator::class);
         $statusText = fn ($status) => $status === 1 ? 'OK' : ($status === 0 ? 'NG' : '');
         $number = fn ($value) => $value !== null && $value !== '' ? number_format((float) $value, 2, '.', '') : '';
+        $reportStatus = \App\Domain\Inspection\InspectionStatus::normalize($inspection->inspectstatus);
         $stdRows = $stdLines->values();
         $stdCount = max(13, $stdRows->count());
         $certLines = $otherLines->filter(fn ($line) => strtoupper(trim((string) $line->inspecttype)) === 'CERTIFIKAT')->values();
@@ -32,7 +33,14 @@
     >
         <x-slot:actions>
             <x-ui.button :href="route('reports.index')" icon="arrow-left">Back to reports</x-ui.button>
-            <x-ui.button variant="primary" icon="printer" onclick="window.print()">Print</x-ui.button>
+
+            @if ($reportStatus === \App\Domain\Inspection\InspectionStatus::CHECKED)
+                <x-ui.button variant="primary" icon="download" :href="route('reports.pdf', $inspection->inspectnum)">
+                    Download PDF
+                </x-ui.button>
+            @endif
+
+            <x-ui.button icon="printer" onclick="window.print()">Print</x-ui.button>
         </x-slot:actions>
     </x-ui.page-header>
 

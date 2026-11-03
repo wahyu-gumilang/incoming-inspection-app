@@ -172,6 +172,33 @@ class InspectionWorkflowTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_checked_inspection_can_be_downloaded_as_pdf(): void
+    {
+        $inspector = $this->makeUser(['role' => Role::INSPECTOR]);
+        $inspectnum = $this->makeInspection($inspector, [
+            'inspectstatus' => InspectionStatus::CHECKED,
+            'checkedby' => 'Checker One',
+            'checked_at' => now(),
+        ]);
+
+        $response = $this->actingAs($inspector)
+            ->get('/reports/'.$inspectnum.'/pdf')
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+
+        $this->assertStringStartsWith('%PDF-', $response->getContent());
+    }
+
+    public function test_unchecked_inspection_cannot_be_downloaded_as_pdf(): void
+    {
+        $inspector = $this->makeUser(['role' => Role::INSPECTOR]);
+        $inspectnum = $this->makeInspection($inspector);
+
+        $this->actingAs($inspector)
+            ->get('/reports/'.$inspectnum.'/pdf')
+            ->assertForbidden();
+    }
+
     private function makeInspection(User $owner, array $overrides = []): string
     {
         $inspectnum = 'INS-WF-'.Str::upper(Str::random(6));

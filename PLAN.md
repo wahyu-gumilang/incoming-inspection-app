@@ -106,8 +106,8 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
 | ✗ Planned | Dashboard | Basic database counts are shown. KPI cards, NG chart and recent inspections still need the inspection data. |
 | ✓ Done | Inspection workflow | Draft/returned inspections can be edited, submitted by their inspector, and approved or returned with a reason by a CHECKER. |
-| ✗ Planned | Reporting | PDF output. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit, AQL calculations, AQL plan administration, inspection workflows, inspection saving and the report output with 117 tests and 522 assertions. |
+| ✓ Done | Reporting | Final PDF download for checked inspections using DomPDF. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit, AQL calculations, AQL plan administration, inspection workflows, inspection saving, reports and PDF output with 119 tests and 530 assertions. |
 
 Local addresses while the migration is in progress:
 
@@ -385,11 +385,11 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Submit action: the owner or a checker submits a draft or returned inspection. |
 | ✓ Done | Check action: only CHECKER or ADMIN; records the checker and timestamp. |
 | ✓ Done | Return action: requires a reason and keeps the inspection editable by its inspector. |
-| ✗ Planned | PDF template for Form 7.4.3-F1 with a PHP PDF engine. |
-| ✗ Planned | A4 landscape, repeated table headers, page X of Y and a watermark for non-checked inspections. |
-| ✗ Planned | Print and download from the inspection page. |
-| ✓ Done | Tests for the approval flow. |
-| ✗ Planned | Tests for the PDF response. |
+| ✓ Done | PDF template for Form 7.4.3-F1 with DomPDF. |
+| ✓ Done | A4 landscape PDF with repeated table headers. |
+| ✗ Planned | Page X of Y and a watermark for non-checked inspections. |
+| ✓ Done | Print and download from the inspection page. |
+| ✓ Done | Tests for the approval flow and the PDF response. |
 
 ### Phase P5 - Cutover
 
@@ -447,7 +447,7 @@ Deployment checklist:
 | Decimal precision | Some standards are stored with two decimals while the printed text has more. | Use the stored numbers for judgement and flag doubtful standards. |
 | Tolerance typos | Some tolerance texts disagree with the numeric limits. | Use the stored numbers and flag the standard. Quality decides the correction. |
 | Per-column sign-off | The paper form has QF number, inspector and checker per delivery column. The schema has one set per inspection. | Use one set per inspection for now. Record the gap. |
-| PDF engine | mPDF and DomPDF are candidates. | Decide with a real Form 7.4.3-F1 prototype. |
+| PDF engine | DomPDF is chosen for the final Form 7.4.3-F1 output. | Keep the layout in public/css/pdf.css and tests on the PDF response. |
 | WAMP version | The target WAMP build and PHP patch are not confirmed. | Confirm before deployment. |
 
 ## 10. Definition of done

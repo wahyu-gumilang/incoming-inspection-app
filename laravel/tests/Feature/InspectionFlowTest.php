@@ -67,6 +67,15 @@ class InspectionFlowTest extends TestCase
             ->assertSee('PO-TEST')
             ->assertSee('Submit for checking')
             ->assertSee('Draft');
+
+        DB::table('inspecttable')
+            ->where('inspectnum', $inspection->inspectnum)
+            ->update(['inspectstatus' => 'CHECKED']);
+
+        $this->actingAs($user)
+            ->get('/reports/'.$inspection->inspectnum.'/pdf')
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
     }
 
     public function test_reports_page_lists_saved_inspections(): void

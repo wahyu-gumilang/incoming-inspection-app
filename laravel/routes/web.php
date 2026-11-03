@@ -34,6 +34,7 @@ Route::middleware(['auth', 'active'])->group(function (): void {
         Route::get('/vendors', [VendorManagementController::class, 'index'])->name('vendors.index');
         Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
         Route::get('/reports/{inspectnum}', [ReportsController::class, 'show'])->name('reports.show');
+        Route::get('/reports/{inspectnum}/pdf', [ReportsController::class, 'pdf'])->name('reports.pdf');
         Route::get('/users', [UserManagementController::class, 'index'])
             ->middleware('role:ADMIN')
             ->name('users.index');
