@@ -41,7 +41,7 @@ The application is the only product codebase. Its SQL schema and migrations live
   PLAN.md.
 - The first PHP proof of concept is GET /items. It reads inventtable and searches item id
   and name through Livewire.
-- Authentication, the application shell, profile settings and the basic dashboard are
+- Authentication, the application shell, profile settings and the workflow dashboard are
   implemented in PHP. The login page is final and includes a submit loading state, a
   remembered username and browser password-manager support.
 - The reusable UI kit lives in resources/views/components/ui with global styles in
@@ -496,7 +496,7 @@ Implemented on 2026-10-28.
 | Palette | Ink and neutral surfaces with an orange accent. The light page background is #e9edf2; the dark page background is #070b12. |
 | Type | Manrope for the authenticated shell. Use tabular numbers for weather, dates and metrics. |
 | Forms | Use the gray --form-border-focus and --form-ring tokens for inputs, selects, textareas and buttons. Do not use the near-black brand for input focus. The users filters and the form role select use x-filter-select with a notched panel and coloured option text. |
-| Navigation | Dashboard, Inspection Form, AQL Table, Reports, Items, Vendor and User Management. User Management is ADMIN only. AQL plan administration is reachable from the AQL Table page for ADMIN and CHECKER. |
+| Navigation | Dashboard, AQL Table, Reports, Items, Vendor and User Management. User Management is ADMIN only. AQL plan administration is reachable from the AQL Table page for ADMIN and CHECKER. |
 | User menu | Compact disclosure panel (max 280px) with a sharp upward notch under the avatar. The profile header shows only the name and role. Account Option contains User Setting, Help Center and Sign out. A second divider precedes the theme control. |
 | Avatar | Show usertable.avatar_path through the avatars route when present; otherwise show the user's initials. Upload and remove on the profile page. Never commit uploaded photos. |
 | Theme | Light, Dark and System are a segmented click control. It posts to profile.theme, saves usertable.theme and applies immediately. Revert and show an error if the save fails. |

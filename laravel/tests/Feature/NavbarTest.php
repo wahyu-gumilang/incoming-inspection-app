@@ -19,10 +19,10 @@ class NavbarTest extends TestCase
         $this->actingAs($user)
             ->get('/')
             ->assertOk()
-            ->assertSeeInOrder(['Dashboard', 'Inspection Form', 'AQL Table', 'Reports', 'Items', 'Vendor'])
+            ->assertSeeInOrder(['Dashboard', 'AQL Table', 'Reports', 'Items', 'Vendor'])
             ->assertSee('Dashboard')
             ->assertSee('Items')
-            ->assertSee('Inspection Form')
+            ->assertDontSee('Inspection Form')
             ->assertSee('AQL Table')
             ->assertSee('Vendor')
             ->assertSee('Reports')
@@ -62,16 +62,13 @@ class NavbarTest extends TestCase
             ->assertSee('AQL Table');
     }
 
-    public function test_module_placeholders_are_available_to_signed_in_users(): void
+    public function test_legacy_inspection_form_url_redirects_to_aql_table(): void
     {
         $user = $this->makeUser();
 
-        foreach (['/inspections'] as $path) {
-            $this->actingAs($user)
-                ->get($path)
-                ->assertOk()
-                ->assertSee('Coming next');
-        }
+        $this->actingAs($user)
+            ->get('/inspections')
+            ->assertRedirect(route('aql.index'));
     }
 
     public function test_help_center_is_available(): void

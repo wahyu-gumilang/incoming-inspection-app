@@ -7,7 +7,6 @@
 
     $items = [
         ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'dashboard', 'active' => request()->routeIs('dashboard')],
-        ['label' => 'Inspection Form', 'route' => 'inspections.index', 'icon' => 'clipboard-check', 'active' => request()->routeIs('inspections.*')],
         ['label' => 'AQL Table', 'route' => 'aql.index', 'icon' => 'table', 'active' => request()->routeIs('aql.*')],
         ['label' => 'Reports', 'route' => 'reports.index', 'icon' => 'reports', 'active' => request()->routeIs('reports.*')],
         ['label' => 'Items', 'route' => 'items.index', 'icon' => 'package', 'active' => request()->routeIs('items.*')],

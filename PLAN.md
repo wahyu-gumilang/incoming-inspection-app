@@ -71,7 +71,7 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | Stability | The navbar stays at the same position across full page loads. No entry animation, stable scrollbar gutter, preloaded Manrope, fixed weather and date widths, and filemtime-versioned CSS/JS. |
 | Top tier | Chubbsafes logo only, a shorter pill search, weather badge, date and avatar menu right. |
 | Bottom tier | Only the primary navigation, centered, with Lucide outline icons and a short orange active underline. |
-| Menu | Dashboard, Inspection Form, AQL Table, Reports, Items, Vendor and User Management. User Management is ADMIN only. AQL plans are managed from the AQL Table page for ADMIN and CHECKER. |
+| Menu | Dashboard, AQL Table, Reports, Items, Vendor and User Management. User Management is ADMIN only. AQL plans are managed from the AQL Table page for ADMIN and CHECKER. |
 | User menu | Compact disclosure panel (max 280px) with an upward notch under the avatar. The header shows the name and role only. Account Option contains User Setting, Help Center and Sign out. |
 | Avatar | usertable.avatar_path photo when present; initials otherwise. Upload and remove on the Profile page. |
 | Theme | Light, Dark and System segmented control below a divider. It saves usertable.theme and applies immediately. |
@@ -104,10 +104,10 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | ✓ Done | AQL input and reports | Form at /aql with item, supplier, delivery, AQL calculation and check-sheet input; saved output at /reports. |
 | ✓ Done | AQL administration | Plan list, plan detail, sampling row editing and default plan selection inside the AQL Table Manage plans dialog. |
 | ✗ Planned | Inspections | List, creation, delivery columns, check sheet and judgments. |
-| ✗ Planned | Dashboard | Basic database counts are shown. KPI cards, NG chart and recent inspections still need the inspection data. |
+| ✓ Done | Dashboard | Workflow counters, recent inspections, quick actions and a master-data summary are available. NG chart remains optional. |
 | ✓ Done | Inspection workflow | Draft/returned inspections can be edited, submitted by their inspector, and approved or returned with a reason by a CHECKER. |
 | ✓ Done | Reporting | Final PDF download for checked inspections using DomPDF. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit, AQL calculations, AQL plan administration, inspection workflows, inspection saving, reports and PDF output with 119 tests and 530 assertions. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit, AQL calculations, AQL plan administration, inspection workflows, inspection saving, reports and PDF output with 120 tests and 539 assertions. |
 
 Local addresses while the migration is in progress:
 
@@ -374,7 +374,7 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Server-side recalculation of all statuses and AQL values. |
 | ✓ Done | Check sheet view in the Form 7.4.3-F1 structure. |
 | ✓ Done | Read-only mode for submitted and checked inspections. |
-| ✗ Planned | Dashboard with KPI cards, NG chart and recent inspections. |
+| ✓ Done | Dashboard with workflow counters, recent inspections, quick actions and a master-data summary. |
 | ✗ Planned | Feature tests for every judgment rule, numbering, snapshot, permissions and transactions. |
 
 ### Phase P4 - Reporting and approval

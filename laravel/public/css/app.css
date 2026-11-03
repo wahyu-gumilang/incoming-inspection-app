@@ -333,34 +333,6 @@ p {
     font-size: 11px;
 }
 
-.module-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 18px;
-    max-width: 640px;
-    padding: 36px;
-}
-
-.module-placeholder-icon {
-    display: grid;
-    place-items: center;
-    width: 58px;
-    height: 58px;
-    border-radius: 18px;
-    background: var(--brand-50);
-    color: var(--brand);
-}
-
-.module-placeholder h2 {
-    font-size: 22px;
-    letter-spacing: -0.03em;
-}
-
-.module-placeholder p {
-    max-width: 52ch;
-}
-
 .help-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
