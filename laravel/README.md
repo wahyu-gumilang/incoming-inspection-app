@@ -70,8 +70,10 @@ The old `/inspections` URL redirects to the AQL Table.
 AQL plans are managed from the **Manage plans** dialog on the AQL Table by ADMIN and CHECKER
 users. Vendor records include contact person, phone/WhatsApp, email, office address and joined
 date. Usernames are numeric employee IDs; ADMIN can reset passwords and delete accounts.
-The reusable interface components live in `resources/views/components/ui` and are documented
-in `../CLAUDE.md`. Global component styles are in `public/css/components.css`.
+Users can change their own password from Profile / User Settings. The Help Center provides
+direct WhatsApp and email support links. The reusable interface components live in
+`resources/views/components/ui` and are documented in `../CLAUDE.md`. Global component styles
+are in `public/css/components.css`.
 
 ## Project rules
 

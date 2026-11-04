@@ -333,44 +333,6 @@ p {
     font-size: 11px;
 }
 
-.help-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-}
-
-.help-card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-}
-
-.help-card-icon {
-    display: grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: var(--brand-50);
-    color: var(--brand);
-}
-
-.help-card h2 {
-    font-size: 19px;
-    letter-spacing: -0.03em;
-}
-
-.help-card p {
-    max-width: 44ch;
-}
-
-@media (max-width: 900px) {
-    .help-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
 .alert {
     margin-bottom: 16px;
     padding: 11px 14px;

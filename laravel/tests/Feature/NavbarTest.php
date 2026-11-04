@@ -31,9 +31,10 @@ class NavbarTest extends TestCase
             ->assertSee('Search items, part numbers...')
             ->assertSee('data-weather-badge', false)
             ->assertSee('Account Option')
-            ->assertSee('User Setting')
-            ->assertSee('Change password')
+            ->assertSee('User Settings')
+            ->assertDontSee('Change password')
             ->assertSee('Help Center')
+            ->assertSee('data-tooltip="Account menu"', false)
             ->assertSee('Light')
             ->assertSee('Dark')
             ->assertSee('System')
@@ -80,7 +81,10 @@ class NavbarTest extends TestCase
             ->get('/help')
             ->assertOk()
             ->assertSee('Help Center')
-            ->assertSee('Sign in and access');
+            ->assertSee('Sign in and access')
+            ->assertSee('https://wa.me/6281281973198', false)
+            ->assertSee('mailto:wahyu.gumilang@gunnebo.com', false)
+            ->assertDontSee('Back to dashboard');
     }
 
     public function test_inspector_cannot_open_user_management(): void

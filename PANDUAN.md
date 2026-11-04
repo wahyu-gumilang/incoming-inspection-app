@@ -409,7 +409,7 @@ Fitur:
 - Edit nama, email, dan role.
 - Aktifkan/nonaktifkan user.
 - Reset password: tombol key menghasilkan temporary password baru yang ditampilkan sekali; user wajib menggantinya saat sign-in berikutnya.
-- User dapat mengganti password sendiri melalui **Account Option → Change password** atau tombol **Change password** di Profile. Perubahan membutuhkan password saat ini dan langsung berlaku.
+- User dapat mengganti password sendiri melalui **User Settings → Change password** di halaman Profile. Perubahan membutuhkan password saat ini dan langsung berlaku.
 - Hapus user dengan konfirmasi.
 - Proteksi agar admin tidak menonaktifkan atau menghapus dirinya sendiri.
 - Proteksi agar admin terakhir yang aktif tidak terhapus.
@@ -437,6 +437,19 @@ Fitur:
   - Dark.
   - System.
 - Tema disimpan dan langsung diterapkan.
+- Tombol **Change password** tersedia di halaman Profile.
+
+#### Account Option
+
+Menu avatar di navbar berisi:
+
+- Profil user dan role.
+- **User Settings** — menuju Profile untuk nama, email, avatar, tema, dan password.
+- **Help Center** — menuju panduan dan kontak support.
+- **Sign out**.
+- Pemilih tema Light, Dark, dan System.
+
+Avatar memiliki tooltip **Account menu** saat di-hover.
 
 ---
 
@@ -447,7 +460,13 @@ Halaman bantuan berisi panduan:
 - Akses aplikasi.
 - Alur inspection.
 - Penggunaan halaman utama.
-- Bantuan dan dukungan.
+- Password dan profile.
+- Kontak support langsung.
+
+Tombol Back to dashboard sudah dihapus. Support dapat dihubungi melalui:
+
+- **WhatsApp:** `+62 812-8197-3198` (`https://wa.me/6281281973198`).
+- **Email / Outlook:** `wahyu.gumilang@gunnebo.com` (`mailto:`).
 
 ---
 
@@ -668,6 +687,10 @@ Status yang tersimpan ditampilkan kembali pada report dan PDF.
 | Style komponen | `laravel/public/css/components.css` |
 | Tooltip custom | `laravel/public/js/tooltip.js` |
 | Search otomatis Reports | `laravel/public/js/auto-submit-search.js` |
+| Account menu | `laravel/resources/views/components/app-navbar.blade.php` |
+| Style account menu | `laravel/public/css/navbar.css` |
+| Halaman Help dan support | `laravel/resources/views/help/index.blade.php` |
+| Style Help | `laravel/public/css/help.css` |
 | Route | `laravel/routes/web.php` |
 | Migrasi workflow | `laravel/database/sql/migrations/016_inspecttable_workflow.sql` |
 | Migrasi profil vendor | `laravel/database/sql/migrations/017_vendtable_profile.sql` |
@@ -694,7 +717,7 @@ bersama perubahan kode.
 
 ## 10. Catatan QA dan batasan saat ini
 
-- **Tes otomatis:** 125 tests, 564 assertions.
+- **Tes otomatis:** 125 tests, 568 assertions.
 - **Formatter:** Pint lulus untuk 85 file.
 - **Composer audit:** tidak ada security advisory.
 - **PDF:** respons sudah diuji menghasilkan `application/pdf`. Pengecekan visual cetak
@@ -721,7 +744,9 @@ Audit ini dilakukan pada 4 November 2026.
 | Reset password | Alur belum jelas di UI. | Key action menghasilkan temporary password baru; user wajib menggantinya saat sign-in berikutnya. |
 | Reports search | Ada search input sekaligus tombol Search. | Tombol Search dihapus; pencarian berjalan otomatis setelah user berhenti mengetik. |
 | Search bar toolbar | Lebar search bar berbeda antara Users, Vendors, Items, dan Reports. | Disamakan mengikuti Users: `flex: 1`, `min-width: 240px`, `max-width: 440px`; tombol Clear memakai cursor pointer. |
-| Ganti password user | Hak ganti password ada tetapi kurang terlihat. | Ditambahkan **Account Option → Change password**; halaman Profile juga tetap memiliki tombol Change password. |
+| Ganti password user | Hak ganti password ada tetapi kurang terlihat. | Change password dipusatkan di **User Settings/Profile**; Account Option hanya berisi User Settings, Help Center, dan Sign out. |
+| Account Option | Item menu masih polos dan Change password duplikat. | User Settings dan Help Center memakai ikon, judul, deskripsi, dan panah; Change password dihapus dari menu. Avatar mendapat tooltip **Account menu**. |
+| Help Center | Belum ada kontak support langsung dan masih ada Back to dashboard. | Ditambahkan kartu WhatsApp dan Email/Outlook; tombol Back to dashboard dihapus. |
 | Reports/AQL Table | Layout input AQL dan check sheet Reports berbeda karena input adalah form interaktif dan Reports adalah Form 7.4.3-F1. | Perlu keputusan produk jika harus dibuat identik 1:1; label dan urutan bagian sudah diselaraskan. |
 | Vendor | Hanya account dan nama. | Ditambah contact person, phone/WhatsApp, email, office address, joined date, dan kolom CSV opsional. |
 | Table spacing | Dashboard memakai padding lebih rapat daripada tabel lain. | Disamakan ke 12px × 20px. |

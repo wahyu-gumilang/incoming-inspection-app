@@ -499,10 +499,10 @@ Implemented on 2026-10-28.
 | Type | Manrope for the authenticated shell. Use tabular numbers for weather, dates and metrics. |
 | Forms | Use the gray --form-border-focus and --form-ring tokens for inputs, selects, textareas and buttons. Do not use the near-black brand for input focus. The users filters and the form role select use x-filter-select with a notched panel and coloured option text. |
 | Navigation | Dashboard, AQL Table, Reports, Items, Vendor and User Management. User Management is ADMIN only. AQL plan administration is reachable from the AQL Table page for ADMIN and CHECKER. |
-| User menu | Compact disclosure panel (max 280px) with a sharp upward notch under the avatar. The profile header shows only the name and role. Account Option contains User Setting, Help Center and Sign out. A second divider precedes the theme control. |
+| User menu | Compact disclosure panel with a sharp upward notch under the avatar. The profile header shows only the name and role. Account Option contains User Settings, Help Center and Sign out; password changes live in User Settings/Profile. A second divider precedes the theme control. |
 | Avatar | Show usertable.avatar_path through the avatars route when present; otherwise show the user's initials. Upload and remove on the profile page. Never commit uploaded photos. |
 | Theme | Light, Dark and System are a segmented click control. It posts to profile.theme, saves usertable.theme and applies immediately. Revert and show an error if the save fails. |
-| Help Center | /help is a real page with sign-in, inspection and support guidance. Do not replace it with a dead link. |
+| Help Center | /help is a real page with sign-in, inspection, password and support guidance. It links directly to WhatsApp and email/Outlook support. Do not replace it with a dead link. |
 | Search | The navbar search submits to the Items page. Keep it functional; do not leave a decorative search box. |
 | Weather | The badge uses Open-Meteo with Jakarta coordinates, caches for 15 minutes and falls back to --°C. Keep fixed widths for the badge and date block so loading never moves them. Confirm the plant location with the owner. |
 | Responsive | Hide the date at 1100px and below. Wrap the search at 820px. The bottom navigation scrolls horizontally on phones. |

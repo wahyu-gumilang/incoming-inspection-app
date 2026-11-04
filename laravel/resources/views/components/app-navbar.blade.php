@@ -75,6 +75,8 @@
                     aria-expanded="false"
                     aria-controls="app-user-menu"
                     aria-label="Open user menu for {{ $user->fullname }}"
+                    aria-haspopup="true"
+                    data-tooltip="Account menu"
                     data-user-menu-button
                 >
                     <x-user-avatar :user="$user" :size="30" />
@@ -95,19 +97,26 @@
                     <div class="app-navbar-menu-section" role="group" aria-labelledby="account-option-title">
                         <span class="app-navbar-menu-heading" id="account-option-title">Account Option</span>
 
-                        <a class="app-navbar-menu-item" href="{{ route('profile.edit') }}">
-                            <x-icon name="user" :size="17" />
-                            User Setting
+                        <a class="app-navbar-menu-item app-navbar-menu-item-rich" href="{{ route('profile.edit') }}">
+                            <span class="app-navbar-menu-item-icon">
+                                <x-icon name="user" :size="17" />
+                            </span>
+                            <span class="app-navbar-menu-item-copy">
+                                <strong>User Settings</strong>
+                                <small>Profile, avatar, and password</small>
+                            </span>
+                            <x-icon name="arrow-up-right" :size="15" class="app-navbar-menu-item-arrow" />
                         </a>
 
-                        <a class="app-navbar-menu-item" href="{{ route('password.change') }}">
-                            <x-icon name="key" :size="17" />
-                            Change password
-                        </a>
-
-                        <a class="app-navbar-menu-item" href="{{ route('help.index') }}">
-                            <x-icon name="help-circle" :size="17" />
-                            Help Center
+                        <a class="app-navbar-menu-item app-navbar-menu-item-rich" href="{{ route('help.index') }}">
+                            <span class="app-navbar-menu-item-icon">
+                                <x-icon name="help-circle" :size="17" />
+                            </span>
+                            <span class="app-navbar-menu-item-copy">
+                                <strong>Help Center</strong>
+                                <small>Guidance and support</small>
+                            </span>
+                            <x-icon name="arrow-up-right" :size="15" class="app-navbar-menu-item-arrow" />
                         </a>
 
                         <form method="POST" action="{{ route('logout') }}">
