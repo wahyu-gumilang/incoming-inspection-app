@@ -100,14 +100,14 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | ✓ Done | User Management | Admin-only list with search, role and status filters, pagination, create, edit, activate/deactivate, reset password and self-protection. Temporary passwords are generated once. |
 | ✓ Done | UI component library | Reusable x-ui components for buttons, alerts, badges, stat cards, fields, search, dropdowns, modals, confirmations, pagination and empty states. Global styles, a User Management refactor and an admin preview at /ui-kit. |
 | ✓ Done | Items master data | List, search, standards filter, pagination, detail with grouped standards, create, rename and standard CRUD. |
-| ✓ Done | Vendors | Vendor list, search, create, rename, delete protection and CSV import. |
+| ✓ Done | Vendors | Vendor list, search, create, edit, delete protection, profile fields (contact, phone, email, address, joined date) and CSV import. |
 | ✓ Done | AQL input and reports | Form at /aql with item, supplier, delivery, AQL calculation and check-sheet input; saved output at /reports. |
 | ✓ Done | AQL administration | Plan list, plan detail, sampling row editing and default plan selection inside the AQL Table Manage plans dialog. |
 | ✓ Done | Inspections | Creation and editing live in the AQL Table; saved check sheets, workflow status and final PDF output live in Reports. |
 | ✓ Done | Dashboard | Workflow counters, recent inspections, quick actions and a master-data summary are available. NG chart remains optional. |
 | ✓ Done | Inspection workflow | Draft/returned inspections can be edited, submitted by their inspector, and approved or returned with a reason by a CHECKER. |
 | ✓ Done | Reporting | Saved check sheets with search and status filters, workflow actions and final PDF download for checked inspections using DomPDF. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit, AQL calculations, AQL plan administration, inspection workflows, inspection saving, report filters and PDF output with 122 tests and 548 assertions. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit, AQL calculations, AQL plan administration, inspection workflows, inspection saving, report filters and PDF output with 125 tests and 563 assertions. |
 
 Local addresses while the migration is in progress:
 
@@ -353,7 +353,7 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Item detail with standards grouped by STD, CERTIFIKAT, VISUAL and FITTING. |
 | ✓ Done | Item create and rename. |
 | ✓ Done | Standard create, update and delete with the existing validation rules. |
-| ✓ Done | Vendor list, lookup, create, rename, delete with usage protection and CSV import. |
+| ✓ Done | Vendor list, lookup, create, edit, delete with usage protection, profile fields and CSV import. |
 | ✓ Done | AQL input form, AQL calculation, inspection draft save and filled report output. |
 | ✓ Done | AQL plan list, plan detail, row editing and default plan selection inside the AQL Table dialog. |
 | ✓ Done | PHP tests for the item list, detail, create, rename, standard CRUD, filter state and role visibility. |

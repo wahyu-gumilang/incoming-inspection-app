@@ -80,7 +80,7 @@
 
             <div class="ui-kit-stack">
                 <x-ui.field label="Part number" for="kit-part" hint="Use the number printed on the item.">
-                    <input id="kit-part" class="input mono" type="text" value="CS-1001">
+                    <input id="kit-part" class="input" type="text" value="CS-1001">
                 </x-ui.field>
 
                 <x-ui.search placeholder="Search components..." label="Search components" />

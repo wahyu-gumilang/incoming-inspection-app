@@ -463,9 +463,13 @@ p {
     padding: 0 14px;
     border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);
-    background: var(--surface-sunk);
+    background: var(--surface);
     color: var(--text);
     font: inherit;
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        color 0.18s ease;
 }
 
 .input:focus,
@@ -475,6 +479,19 @@ p {
 .app-body textarea:focus {
     border-color: var(--form-border-focus);
     outline: 3px solid var(--form-ring);
+}
+
+.app-body input:not([type="checkbox"]):not([type="radio"]):not([data-navbar-search]):disabled,
+.app-body select:disabled,
+.app-body textarea:disabled,
+.app-body .input:disabled,
+.app-body .select:disabled {
+    border-color: var(--border);
+    background: color-mix(in srgb, var(--surface-sunk) 82%, var(--text-3) 8%);
+    color: var(--text-3);
+    -webkit-text-fill-color: var(--text-3);
+    cursor: not-allowed;
+    opacity: 1;
 }
 
 .app-body .btn:focus-visible {
@@ -1297,11 +1314,6 @@ p {
     .auth-remember input:checked + .auth-remember-box {
         animation: none;
     }
-}
-
-.mono {
-    font-variant-numeric: tabular-nums;
-    font-weight: 600;
 }
 
 .empty {

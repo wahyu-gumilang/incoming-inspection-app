@@ -6,7 +6,7 @@ pada aplikasi **Incoming Inspection QC PT. Chubb Safes Indonesia**.
 Dokumen ini adalah panduan fitur. Aturan engineering dan keputusan teknis tetap berada di
 `CLAUDE.md` dan `PLAN.md`.
 
-- **Terakhir diperbarui:** 3 November 2026
+- **Terakhir diperbarui:** 4 November 2026
 - **Stack:** PHP 8.5, Laravel 13, Blade, Livewire 4, MariaDB/MySQL, DomPDF
 - **Zona waktu aplikasi:** Asia/Jakarta
 - **Login lokal:** `http://127.0.0.1:8000/login`
@@ -39,7 +39,7 @@ Fitur utama:
 
 - Login dengan role **INSPECTOR**, **CHECKER**, dan **ADMIN**.
 - Master item beserta standar pemeriksaan.
-- Master vendor/supplier, termasuk import CSV.
+- Master vendor/supplier dengan profil kontak, alamat, dan tanggal bergabung, termasuk import CSV.
 - AQL Table untuk membuat dan mengedit inspection.
 - Perhitungan sample size, accept number, dan reject number dari AQL plan.
 - AQL plan administration di dalam halaman AQL Table.
@@ -47,6 +47,7 @@ Fitur utama:
 - Workflow **DRAFT → SUBMITTED → CHECKED**, dengan **RETURNED** untuk revisi.
 - PDF final hanya untuk inspection yang sudah **CHECKED**.
 - Dashboard berisi ringkasan workflow, recent inspections, dan master data.
+- Input enabled dan disabled dibedakan secara visual; tooltip custom untuk tombol ikon.
 
 ---
 
@@ -267,6 +268,7 @@ Reports menampilkan inspection yang sudah tersimpan.
 
 Fitur:
 
+- Pencarian otomatis saat mengetik; tidak ada tombol Search terpisah.
 - Pencarian berdasarkan:
   - Nomor inspection.
   - Item.
@@ -364,15 +366,30 @@ Master data supplier.
 
 Fitur:
 
-- Daftar vendor.
-- Pencarian berdasarkan account number atau nama.
+- Daftar vendor dengan account, nama, contact person, telepon, tanggal bergabung, dan jumlah inspection.
+- Pencarian berdasarkan account, nama, contact person, telepon, email, atau alamat.
 - Tambah vendor.
-- Rename vendor.
+- Edit profil vendor:
+  - Vendor account.
+  - Vendor name.
+  - Contact person.
+  - Phone / WhatsApp.
+  - Email.
+  - Office address.
+  - Joined date.
 - Hapus vendor.
 - Proteksi penghapusan jika vendor sudah dipakai inspection.
-- Import vendor dari CSV.
+- Import vendor dari CSV dengan kolom opsional:
+  - `vendaccount`
+  - `name`
+  - `contact_person`
+  - `phone`
+  - `email`
+  - `address`
+  - `joined_at`
 
-Vendor menjadi sumber pilihan supplier pada AQL Table.
+Vendor menjadi sumber pilihan supplier pada AQL Table. Import dua kolom lama tetap didukung;
+kolom profil yang tidak diisi tidak menghapus data profil yang sudah ada.
 
 ---
 
@@ -388,10 +405,16 @@ Fitur:
 - Filter status.
 - Statistik user.
 - Tambah user dengan temporary password.
-- Edit user.
+- Username hanya boleh angka dan permanen setelah akun dibuat.
+- Edit nama, email, dan role.
 - Aktifkan/nonaktifkan user.
-- Reset password.
+- Reset password: tombol key menghasilkan temporary password baru yang ditampilkan sekali; user wajib menggantinya saat sign-in berikutnya.
+- Hapus user dengan konfirmasi.
 - Proteksi agar admin tidak menonaktifkan atau menghapus dirinya sendiri.
+- Proteksi agar admin terakhir yang aktif tidak terhapus.
+
+Catatan: nama inspector/checker disimpan pada inspection, jadi riwayat inspection tetap
+menampilkan nama yang tersimpan meskipun akun user dihapus.
 
 Role:
 
@@ -488,6 +511,7 @@ Tujuannya agar bookmark lama tetap berfungsi tanpa mempertahankan halaman kosong
 | Manage AQL plans | Tidak | Ya | Ya |
 | Download PDF CHECKED | Ya | Ya | Ya |
 | User Management | Tidak | Tidak | Ya |
+| Hapus user | Tidak | Tidak | Ya |
 
 Catatan: inspection legacy dengan status numerik lama tidak dapat diedit atau diproses
 melalui workflow baru.
@@ -501,7 +525,7 @@ melalui workflow baru.
 1. ADMIN membuka **Items**.
 2. Menambahkan item dan standar pemeriksaan.
 3. ADMIN membuka **Vendors**.
-4. Menambahkan vendor atau import CSV.
+4. Menambahkan vendor beserta contact person, telepon, email, alamat, dan tanggal bergabung, atau import CSV.
 5. ADMIN membuka **User Management**.
 6. Membuat user INSPECTOR, CHECKER, atau ADMIN.
 7. CHECKER/ADMIN membuka **AQL Table → Manage plans**.
@@ -641,8 +665,11 @@ Status yang tersimpan ditampilkan kembali pada report dan PDF.
 | Tampilan dashboard | `laravel/resources/views/dashboard.blade.php` |
 | Komponen UI bersama | `laravel/resources/views/components/ui/` |
 | Style komponen | `laravel/public/css/components.css` |
+| Tooltip custom | `laravel/public/js/tooltip.js` |
+| Search otomatis Reports | `laravel/public/js/auto-submit-search.js` |
 | Route | `laravel/routes/web.php` |
 | Migrasi workflow | `laravel/database/sql/migrations/016_inspecttable_workflow.sql` |
+| Migrasi profil vendor | `laravel/database/sql/migrations/017_vendtable_profile.sql` |
 | Tes workflow dan PDF | `laravel/tests/Feature/InspectionWorkflowTest.php` |
 
 ---
@@ -666,7 +693,7 @@ bersama perubahan kode.
 
 ## 10. Catatan QA dan batasan saat ini
 
-- **Tes otomatis:** 122 tests, 548 assertions.
+- **Tes otomatis:** 125 tests, 563 assertions.
 - **Formatter:** Pint lulus untuk 85 file.
 - **Composer audit:** tidak ada security advisory.
 - **PDF:** respons sudah diuji menghasilkan `application/pdf`. Pengecekan visual cetak
@@ -675,3 +702,28 @@ bersama perubahan kode.
   baru.
 - **Dashboard:** belum menampilkan grafik NG; grafik bersifat opsional.
 - **Inspection Form lama:** sudah dihapus; `/inspections` hanya redirect ke `/aql`.
+
+---
+
+## 11. Audit UI/UX terakhir
+
+Audit ini dilakukan pada 4 November 2026.
+
+| Area | Temuan | Status |
+|---|---|---|
+| Input enabled/disabled | Enabled dan disabled sebelumnya memakai latar yang sama; teks disabled masih gelap. | Diperbaiki: enabled memakai `--surface`, disabled memakai latar abu-abu dan teks `--text-3`. |
+| Select/combobox/dropdown disabled | Sebagian hanya memakai opacity. | Diperbaiki: latar, border, dan warna teks disabled sekarang konsisten. |
+| `input mono` | Class `mono` membuat input terlihat lebih tebal dan besar. | Dihapus dari seluruh halaman; class CSS `.mono` juga dihapus. |
+| Tombol Back | Ikon panah lurus terlalu generik. | Diganti dengan ikon `undo-2` pada semua tombol Back. |
+| Tooltip tombol | Tooltip memakai atribut `title` bawaan browser. | Diganti dengan tooltip custom berstruktur, memiliki panah penunjuk, dan mengikuti posisi tombol. |
+| User Management | Username menerima huruf; belum ada hapus user; status username permanen belum dijelaskan. | Username sekarang angka saja, ada hint permanen, dan ada hapus user dengan konfirmasi serta proteksi admin terakhir/self. |
+| Reset password | Alur belum jelas di UI. | Key action menghasilkan temporary password baru; user wajib menggantinya saat sign-in berikutnya. |
+| Reports search | Ada search input sekaligus tombol Search. | Tombol Search dihapus; pencarian berjalan otomatis setelah user berhenti mengetik. |
+| Reports/AQL Table | Layout input AQL dan check sheet Reports berbeda karena input adalah form interaktif dan Reports adalah Form 7.4.3-F1. | Perlu keputusan produk jika harus dibuat identik 1:1; label dan urutan bagian sudah diselaraskan. |
+| Vendor | Hanya account dan nama. | Ditambah contact person, phone/WhatsApp, email, office address, joined date, dan kolom CSV opsional. |
+| Table spacing | Dashboard memakai padding lebih rapat daripada tabel lain. | Disamakan ke 12px × 20px. |
+| Navbar/page width | Navbar dan `.page` sama-sama memakai max-width 1448px. | Sudah konsisten. |
+| Responsive | Tabel lebar, form vendor, modal, dan toolbar Reports berpotensi sempit di HP. | Tabel memakai horizontal scroll; form vendor menjadi satu kolom; modal menjadi full-screen; toolbar Reports wrap. |
+| Dark mode | Komponen baru harus memakai token warna. | Tooltip, input disabled, select, combobox, dan vendor form memakai token tema. |
+| Empty/loading/error | Sebagian besar halaman memiliki empty state dan error field; tombol submit memakai disabled saat loading. | Konsisten; spinner global masih opsional. |
+| Login | Login adalah desain final. | Tidak diubah. |

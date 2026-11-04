@@ -38,6 +38,7 @@
     </main>
 
     <script src="{{ asset('js/navbar.js') }}?v={{ filemtime(public_path('js/navbar.js')) }}" defer></script>
+    <script src="{{ asset('js/tooltip.js') }}?v={{ filemtime(public_path('js/tooltip.js')) }}" defer></script>
     @livewireScripts
     @stack('scripts')
 </body>

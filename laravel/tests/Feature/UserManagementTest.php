@@ -139,6 +139,20 @@ class UserManagementTest extends TestCase
             ->assertHasErrors(['username', 'fullname', 'formRole']);
     }
 
+    public function test_create_rejects_a_non_numeric_username(): void
+    {
+        $admin = $this->makeUser(['role' => Role::ADMIN]);
+
+        Livewire::actingAs($admin)
+            ->test(UserManager::class)
+            ->call('openCreate')
+            ->set('username', 'ABC123')
+            ->set('fullname', 'Numeric Only')
+            ->set('formRole', Role::INSPECTOR)
+            ->call('createUser')
+            ->assertHasErrors('username');
+    }
+
     public function test_username_must_be_unique(): void
     {
         $admin = $this->makeUser(['role' => Role::ADMIN]);
@@ -258,5 +272,34 @@ class UserManagementTest extends TestCase
             ->assertHasErrors('reset');
 
         $this->assertSame($oldHash, $admin->fresh()->password_hash);
+    }
+
+    public function test_admin_can_delete_another_user(): void
+    {
+        $admin = $this->makeUser(['role' => Role::ADMIN]);
+        $target = $this->makeUser(['fullname' => 'Delete Me']);
+
+        Livewire::actingAs($admin)
+            ->test(UserManager::class)
+            ->call('confirmDelete', $target->userid)
+            ->assertSet('showDelete', true)
+            ->call('deleteUser')
+            ->assertHasNoErrors()
+            ->assertSet('showDelete', false)
+            ->assertSet('statusMessage', 'User deleted.');
+
+        $this->assertDatabaseMissing('usertable', ['userid' => $target->userid]);
+    }
+
+    public function test_admin_cannot_delete_self(): void
+    {
+        $admin = $this->makeUser(['role' => Role::ADMIN]);
+
+        Livewire::actingAs($admin)
+            ->test(UserManager::class)
+            ->call('confirmDelete', $admin->userid)
+            ->assertHasErrors('deleteUser');
+
+        $this->assertDatabaseHas('usertable', ['userid' => $admin->userid]);
     }
 }

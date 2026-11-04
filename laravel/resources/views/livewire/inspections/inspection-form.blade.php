@@ -10,7 +10,7 @@
             @if ($editing)
                 <x-ui.button
                     variant="secondary"
-                    icon="arrow-left"
+                    icon="undo-2"
                     :href="route('reports.show', ['inspectnum' => $inspectnum])"
                 >
                     Back to report
@@ -316,7 +316,7 @@
         <div class="card inspection-section-card">
             <div class="inspection-section-heading">
                 <div>
-                    <h2>Visual, Fitting, and Certificate</h2>
+                    <h2>Certificate, Visual, and Fitting</h2>
                     <p>Enter the result and choose OK or NG for each delivery.</p>
                 </div>
                 <x-ui.badge variant="neutral">{{ count($otherLines) }} requirements</x-ui.badge>
@@ -406,6 +406,7 @@
                         type="button"
                         class="icon-btn"
                         wire:click="closePlanAdmin"
+                        data-tooltip="Close AQL plan administration"
                         aria-label="Close AQL plan administration"
                     >
                         <x-icon name="x" :size="18" />

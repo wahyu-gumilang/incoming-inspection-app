@@ -34,6 +34,16 @@ class VendorManager extends Component
 
     public string $name = '';
 
+    public string $contactPerson = '';
+
+    public string $phone = '';
+
+    public string $email = '';
+
+    public string $address = '';
+
+    public string $joinedAt = '';
+
     public string $editingAccount = '';
 
     public string $deleteAccount = '';
@@ -85,16 +95,20 @@ class VendorManager extends Component
     {
         abort_unless(auth()->user()?->isChecker(), 403);
 
-        $this->account = trim($this->account);
-        $this->name = trim($this->name);
+        $this->normalizeForm();
 
         $this->validate([
             'account' => ['required', 'string', 'max:30', 'unique:vendtable,vendaccount'],
             'name' => ['required', 'string', 'max:100'],
+            'contactPerson' => ['nullable', 'string', 'max:100'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'email' => ['nullable', 'email', 'max:100'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'joinedAt' => ['nullable', 'date'],
         ]);
 
         try {
-            app(VendorService::class)->create($this->account, $this->name);
+            app(VendorService::class)->create($this->vendorData());
         } catch (DomainException $exception) {
             $this->addError('account', $exception->getMessage());
 
@@ -120,6 +134,11 @@ class VendorManager extends Component
         $this->account = $vendor->vendaccount;
         $this->editingAccount = $vendor->vendaccount;
         $this->name = trim((string) $vendor->name);
+        $this->contactPerson = trim((string) ($vendor->contact_person ?? ''));
+        $this->phone = trim((string) ($vendor->phone ?? ''));
+        $this->email = trim((string) ($vendor->email ?? ''));
+        $this->address = trim((string) ($vendor->address ?? ''));
+        $this->joinedAt = $vendor->joined_at ? (string) $vendor->joined_at : '';
         $this->showEdit = true;
         $this->showCreate = false;
         $this->showDelete = false;
@@ -137,14 +156,19 @@ class VendorManager extends Component
     {
         abort_unless(auth()->user()?->isChecker(), 403);
 
-        $this->name = trim($this->name);
+        $this->normalizeForm();
 
         $this->validate([
             'name' => ['required', 'string', 'max:100'],
+            'contactPerson' => ['nullable', 'string', 'max:100'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'email' => ['nullable', 'email', 'max:100'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'joinedAt' => ['nullable', 'date'],
         ]);
 
         try {
-            app(VendorService::class)->rename($this->editingAccount, $this->name);
+            app(VendorService::class)->update($this->editingAccount, $this->vendorData(false));
         } catch (DomainException $exception) {
             $this->addError('name', $exception->getMessage());
 
@@ -152,7 +176,7 @@ class VendorManager extends Component
         }
 
         $this->showEdit = false;
-        $this->statusMessage = 'Vendor name updated.';
+        $this->statusMessage = 'Vendor updated.';
         $this->errorMessage = '';
         $this->resetForm();
     }
@@ -303,6 +327,11 @@ class VendorManager extends Component
             $fields = str_getcsv($line, $delimiter);
             $account = trim((string) ($fields[0] ?? ''));
             $name = trim((string) ($fields[1] ?? ''));
+            $contactPerson = trim((string) ($fields[2] ?? ''));
+            $phone = trim((string) ($fields[3] ?? ''));
+            $email = trim((string) ($fields[4] ?? ''));
+            $address = trim((string) ($fields[5] ?? ''));
+            $joinedAt = trim((string) ($fields[6] ?? ''));
 
             if ($index === 0 && $this->isHeader($account, $name)) {
                 continue;
@@ -336,6 +365,46 @@ class VendorManager extends Component
                 continue;
             }
 
+            if (mb_strlen($contactPerson) > 100) {
+                $this->importErrors[] = 'Line '.$lineNumber.': contact person must be 100 characters or fewer.';
+
+                continue;
+            }
+
+            if (mb_strlen($phone) > 30) {
+                $this->importErrors[] = 'Line '.$lineNumber.': phone must be 30 characters or fewer.';
+
+                continue;
+            }
+
+            if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+                $this->importErrors[] = 'Line '.$lineNumber.': email is not valid.';
+
+                continue;
+            }
+
+            if (mb_strlen($address) > 255) {
+                $this->importErrors[] = 'Line '.$lineNumber.': address must be 255 characters or fewer.';
+
+                continue;
+            }
+
+            if ($joinedAt !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $joinedAt) !== 1) {
+                $this->importErrors[] = 'Line '.$lineNumber.': joined date must use YYYY-MM-DD.';
+
+                continue;
+            }
+
+            if ($joinedAt !== '') {
+                [$year, $month, $day] = array_map('intval', explode('-', $joinedAt));
+
+                if (! checkdate($month, $day, $year)) {
+                    $this->importErrors[] = 'Line '.$lineNumber.': joined date is not valid.';
+
+                    continue;
+                }
+            }
+
             $key = strtolower($account);
 
             if (isset($seen[$key])) {
@@ -348,6 +417,11 @@ class VendorManager extends Component
             $this->importRows[] = [
                 'vendaccount' => $account,
                 'name' => $name,
+                'contact_person' => $contactPerson !== '' ? $contactPerson : null,
+                'phone' => $phone !== '' ? $phone : null,
+                'email' => $email !== '' ? $email : null,
+                'address' => $address !== '' ? $address : null,
+                'joined_at' => $joinedAt !== '' ? $joinedAt : null,
             ];
         }
 
@@ -367,10 +441,47 @@ class VendorManager extends Component
             || in_array($name, ['name', 'vendor name', 'nama vendor'], true);
     }
 
+    private function normalizeForm(): void
+    {
+        $this->account = trim($this->account);
+        $this->name = trim($this->name);
+        $this->contactPerson = trim($this->contactPerson);
+        $this->phone = trim($this->phone);
+        $this->email = trim($this->email);
+        $this->address = trim($this->address);
+        $this->joinedAt = trim($this->joinedAt);
+    }
+
+    /**
+     * @return array<string, string|null>
+     */
+    private function vendorData(bool $includeAccount = true): array
+    {
+        $data = [
+            'name' => $this->name,
+            'contact_person' => $this->contactPerson !== '' ? $this->contactPerson : null,
+            'phone' => $this->phone !== '' ? $this->phone : null,
+            'email' => $this->email !== '' ? $this->email : null,
+            'address' => $this->address !== '' ? $this->address : null,
+            'joined_at' => $this->joinedAt !== '' ? $this->joinedAt : null,
+        ];
+
+        if ($includeAccount) {
+            $data = ['vendaccount' => $this->account] + $data;
+        }
+
+        return $data;
+    }
+
     private function resetForm(): void
     {
         $this->account = '';
         $this->name = '';
+        $this->contactPerson = '';
+        $this->phone = '';
+        $this->email = '';
+        $this->address = '';
+        $this->joinedAt = '';
         $this->editingAccount = '';
         $this->deleteAccount = '';
         $this->deleteName = '';

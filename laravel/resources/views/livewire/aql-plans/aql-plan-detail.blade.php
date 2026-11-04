@@ -1,6 +1,6 @@
 <div class="aql-plans-page">
     <div class="aql-plan-detail-embedded-head">
-        <x-ui.button variant="ghost" size="sm" icon="arrow-left" wire:click="backToPlans">
+        <x-ui.button variant="ghost" size="sm" icon="undo-2" wire:click="backToPlans">
             All plans
         </x-ui.button>
 

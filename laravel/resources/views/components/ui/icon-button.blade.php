@@ -8,6 +8,6 @@
     };
 @endphp
 
-<button {{ $attributes->merge(['type' => $type, 'class' => "icon-btn {$variantClass}", 'title' => $label, 'aria-label' => $label]) }}>
+<button {{ $attributes->merge(['type' => $type, 'class' => "icon-btn {$variantClass}", 'data-tooltip' => $label, 'aria-label' => $label]) }}>
     <x-icon :name="$icon" :size="16" />
 </button>

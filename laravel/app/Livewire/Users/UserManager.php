@@ -38,6 +38,8 @@ class UserManager extends Component
 
     public bool $showReset = false;
 
+    public bool $showDelete = false;
+
     public bool $showToggle = false;
 
     public string $username = '';
@@ -57,6 +59,10 @@ class UserManager extends Component
     public ?int $resetId = null;
 
     public string $resetName = '';
+
+    public ?int $deleteId = null;
+
+    public string $deleteName = '';
 
     public ?int $toggleId = null;
 
@@ -159,6 +165,7 @@ class UserManager extends Component
     {
         $this->resetForm();
         $this->showCreate = true;
+        $this->showDelete = false;
         $this->resetValidation();
     }
 
@@ -205,6 +212,7 @@ class UserManager extends Component
         $this->email = $user->email ?? '';
         $this->formRole = $user->role;
         $this->showEdit = true;
+        $this->showDelete = false;
         $this->openFormRole = false;
         $this->resetValidation();
     }
@@ -274,6 +282,46 @@ class UserManager extends Component
 
         session()->now('temporary_password', $password);
         session()->now('temporary_username', $user->username);
+    }
+
+    public function confirmDelete(int $userid): void
+    {
+        $user = User::findOrFail($userid);
+
+        if ($user->is(auth()->user())) {
+            $this->showDelete = false;
+            $this->addError('deleteUser', 'You cannot delete your own account.');
+
+            return;
+        }
+
+        $this->deleteId = $user->userid;
+        $this->deleteName = $user->fullname;
+        $this->showDelete = true;
+        $this->resetValidation();
+    }
+
+    public function closeDelete(): void
+    {
+        $this->showDelete = false;
+        $this->resetValidation();
+    }
+
+    public function deleteUser(): void
+    {
+        $user = User::findOrFail($this->deleteId);
+
+        try {
+            app(UserService::class)->delete($user, auth()->user());
+        } catch (DomainException $exception) {
+            $this->addError('deleteUser', $exception->getMessage());
+
+            return;
+        }
+
+        $this->showDelete = false;
+        $this->statusMessage = 'User deleted.';
+        $this->resetValidation();
     }
 
     public function confirmToggle(int $userid): void
@@ -349,7 +397,7 @@ class UserManager extends Component
                     'string',
                     'min:3',
                     'max:50',
-                    'regex:/^[A-Za-z0-9._-]+$/',
+                    'regex:/^[0-9]+$/',
                     'unique:usertable,username',
                 ],
                 'fullname' => ['required', 'string', 'max:50'],
@@ -378,6 +426,8 @@ class UserManager extends Component
         $this->editingId = null;
         $this->editingUsername = '';
         $this->editingIsSelf = false;
+        $this->deleteId = null;
+        $this->deleteName = '';
         $this->openFormRole = false;
         $this->resetValidation();
     }

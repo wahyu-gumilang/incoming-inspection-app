@@ -9,7 +9,7 @@
         description="Quick guidance for access and incoming inspection."
     >
         <x-slot:actions>
-            <x-ui.button :href="route('dashboard')" icon="arrow-left">Back to dashboard</x-ui.button>
+            <x-ui.button :href="route('dashboard')" icon="undo-2">Back to dashboard</x-ui.button>
         </x-slot:actions>
     </x-ui.page-header>
 

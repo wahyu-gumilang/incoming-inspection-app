@@ -174,6 +174,13 @@
                                             :label="($user->active ? 'Deactivate' : 'Activate').' '.$user->fullname"
                                             wire:click="confirmToggle({{ $user->userid }})"
                                         />
+
+                                        <x-ui.icon-button
+                                            icon="trash-2"
+                                            variant="danger"
+                                            :label="'Delete '.$user->fullname"
+                                            wire:click="confirmDelete({{ $user->userid }})"
+                                        />
                                     @endif
                                 </div>
                             </td>
@@ -211,8 +218,17 @@
                     <input id="create-fullname" class="input" type="text" wire:model="fullname" maxlength="50" autofocus>
                 </x-ui.field>
 
-                <x-ui.field label="Username" for="create-username" name="username" hint="3-50 letters, digits, dots, dashes or underscores.">
-                    <input id="create-username" class="input mono" type="text" wire:model="username" maxlength="50" autocomplete="off">
+                <x-ui.field label="Username" for="create-username" name="username" hint="Numbers only, 3-50 digits. Username is permanent after creation.">
+                    <input
+                        id="create-username"
+                        class="input"
+                        type="text"
+                        wire:model="username"
+                        maxlength="50"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        autocomplete="off"
+                    >
                 </x-ui.field>
 
                 <x-ui.field label="Email" for="create-email" name="email">
@@ -249,8 +265,12 @@
             close="closeEdit"
         >
             <form wire:submit="saveEdit" class="form">
-                <x-ui.field label="Username" for="edit-username">
-                    <input id="edit-username" class="input mono" type="text" value="{{ $editingUsername }}" disabled>
+                <x-ui.field
+                    label="Username"
+                    for="edit-username"
+                    hint="Username is permanent and cannot be changed."
+                >
+                    <input id="edit-username" class="input" type="text" value="{{ $editingUsername }}" disabled>
                 </x-ui.field>
 
                 <x-ui.field label="Full name" for="edit-fullname" name="fullname">
@@ -301,9 +321,26 @@
         >
             <p>
                 Reset the password for <strong>{{ $resetName }}</strong>? A new temporary password
-                will be generated and shown once.
+                will be generated and shown once. The user must change it at the next sign-in.
             </p>
             @error('reset') <p class="field-error">{{ $message }}</p> @enderror
+        </x-ui.confirm>
+    @endif
+
+    @if ($showDelete)
+        <x-ui.confirm
+            title="Delete user"
+            close="closeDelete"
+            confirm="deleteUser"
+            confirm-label="Delete user"
+            confirm-icon="trash-2"
+            variant="danger"
+        >
+            <p>
+                Delete <strong>{{ $deleteName }}</strong>? This cannot be undone.
+                Historical inspections keep the inspector or checker name that was saved with them.
+            </p>
+            @error('deleteUser') <p class="field-error">{{ $message }}</p> @enderror
         </x-ui.confirm>
     @endif
 

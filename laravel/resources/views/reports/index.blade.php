@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="{{ asset('css/reports.css') }}?v={{ filemtime(public_path('css/reports.css')) }}">
 @endpush
 
+@push('scripts')
+    <script src="{{ asset('js/auto-submit-search.js') }}?v={{ filemtime(public_path('js/auto-submit-search.js')) }}" defer></script>
+@endpush
+
 @section('content')
     <x-ui.page-header
         eyebrow="Inspection Reports"
@@ -15,7 +19,12 @@
 
     <div class="card reports-panel">
         <div class="reports-toolbar">
-            <form class="reports-search" method="GET" action="{{ route('reports.index') }}">
+            <form
+                class="reports-search"
+                method="GET"
+                action="{{ route('reports.index') }}"
+                data-auto-submit-search
+            >
                 <x-ui.search
                     name="search"
                     value="{{ $search }}"
@@ -30,8 +39,6 @@
                         @endforeach
                     </x-ui.select>
                 </div>
-
-                <x-ui.button type="submit" icon="search">Search</x-ui.button>
 
                 @if ($search !== '' || $status !== '')
                     <x-ui.button variant="ghost" icon="rotate-ccw" :href="route('reports.index')">Clear</x-ui.button>
@@ -73,7 +80,7 @@
                         @foreach ($inspections as $inspection)
                             <tr>
                                 <td>
-                                    <a class="report-number mono" href="{{ route('reports.show', $inspection->inspectnum) }}">
+                                    <a class="report-number" href="{{ route('reports.show', $inspection->inspectnum) }}">
                                         {{ $inspection->inspectnum }}
                                     </a>
                                 </td>

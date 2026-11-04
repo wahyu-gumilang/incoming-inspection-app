@@ -48,8 +48,8 @@ The application is the only product codebase. Its SQL schema and migrations live
   public/css/components.css. User Management is the reference consumer. The admin-only
   preview is at /ui-kit.
 - Items master data is implemented: list, search, standards filter, pagination, detail,
-  create, rename and standard CRUD. Vendors are implemented with CRUD, usage protection and
-  CSV import. The AQL input form, filled check-sheet output in Reports and AQL plan
+  create, rename and standard CRUD. Vendors are implemented with CRUD, profile fields,
+  usage protection and CSV import. The AQL input form, filled check-sheet output in Reports and AQL plan
   administration are implemented. Submission/checking and final PDF download are implemented.
 
 ## 4. QC workflow
@@ -357,7 +357,9 @@ controllers, Livewire components or Blade views.
 - Use the rate limiter for failed logins.
 - Re-read the user's active state and role on each request.
 - Use middleware for role checks: INSPECTOR, CHECKER, ADMIN.
-- An Admin cannot demote, deactivate or reset their own account.
+- An Admin cannot demote, deactivate, delete or reset their own account. The last active
+  administrator cannot be deleted. Usernames are numeric employee IDs and are permanent after
+  creation.
 - Admin user management generates a temporary password, sets must_change_password and shows
   the password once. Never store or display it again.
 - Deactivate users; do not delete them, so names on old inspections remain valid.
@@ -514,7 +516,7 @@ Implemented on 2026-10-28.
 - Login page tests cover the loading state markup, remember token, remembered username, failed login and inactive users.
 - Navbar tests cover the primary menu, admin-only user management, the legacy /inspections redirect, the search query, the user menu, Help Center and theme persistence.
 - Profile tests cover avatar upload, removal, validation and serving.
-- User management tests cover admin access, search and filters, stat-card filter synchronization, create with a temporary password, edit, self-protection, activation and password reset.
+- User management tests cover admin access, search and filters, stat-card filter synchronization, numeric usernames, create with a temporary password, edit, self-protection, activation, password reset and delete.
 - Test success paths and the main error paths.
 - Test exactly on each limit and 0.01 outside each limit.
 - Test Min, Max, zero tolerance, negative tolerance, qualitative tolerance and empty values.

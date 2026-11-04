@@ -32,7 +32,7 @@
         :description="($inspection->itemid ?: '—').' · '.($inspection->itemname ?: '—').' · '.($inspection->name ?: '—')"
     >
         <x-slot:actions>
-            <x-ui.button :href="route('reports.index')" icon="arrow-left">Back to reports</x-ui.button>
+            <x-ui.button :href="route('reports.index')" icon="undo-2">Back to reports</x-ui.button>
 
             @if ($reportStatus === \App\Domain\Inspection\InspectionStatus::CHECKED)
                 <x-ui.button variant="primary" icon="download" :href="route('reports.pdf', $inspection->inspectnum)">

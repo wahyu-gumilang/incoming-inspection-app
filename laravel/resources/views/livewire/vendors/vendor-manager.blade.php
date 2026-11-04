@@ -26,7 +26,7 @@
         <div class="vendors-toolbar">
             <x-ui.search
                 wire:model.live.debounce.300ms="search"
-                placeholder="Search vendor account or name..."
+                placeholder="Search vendor, contact, phone, or email..."
                 label="Search vendors"
             />
 
@@ -56,6 +56,8 @@
                         <tr>
                             <th>Vendor account</th>
                             <th>Vendor name</th>
+                            <th>Contact</th>
+                            <th>Joined</th>
                             <th>Inspections</th>
                             @if ($canManage)
                                 <th class="vendors-actions-head">Actions</th>
@@ -65,8 +67,19 @@
                     <tbody>
                         @foreach ($vendors as $vendor)
                             <tr wire:key="vendor-{{ $vendor->vendaccount }}">
-                                <td><span class="vendor-account mono">{{ $vendor->vendaccount }}</span></td>
+                                <td><span class="vendor-account">{{ $vendor->vendaccount }}</span></td>
                                 <td><span class="vendor-name">{{ $vendor->name ?: '—' }}</span></td>
+                                <td>
+                                    @if ($vendor->contact_person || $vendor->phone)
+                                        <span class="vendor-contact">{{ $vendor->contact_person ?: '—' }}</span>
+                                        <small>{{ $vendor->phone ?: $vendor->email }}</small>
+                                    @else
+                                        <span class="vendor-muted">—</span>
+                                    @endif
+                                </td>
+                                <td class="vendor-muted">
+                                    {{ $vendor->joined_at ? \Illuminate\Support\Carbon::parse($vendor->joined_at)->format('j M Y') : '—' }}
+                                </td>
                                 <td>
                                     @if ((int) $vendor->inspection_count > 0)
                                         <x-ui.badge variant="info">{{ number_format($vendor->inspection_count) }}</x-ui.badge>
@@ -127,7 +140,7 @@
                 >
                     <input
                         id="vendor-account"
-                        class="input mono"
+                        class="input"
                         type="text"
                         wire:model="account"
                         maxlength="30"
@@ -147,6 +160,28 @@
                     >
                 </x-ui.field>
 
+                <div class="vendor-form-grid">
+                    <x-ui.field label="Contact person" for="vendor-contact" name="contactPerson">
+                        <input id="vendor-contact" class="input" type="text" wire:model="contactPerson" maxlength="100" autocomplete="off">
+                    </x-ui.field>
+
+                    <x-ui.field label="Phone / WhatsApp" for="vendor-phone" name="phone">
+                        <input id="vendor-phone" class="input" type="text" wire:model="phone" maxlength="30" autocomplete="off">
+                    </x-ui.field>
+
+                    <x-ui.field label="Email" for="vendor-email" name="email">
+                        <input id="vendor-email" class="input" type="email" wire:model="email" maxlength="100" autocomplete="off">
+                    </x-ui.field>
+
+                    <x-ui.field label="Joined date" for="vendor-joined" name="joinedAt">
+                        <input id="vendor-joined" class="input" type="date" wire:model="joinedAt">
+                    </x-ui.field>
+                </div>
+
+                <x-ui.field label="Office address" for="vendor-address" name="address">
+                    <input id="vendor-address" class="input" type="text" wire:model="address" maxlength="255" autocomplete="off">
+                </x-ui.field>
+
                 <div class="modal-foot">
                     <x-ui.button variant="secondary" type="button" icon="x" wire:click="closeCreate">Cancel</x-ui.button>
                     <x-ui.button variant="primary" type="submit" icon="plus" wire:loading.attr="disabled">Create vendor</x-ui.button>
@@ -163,7 +198,7 @@
         >
             <form wire:submit="saveEdit" class="form">
                 <x-ui.field label="Vendor account" for="edit-vendor-account">
-                    <input id="edit-vendor-account" class="input mono" type="text" value="{{ $editingAccount }}" disabled>
+                    <input id="edit-vendor-account" class="input" type="text" value="{{ $editingAccount }}" disabled>
                 </x-ui.field>
 
                 <x-ui.field label="Vendor name" for="edit-vendor-name" name="name">
@@ -175,6 +210,28 @@
                         maxlength="100"
                         autofocus
                     >
+                </x-ui.field>
+
+                <div class="vendor-form-grid">
+                    <x-ui.field label="Contact person" for="edit-vendor-contact" name="contactPerson">
+                        <input id="edit-vendor-contact" class="input" type="text" wire:model="contactPerson" maxlength="100" autocomplete="off">
+                    </x-ui.field>
+
+                    <x-ui.field label="Phone / WhatsApp" for="edit-vendor-phone" name="phone">
+                        <input id="edit-vendor-phone" class="input" type="text" wire:model="phone" maxlength="30" autocomplete="off">
+                    </x-ui.field>
+
+                    <x-ui.field label="Email" for="edit-vendor-email" name="email">
+                        <input id="edit-vendor-email" class="input" type="email" wire:model="email" maxlength="100" autocomplete="off">
+                    </x-ui.field>
+
+                    <x-ui.field label="Joined date" for="edit-vendor-joined" name="joinedAt">
+                        <input id="edit-vendor-joined" class="input" type="date" wire:model="joinedAt">
+                    </x-ui.field>
+                </div>
+
+                <x-ui.field label="Office address" for="edit-vendor-address" name="address">
+                    <input id="edit-vendor-address" class="input" type="text" wire:model="address" maxlength="255" autocomplete="off">
                 </x-ui.field>
 
                 <div class="modal-foot">
@@ -196,7 +253,7 @@
         >
             <p>
                 Delete <strong>{{ $deleteName ?: $deleteAccount }}</strong>
-                (<span class="mono">{{ $deleteAccount }}</span>)? This cannot be undone.
+                (<span>{{ $deleteAccount }}</span>)? This cannot be undone.
             </p>
             @error('deleteVendor')
                 <p class="field-error">{{ $message }}</p>
@@ -207,7 +264,7 @@
     @if ($showImport)
         <x-ui.modal
             title="Import vendors"
-            subtitle="CSV columns: vendaccount, name. Header is optional."
+            subtitle="CSV columns: vendaccount, name, contact_person, phone, email, address, joined_at. Header is optional."
             close="closeImport"
         >
             <form wire:submit="importVendors" class="form">
@@ -250,13 +307,15 @@
                                 <tr>
                                     <th>Vendor account</th>
                                     <th>Vendor name</th>
+                                    <th>Contact</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (array_slice($importRows, 0, 8) as $row)
                                     <tr wire:key="import-{{ $row['vendaccount'] }}">
-                                        <td class="mono">{{ $row['vendaccount'] }}</td>
+                                        <td>{{ $row['vendaccount'] }}</td>
                                         <td>{{ $row['name'] }}</td>
+                                        <td>{{ $row['contact_person'] ?: ($row['phone'] ?: '—') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

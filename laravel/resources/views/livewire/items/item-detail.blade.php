@@ -5,7 +5,7 @@
         :description="'Part number '.$item->itemid.' · '.number_format($item->standards_count).' standards'"
     >
         <x-slot:actions>
-            <x-ui.button variant="ghost" :href="route('items.index')" icon="arrow-left">
+            <x-ui.button variant="ghost" :href="route('items.index')" icon="undo-2">
                 Back to items
             </x-ui.button>
 
@@ -242,7 +242,7 @@
                     <x-ui.field label="Standard value" for="standard-value" name="standardValue">
                         <input
                             id="standard-value"
-                            class="input mono"
+                            class="input"
                             type="number"
                             step="0.01"
                             wire:model="standardValue"
@@ -263,7 +263,7 @@
                         <x-ui.field label="Tolerance plus" for="standard-plus" name="tolerancePlus">
                             <input
                                 id="standard-plus"
-                                class="input mono"
+                                class="input"
                                 type="number"
                                 step="0.01"
                                 wire:model="tolerancePlus"
@@ -273,7 +273,7 @@
                         <x-ui.field label="Tolerance minus" for="standard-minus" name="toleranceMinus">
                             <input
                                 id="standard-minus"
-                                class="input mono"
+                                class="input"
                                 type="number"
                                 step="0.01"
                                 wire:model="toleranceMinus"

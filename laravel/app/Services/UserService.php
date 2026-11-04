@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Domain\User\Role;
 use App\Models\User;
 use DomainException;
 use Illuminate\Database\QueryException;
@@ -64,6 +65,26 @@ class UserService
         }
 
         $user->forceFill(['active' => $active])->save();
+    }
+
+    public function delete(User $user, User $actor): void
+    {
+        if ($user->is($actor)) {
+            throw new DomainException('You cannot delete your own account.');
+        }
+
+        if ($user->role === Role::ADMIN && $user->active) {
+            $activeAdmins = User::query()
+                ->where('role', Role::ADMIN)
+                ->where('active', true)
+                ->count();
+
+            if ($activeAdmins <= 1) {
+                throw new DomainException('You cannot delete the last active administrator.');
+            }
+        }
+
+        $user->delete();
     }
 
     public function resetPassword(User $user, User $actor): string

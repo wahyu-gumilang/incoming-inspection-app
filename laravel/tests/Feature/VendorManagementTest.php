@@ -37,6 +37,11 @@ class VendorManagementTest extends TestCase
             ->assertSet('showCreate', true)
             ->set('account', 'V-9001')
             ->set('name', 'PT Vendor Baru')
+            ->set('contactPerson', 'Budi')
+            ->set('phone', '0812-3456-7890')
+            ->set('email', 'budi@example.com')
+            ->set('address', 'Jl. Industri No. 1')
+            ->set('joinedAt', '2026-11-04')
             ->call('createVendor')
             ->assertHasNoErrors()
             ->assertSet('showCreate', false)
@@ -45,6 +50,11 @@ class VendorManagementTest extends TestCase
         $this->assertDatabaseHas('vendtable', [
             'vendaccount' => 'V-9001',
             'name' => 'PT Vendor Baru',
+            'contact_person' => 'Budi',
+            'phone' => '0812-3456-7890',
+            'email' => 'budi@example.com',
+            'address' => 'Jl. Industri No. 1',
+            'joined_at' => '2026-11-04',
         ]);
     }
 
@@ -57,14 +67,18 @@ class VendorManagementTest extends TestCase
             ->call('openEdit', 'V-0001')
             ->assertSet('editingAccount', 'V-0001')
             ->set('name', 'PT Sinar Logam Abadi Updated')
+            ->set('contactPerson', 'Siti')
+            ->set('phone', '021-555-0100')
             ->call('saveEdit')
             ->assertHasNoErrors()
             ->assertSet('showEdit', false)
-            ->assertSet('statusMessage', 'Vendor name updated.');
+            ->assertSet('statusMessage', 'Vendor updated.');
 
         $this->assertDatabaseHas('vendtable', [
             'vendaccount' => 'V-0001',
             'name' => 'PT Sinar Logam Abadi Updated',
+            'contact_person' => 'Siti',
+            'phone' => '021-555-0100',
         ]);
     }
 
@@ -111,7 +125,9 @@ class VendorManagementTest extends TestCase
         $checker = $this->makeUser(['role' => Role::CHECKER]);
         $file = UploadedFile::fake()->createWithContent(
             'vendors.csv',
-            "vendaccount,name\nV-9101,PT Import Satu\nV-9102,PT Import Dua\n",
+            "vendaccount,name,contact_person,phone,email,address,joined_at\n"
+            ."V-9101,PT Import Satu,Budi,0812-1111-2222,budi@example.com,Jl. Satu,2026-01-10\n"
+            ."V-9102,PT Import Dua,Siti,0812-3333-4444,siti@example.com,Jl. Dua,2026-02-11\n",
         );
 
         Livewire::actingAs($checker)
@@ -127,10 +143,16 @@ class VendorManagementTest extends TestCase
         $this->assertDatabaseHas('vendtable', [
             'vendaccount' => 'V-9101',
             'name' => 'PT Import Satu',
+            'contact_person' => 'Budi',
+            'phone' => '0812-1111-2222',
+            'joined_at' => '2026-01-10',
         ]);
         $this->assertDatabaseHas('vendtable', [
             'vendaccount' => 'V-9102',
             'name' => 'PT Import Dua',
+            'contact_person' => 'Siti',
+            'phone' => '0812-3333-4444',
+            'joined_at' => '2026-02-11',
         ]);
     }
 

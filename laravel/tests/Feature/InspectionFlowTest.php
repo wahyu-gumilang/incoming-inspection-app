@@ -97,7 +97,8 @@ class InspectionFlowTest extends TestCase
             ->get('/reports')
             ->assertOk()
             ->assertSee('INS-TEST-REPORT')
-            ->assertSee('Handle Rhino Prima');
+            ->assertSee('Handle Rhino Prima')
+            ->assertSee('data-auto-submit-search', false);
     }
 
     public function test_reports_page_can_filter_by_status(): void

@@ -69,6 +69,11 @@
             <path d="M19 12H5"></path>
             @break
 
+        @case('undo-2')
+            <path d="M9 14 4 9l5-5"></path>
+            <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5 5.5 5.5 0 0 1-5.5 5.5H11"></path>
+            @break
+
         @case('chevron-right')
             <path d="m9 18 6-6-6-6"></path>
             @break

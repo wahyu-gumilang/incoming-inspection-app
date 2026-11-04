@@ -235,5 +235,10 @@ CREATE TABLE `usertable` (
 CREATE TABLE `vendtable` (
   `vendaccount` varchar(30) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
+  `contact_person` varchar(100) DEFAULT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `joined_at` date DEFAULT NULL,
   PRIMARY KEY (`vendaccount`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

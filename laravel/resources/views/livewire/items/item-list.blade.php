@@ -109,7 +109,7 @@
                         @foreach ($items as $item)
                             <tr wire:key="item-{{ $item->itemid }}">
                                 <td>
-                                    <a class="item-id-link mono" href="{{ route('items.show', $item->itemid) }}">
+                                    <a class="item-id-link" href="{{ route('items.show', $item->itemid) }}">
                                         {{ $item->itemid }}
                                     </a>
                                 </td>
@@ -165,7 +165,7 @@
                 >
                     <input
                         id="create-itemid"
-                        class="input mono"
+                        class="input"
                         type="text"
                         wire:model="itemid"
                         maxlength="30"

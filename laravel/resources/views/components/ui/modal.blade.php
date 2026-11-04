@@ -13,7 +13,7 @@
                     <p>{{ $subtitle }}</p>
                 @endif
             </div>
-            <button type="button" class="icon-btn" wire:click="{{ $close }}" aria-label="Close">
+            <button type="button" class="icon-btn" wire:click="{{ $close }}" data-tooltip="Close dialog" aria-label="Close dialog">
                 <x-icon name="x" :size="18" />
             </button>
         </div>
