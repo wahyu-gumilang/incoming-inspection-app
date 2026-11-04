@@ -9,61 +9,46 @@
 @section('content')
     @php($user = auth()->user())
 
-    <div class="profile-page">
+    <div class="settings-page">
         <x-ui.page-header
             eyebrow="Account"
             title="Profile settings"
-            description="Manage your identity, profile photo, and appearance."
-        >
-            <x-slot:actions>
-                <x-ui.button :href="route('password.change')" icon="key">Change password</x-ui.button>
-            </x-slot:actions>
-        </x-ui.page-header>
+            description="Manage your identity, photo, and interface preferences."
+        />
 
-        @if ($errors->any())
-            <x-ui.alert variant="error">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </x-ui.alert>
-        @endif
+        <x-settings-tabs active="profile" />
 
-        <div class="profile-layout">
-            <aside class="card profile-summary">
-                <div class="profile-summary-banner" aria-hidden="true"></div>
+        <div class="settings-shell">
+            <section class="card settings-identity">
+                <x-user-avatar :user="$user" :size="64" class="settings-identity-avatar" />
 
-                <div class="profile-summary-content">
-                    <x-user-avatar :user="$user" :size="88" class="profile-summary-avatar" />
-
-                    <div class="profile-summary-identity">
+                <div class="settings-identity-main">
+                    <div class="settings-identity-name">
                         <h2>{{ $user->fullname }}</h2>
-                        <p>{{ $user->email ?: 'No email address set' }}</p>
                         <x-ui.role-badge :role="$user->role" />
                     </div>
-
-                    <div class="profile-summary-meta">
-                        <div class="profile-summary-meta-row">
-                            <span>Username</span>
-                            <strong>{{ $user->username }}</strong>
-                        </div>
-                        <div class="profile-summary-meta-row">
-                            <span>Status</span>
-                            <x-ui.status-badge :active="$user->active" />
-                        </div>
-                    </div>
-
+                    <p>{{ $user->email ?: 'No email address set' }}</p>
                 </div>
-            </aside>
 
-            <form method="POST" action="{{ route('profile.update') }}" class="profile-form" enctype="multipart/form-data">
+                <div class="settings-identity-meta">
+                    <div>
+                        <span>Username</span>
+                        <strong>{{ $user->username }}</strong>
+                    </div>
+                    <div>
+                        <span>Status</span>
+                        <x-ui.status-badge :active="$user->active" />
+                    </div>
+                </div>
+            </section>
+
+            <form method="POST" action="{{ route('profile.update') }}" class="settings-form" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
-                <section class="card profile-section">
-                    <div class="profile-section-head">
-                        <span class="profile-section-icon">
+                <section class="card settings-section">
+                    <div class="settings-section-head">
+                        <span class="settings-section-icon">
                             <x-icon name="camera" :size="18" />
                         </span>
                         <div>
@@ -72,10 +57,10 @@
                         </div>
                     </div>
 
-                    <div class="profile-photo-editor">
-                        <x-user-avatar :user="$user" :size="80" />
+                    <div class="settings-photo-editor">
+                        <x-user-avatar :user="$user" :size="76" />
 
-                        <div class="profile-photo-actions">
+                        <div class="settings-photo-actions">
                             <input
                                 id="profile-avatar"
                                 class="profile-file-input"
@@ -103,9 +88,9 @@
                     </div>
                 </section>
 
-                <section class="card profile-section">
-                    <div class="profile-section-head">
-                        <span class="profile-section-icon">
+                <section class="card settings-section">
+                    <div class="settings-section-head">
+                        <span class="settings-section-icon">
                             <x-icon name="user" :size="18" />
                         </span>
                         <div>
@@ -114,7 +99,7 @@
                         </div>
                     </div>
 
-                    <div class="profile-fields-grid">
+                    <div class="settings-fields-grid">
                         <x-ui.field label="Full name" for="profile-fullname" name="fullname">
                             <input
                                 id="profile-fullname"
@@ -140,7 +125,7 @@
                         </x-ui.field>
                     </div>
 
-                    <div class="profile-readonly-grid">
+                    <div class="settings-readonly-grid">
                         <x-ui.field label="Username" for="profile-username">
                             <input id="profile-username" class="input" type="text" value="{{ $user->username }}" disabled>
                         </x-ui.field>
@@ -151,9 +136,9 @@
                     </div>
                 </section>
 
-                <section class="card profile-section">
-                    <div class="profile-section-head">
-                        <span class="profile-section-icon">
+                <section class="card settings-section">
+                    <div class="settings-section-head">
+                        <span class="settings-section-icon">
                             <x-icon name="sun" :size="18" />
                         </span>
                         <div>
@@ -162,29 +147,29 @@
                         </div>
                     </div>
 
-                    <div class="profile-theme-options">
-                        <label class="profile-theme-option">
+                    <div class="settings-theme-options">
+                        <label class="settings-theme-option">
                             <input type="radio" name="theme" value="light" @checked(old('theme', $user->theme) === 'light')>
-                            <span class="profile-theme-icon"><x-icon name="sun" :size="18" /></span>
-                            <span class="profile-theme-copy">
+                            <span class="settings-theme-icon"><x-icon name="sun" :size="18" /></span>
+                            <span class="settings-theme-copy">
                                 <strong>Light</strong>
                                 <small>Bright and clean</small>
                             </span>
                         </label>
 
-                        <label class="profile-theme-option">
+                        <label class="settings-theme-option">
                             <input type="radio" name="theme" value="dark" @checked(old('theme', $user->theme) === 'dark')>
-                            <span class="profile-theme-icon"><x-icon name="moon" :size="18" /></span>
-                            <span class="profile-theme-copy">
+                            <span class="settings-theme-icon"><x-icon name="moon" :size="18" /></span>
+                            <span class="settings-theme-copy">
                                 <strong>Dark</strong>
                                 <small>Low-light workspace</small>
                             </span>
                         </label>
 
-                        <label class="profile-theme-option">
+                        <label class="settings-theme-option">
                             <input type="radio" name="theme" value="system" @checked(old('theme', $user->theme) === 'system')>
-                            <span class="profile-theme-icon"><x-icon name="monitor" :size="18" /></span>
-                            <span class="profile-theme-copy">
+                            <span class="settings-theme-icon"><x-icon name="monitor" :size="18" /></span>
+                            <span class="settings-theme-copy">
                                 <strong>System</strong>
                                 <small>Follow device setting</small>
                             </span>
@@ -196,7 +181,7 @@
                     @enderror
                 </section>
 
-                <div class="profile-actions">
+                <div class="settings-actions">
                     <x-ui.button variant="primary" type="submit" icon="save">Save changes</x-ui.button>
                 </div>
             </form>
