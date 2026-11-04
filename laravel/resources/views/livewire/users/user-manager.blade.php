@@ -157,28 +157,28 @@
                                 <div class="row-actions">
                                     <x-ui.icon-button
                                         icon="pencil"
-                                        label="Edit {{ $user->fullname }}"
+                                        label="Edit row"
                                         wire:click="openEdit({{ $user->userid }})"
                                     />
 
                                     @if ($user->userid !== $currentUserId)
                                         <x-ui.icon-button
                                             icon="key"
-                                            label="Reset password for {{ $user->fullname }}"
+                                            label="Reset password"
                                             wire:click="confirmReset({{ $user->userid }})"
                                         />
 
                                         <x-ui.icon-button
                                             :icon="$user->active ? 'user-x' : 'user-check'"
                                             :variant="$user->active ? 'danger' : 'success'"
-                                            :label="($user->active ? 'Deactivate' : 'Activate').' '.$user->fullname"
+                                            :label="$user->active ? 'Deactivate user' : 'Activate user'"
                                             wire:click="confirmToggle({{ $user->userid }})"
                                         />
 
                                         <x-ui.icon-button
                                             icon="trash-2"
                                             variant="danger"
-                                            :label="'Delete '.$user->fullname"
+                                            label="Delete row"
                                             wire:click="confirmDelete({{ $user->userid }})"
                                         />
                                     @endif

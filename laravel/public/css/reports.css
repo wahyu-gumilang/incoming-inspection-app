@@ -34,6 +34,8 @@
 
 .reports-search .ui-search {
     flex: 1;
+    min-width: 240px;
+    max-width: 440px;
 }
 
 .reports-status-filter {
@@ -154,6 +156,7 @@
 
     .reports-search .ui-search {
         flex-basis: 100%;
+        max-width: none;
     }
 
     .reports-status-filter {

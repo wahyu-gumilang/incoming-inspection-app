@@ -50,7 +50,7 @@
 .vendors-toolbar .ui-search {
     flex: 1;
     min-width: 240px;
-    max-width: 480px;
+    max-width: 440px;
 }
 
 .vendors-count {

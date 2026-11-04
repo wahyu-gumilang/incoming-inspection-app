@@ -135,14 +135,14 @@
                                         <div class="aql-plan-row-actions">
                                             <x-ui.icon-button
                                                 icon="pencil"
-                                                :label="'Edit row '.$row->lotmin.'-'.($row->lotmax ?? 'no upper limit')"
+                                                label="Edit row"
                                                 wire:click="openEditRow({{ $row->inspectcategory }}, {{ $row->lotmin }})"
                                             />
 
                                             <x-ui.icon-button
                                                 icon="trash-2"
                                                 variant="danger"
-                                                :label="'Delete row '.$row->lotmin.'-'.($row->lotmax ?? 'no upper limit')"
+                                                label="Delete row"
                                                 wire:click="confirmDeleteRow({{ $row->inspectcategory }}, {{ $row->lotmin }})"
                                             />
                                         </div>

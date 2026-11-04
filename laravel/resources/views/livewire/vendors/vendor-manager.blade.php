@@ -92,16 +92,14 @@
                                         <div class="vendor-row-actions">
                                             <x-ui.icon-button
                                                 icon="pencil"
-                                                :label="'Edit '.$vendor->vendaccount"
+                                                label="Edit row"
                                                 wire:click="openEdit({{ \Illuminate\Support\Js::from($vendor->vendaccount) }})"
                                             />
 
                                             <x-ui.icon-button
                                                 icon="trash-2"
                                                 variant="danger"
-                                                :label="(int) $vendor->inspection_count > 0
-                                                    ? 'Cannot delete '.$vendor->vendaccount.': used by inspections'
-                                                    : 'Delete '.$vendor->vendaccount"
+                                                label="Delete row"
                                                 :disabled="(int) $vendor->inspection_count > 0"
                                                 wire:click="confirmDelete({{ \Illuminate\Support\Js::from($vendor->vendaccount) }})"
                                             />

@@ -100,6 +100,11 @@
                             User Setting
                         </a>
 
+                        <a class="app-navbar-menu-item" href="{{ route('password.change') }}">
+                            <x-icon name="key" :size="17" />
+                            Change password
+                        </a>
+
                         <a class="app-navbar-menu-item" href="{{ route('help.index') }}">
                             <x-icon name="help-circle" :size="17" />
                             Help Center

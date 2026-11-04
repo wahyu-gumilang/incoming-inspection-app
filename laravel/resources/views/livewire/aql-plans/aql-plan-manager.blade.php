@@ -138,18 +138,14 @@
 
                                             <x-ui.icon-button
                                                 icon="pencil"
-                                                :label="'Edit '.$plan->name"
+                                                label="Edit row"
                                                 wire:click="openEdit({{ $plan->planid }})"
                                             />
 
                                             <x-ui.icon-button
                                                 icon="trash-2"
                                                 variant="danger"
-                                                :label="(int) $plan->inspection_count > 0
-                                                    ? 'Cannot delete '.$plan->name.': used by inspections'
-                                                    : ((int) $totalPlans <= 1
-                                                        ? 'Cannot delete the only AQL plan'
-                                                        : 'Delete '.$plan->name)"
+                                                label="Delete row"
                                                 :disabled="(int) $plan->inspection_count > 0 || (int) $totalPlans <= 1"
                                                 wire:click="confirmDelete({{ $plan->planid }})"
                                             />

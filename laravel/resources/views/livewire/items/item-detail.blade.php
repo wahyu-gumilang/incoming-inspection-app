@@ -146,13 +146,13 @@
                                                 <span class="item-standard-row-actions">
                                                     <x-ui.icon-button
                                                         icon="pencil"
-                                                        :label="'Edit '.trim((string) $standard->inspectitem)"
+                                                        label="Edit row"
                                                         wire:click="openStandardEdit({{ \Illuminate\Support\Js::from($standard->inspecttype) }}, {{ \Illuminate\Support\Js::from($standard->inspectitem) }})"
                                                     />
                                                     <x-ui.icon-button
                                                         icon="trash-2"
                                                         variant="danger"
-                                                        :label="'Delete '.trim((string) $standard->inspectitem)"
+                                                        label="Delete row"
                                                         wire:click="confirmStandardDelete({{ \Illuminate\Support\Js::from($standard->inspecttype) }}, {{ \Illuminate\Support\Js::from($standard->inspectitem) }})"
                                                     />
                                                 </span>

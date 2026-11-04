@@ -32,6 +32,7 @@ class NavbarTest extends TestCase
             ->assertSee('data-weather-badge', false)
             ->assertSee('Account Option')
             ->assertSee('User Setting')
+            ->assertSee('Change password')
             ->assertSee('Help Center')
             ->assertSee('Light')
             ->assertSee('Dark')

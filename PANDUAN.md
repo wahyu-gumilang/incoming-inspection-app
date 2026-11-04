@@ -409,6 +409,7 @@ Fitur:
 - Edit nama, email, dan role.
 - Aktifkan/nonaktifkan user.
 - Reset password: tombol key menghasilkan temporary password baru yang ditampilkan sekali; user wajib menggantinya saat sign-in berikutnya.
+- User dapat mengganti password sendiri melalui **Account Option → Change password** atau tombol **Change password** di Profile. Perubahan membutuhkan password saat ini dan langsung berlaku.
 - Hapus user dengan konfirmasi.
 - Proteksi agar admin tidak menonaktifkan atau menghapus dirinya sendiri.
 - Proteksi agar admin terakhir yang aktif tidak terhapus.
@@ -693,7 +694,7 @@ bersama perubahan kode.
 
 ## 10. Catatan QA dan batasan saat ini
 
-- **Tes otomatis:** 125 tests, 563 assertions.
+- **Tes otomatis:** 125 tests, 564 assertions.
 - **Formatter:** Pint lulus untuk 85 file.
 - **Composer audit:** tidak ada security advisory.
 - **PDF:** respons sudah diuji menghasilkan `application/pdf`. Pengecekan visual cetak
@@ -715,10 +716,12 @@ Audit ini dilakukan pada 4 November 2026.
 | Select/combobox/dropdown disabled | Sebagian hanya memakai opacity. | Diperbaiki: latar, border, dan warna teks disabled sekarang konsisten. |
 | `input mono` | Class `mono` membuat input terlihat lebih tebal dan besar. | Dihapus dari seluruh halaman; class CSS `.mono` juga dihapus. |
 | Tombol Back | Ikon panah lurus terlalu generik. | Diganti dengan ikon `undo-2` pada semua tombol Back. |
-| Tooltip tombol | Tooltip memakai atribut `title` bawaan browser. | Diganti dengan tooltip custom berstruktur, memiliki panah penunjuk, dan mengikuti posisi tombol. |
+| Tooltip tombol | Tooltip memakai atribut `title` bawaan browser dan labelnya terlalu detail. | Diganti dengan tooltip custom berstruktur, memiliki panah penunjuk, dan label tabel dibuat generik (`Edit row`, `Delete row`, `Reset password`, `Activate user`, `Deactivate user`). |
 | User Management | Username menerima huruf; belum ada hapus user; status username permanen belum dijelaskan. | Username sekarang angka saja, ada hint permanen, dan ada hapus user dengan konfirmasi serta proteksi admin terakhir/self. |
 | Reset password | Alur belum jelas di UI. | Key action menghasilkan temporary password baru; user wajib menggantinya saat sign-in berikutnya. |
 | Reports search | Ada search input sekaligus tombol Search. | Tombol Search dihapus; pencarian berjalan otomatis setelah user berhenti mengetik. |
+| Search bar toolbar | Lebar search bar berbeda antara Users, Vendors, Items, dan Reports. | Disamakan mengikuti Users: `flex: 1`, `min-width: 240px`, `max-width: 440px`; tombol Clear memakai cursor pointer. |
+| Ganti password user | Hak ganti password ada tetapi kurang terlihat. | Ditambahkan **Account Option → Change password**; halaman Profile juga tetap memiliki tombol Change password. |
 | Reports/AQL Table | Layout input AQL dan check sheet Reports berbeda karena input adalah form interaktif dan Reports adalah Form 7.4.3-F1. | Perlu keputusan produk jika harus dibuat identik 1:1; label dan urutan bagian sudah diselaraskan. |
 | Vendor | Hanya account dan nama. | Ditambah contact person, phone/WhatsApp, email, office address, joined date, dan kolom CSV opsional. |
 | Table spacing | Dashboard memakai padding lebih rapat daripada tabel lain. | Disamakan ke 12px × 20px. |

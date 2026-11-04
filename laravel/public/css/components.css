@@ -1048,6 +1048,10 @@
     padding-left: 42px;
 }
 
+.ui-search .input::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
 .ui-dropdown {
     position: relative;
     flex: 0 0 170px;

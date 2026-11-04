@@ -23,9 +23,9 @@
             </div>
 
             <div class="ui-kit-row">
-                <x-ui.icon-button icon="pencil" label="Edit example" />
-                <x-ui.icon-button icon="key" label="Reset example" />
-                <x-ui.icon-button icon="trash-2" label="Delete example" variant="danger" />
+                <x-ui.icon-button icon="pencil" label="Edit" />
+                <x-ui.icon-button icon="key" label="Reset password" />
+                <x-ui.icon-button icon="trash-2" label="Delete" variant="danger" />
             </div>
         </section>
 
