@@ -427,6 +427,22 @@ Role:
 
 ### 4.9 Profile — `/profile`
 
+Halaman Profile memakai layout dua kolom:
+
+- **Kartu identitas** di kiri:
+  - Avatar besar.
+  - Nama lengkap.
+  - Email.
+  - Role.
+  - Username.
+  - Status aktif.
+- **Form pengaturan** di kanan:
+  - Foto profil: pilih file, hapus foto, batas JPG/PNG/WebP 2 MB.
+  - Informasi pribadi: full name dan email.
+  - Username dan role sebagai field read-only.
+  - Appearance: kartu pilihan Light, Dark, atau System.
+  - Tombol Save changes.
+
 Fitur:
 
 - Ubah data profil.
@@ -437,7 +453,8 @@ Fitur:
   - Dark.
   - System.
 - Tema disimpan dan langsung diterapkan.
-- Tombol **Change password** tersedia di halaman Profile.
+- Tombol **Change password** tersedia di header halaman Profile.
+- Layout responsif: kartu identitas dan form menjadi satu kolom di layar kecil.
 
 #### Account Option
 
@@ -461,6 +478,8 @@ Halaman bantuan berisi panduan:
 - Alur inspection.
 - Penggunaan halaman utama.
 - Password dan profile.
+- Kartu panduan bernomor 01–03.
+- Tombol Contact support yang mengarah ke bagian support.
 - Kontak support langsung.
 
 Tombol Back to dashboard sudah dihapus. Support dapat dihubungi melalui:
@@ -689,6 +708,8 @@ Status yang tersimpan ditampilkan kembali pada report dan PDF.
 | Search otomatis Reports | `laravel/public/js/auto-submit-search.js` |
 | Account menu | `laravel/resources/views/components/app-navbar.blade.php` |
 | Style account menu | `laravel/public/css/navbar.css` |
+| Halaman Profile | `laravel/resources/views/profile/edit.blade.php` |
+| Style Profile | `laravel/public/css/profile.css` |
 | Halaman Help dan support | `laravel/resources/views/help/index.blade.php` |
 | Style Help | `laravel/public/css/help.css` |
 | Route | `laravel/routes/web.php` |
@@ -746,7 +767,8 @@ Audit ini dilakukan pada 4 November 2026.
 | Search bar toolbar | Lebar search bar berbeda antara Users, Vendors, Items, dan Reports. | Disamakan mengikuti Users: `flex: 1`, `min-width: 240px`, `max-width: 440px`; tombol Clear memakai cursor pointer. |
 | Ganti password user | Hak ganti password ada tetapi kurang terlihat. | Change password dipusatkan di **User Settings/Profile**; Account Option hanya berisi User Settings, Help Center, dan Sign out. |
 | Account Option | Item menu masih polos dan Change password duplikat. | User Settings dan Help Center memakai ikon, judul, deskripsi, dan panah; Change password dihapus dari menu. Avatar mendapat tooltip **Account menu**. |
-| Help Center | Belum ada kontak support langsung dan masih ada Back to dashboard. | Ditambahkan kartu WhatsApp dan Email/Outlook; tombol Back to dashboard dihapus. |
+| Help Center | Belum ada kontak support langsung dan masih ada Back to dashboard. | Ditambahkan kartu WhatsApp dan Email/Outlook; tombol Back to dashboard dihapus; kartu panduan diberi nomor dan hover state. |
+| Profile settings | Form masih berupa satu kartu sempit dan tema memakai native select. | Dibuat layout dua kolom: kartu identitas + form terbagi per section; tema memakai kartu pilihan; avatar editor dan read-only identity dirapikan. |
 | Reports/AQL Table | Layout input AQL dan check sheet Reports berbeda karena input adalah form interaktif dan Reports adalah Form 7.4.3-F1. | Perlu keputusan produk jika harus dibuat identik 1:1; label dan urutan bagian sudah diselaraskan. |
 | Vendor | Hanya account dan nama. | Ditambah contact person, phone/WhatsApp, email, office address, joined date, dan kolom CSV opsional. |
 | Table spacing | Dashboard memakai padding lebih rapat daripada tabel lain. | Disamakan ke 12px × 20px. |

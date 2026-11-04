@@ -372,26 +372,6 @@ p {
     gap: 5px;
 }
 
-.avatar-field {
-    display: flex;
-    align-items: flex-start;
-    gap: 18px;
-    padding-bottom: 4px;
-}
-
-.avatar-field-body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 0;
-}
-
-.avatar-input {
-    height: auto;
-    padding: 8px 12px;
-}
-
 .field-hint {
     color: var(--text-3);
     font-size: 11px;
@@ -1306,11 +1286,6 @@ code {
 
     .page-header {
         flex-direction: column;
-    }
-
-    .avatar-field {
-        flex-direction: column;
-        align-items: flex-start;
     }
 
     .stat-grid {

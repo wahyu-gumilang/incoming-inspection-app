@@ -11,13 +11,20 @@
         eyebrow="Support"
         title="Help Center"
         description="Quick guidance for access, incoming inspection, and direct support."
-    />
+    >
+        <x-slot:actions>
+            <x-ui.button href="#support" icon="message-circle">Contact support</x-ui.button>
+        </x-slot:actions>
+    </x-ui.page-header>
 
     <div class="help-grid">
         <div class="card help-card">
-            <span class="help-card-icon">
-                <x-icon name="user" :size="24" />
-            </span>
+            <div class="help-card-top">
+                <span class="help-card-icon">
+                    <x-icon name="user" :size="24" />
+                </span>
+                <span class="help-card-index">01</span>
+            </div>
             <h2>Sign in and access</h2>
             <p>
                 Use your PT. Chubb Safes Indonesia username. If your account is inactive or you
@@ -26,9 +33,12 @@
         </div>
 
         <div class="card help-card">
-            <span class="help-card-icon">
-                <x-icon name="clipboard-check" :size="24" />
-            </span>
+            <div class="help-card-top">
+                <span class="help-card-icon">
+                    <x-icon name="clipboard-check" :size="24" />
+                </span>
+                <span class="help-card-index">02</span>
+            </div>
             <h2>Incoming inspection</h2>
             <p>
                 Select the item and supplier, fill up to seven delivery columns, enter the actual
@@ -38,9 +48,12 @@
         </div>
 
         <div class="card help-card">
-            <span class="help-card-icon">
-                <x-icon name="key" :size="24" />
-            </span>
+            <div class="help-card-top">
+                <span class="help-card-icon">
+                    <x-icon name="key" :size="24" />
+                </span>
+                <span class="help-card-index">03</span>
+            </div>
             <h2>Password and profile</h2>
             <p>
                 Open <strong>User Settings</strong> from the account menu to update your profile,
@@ -49,7 +62,7 @@
         </div>
     </div>
 
-    <section class="card help-support">
+    <section class="card help-support" id="support">
         <div class="help-support-head">
             <div>
                 <span class="help-support-eyebrow">Direct support</span>
