@@ -427,30 +427,30 @@ Role:
 
 ### 4.9 Profile — `/profile`
 
-Halaman Profile memakai desain **account center**:
+Halaman Profile memakai layout **full-width** yang mengikuti `.page` seperti halaman lain:
 
-- **Hero profil** dengan gradient halus dan grid dekoratif:
-  - Avatar besar dan indikator status.
+- **Profile overview card**:
+  - Avatar.
   - Nama lengkap.
   - Role.
   - Email.
   - Username.
   - Status aktif.
   - Member since.
+  - Tombol Change password.
 - **Personal details**:
   - Full name.
   - Email.
   - Username dan role read-only.
 - **Profile photo**:
   - Pilih file.
+  - Status file yang dipilih.
+  - Validasi tipe dan ukuran maksimal 2 MB.
   - Hapus foto.
-  - Batas JPG/PNG/WebP 2 MB.
-- **Security card**:
-  - Penjelasan keamanan akun.
-  - Tombol Change password.
 - **Appearance**:
   - Kartu pilihan Light, Dark, atau System.
-- Tombol Save changes untuk menyimpan seluruh perubahan.
+  - Perubahan tema langsung diterapkan dan disimpan.
+- Tombol Save changes untuk menyimpan data profil.
 
 Fitur:
 
@@ -462,12 +462,13 @@ Fitur:
   - Dark.
   - System.
 - Tema disimpan dan langsung diterapkan.
-- **Change password** dibuka sebagai modal dari kartu Security.
-- Layout responsif: hero, kartu pengaturan, dan security card menyesuaikan di layar kecil.
+- **Change password** dibuka sebagai modal dari overview card.
+- Layout responsif: overview dan kartu pengaturan menyesuaikan di layar kecil.
 
 #### Change password — modal dan `/change-password`
 
 Dari Profile, tombol Change password membuka **modal** agar tidak memakan satu halaman penuh.
+Modal memakai lebar 820px, tanpa scrollbar/overflow, dan teks panel dibatasi maksimal dua baris.
 
 Modal berisi:
 
@@ -752,6 +753,7 @@ Status yang tersimpan ditampilkan kembali pada report dan PDF.
 | Modal Change password | `laravel/public/js/password-modal.js` |
 | Checklist password dinamis | `laravel/public/js/password-requirements.js` |
 | Toggle show/hide password | `laravel/public/js/password-toggle.js` |
+| Validasi foto dan tema Profile | `laravel/public/js/profile-form.js` |
 | Style Profile dan Change password | `laravel/public/css/profile.css` |
 | Halaman Help dan support | `laravel/resources/views/help/index.blade.php` |
 | Style Help | `laravel/public/css/help.css` |
@@ -811,7 +813,7 @@ Audit ini dilakukan pada 4 November 2026.
 | Ganti password user | Hak ganti password ada tetapi kurang terlihat. | Change password dipusatkan di **User Settings/Profile**; Account Option hanya berisi User Settings, Help Center, dan Sign out. |
 | Account Option | Item menu masih polos dan Change password duplikat. | User Settings dan Help Center memakai ikon, judul, deskripsi, dan panah; Change password dihapus dari menu. Avatar mendapat tooltip **Account menu**. |
 | Help Center | Belum ada kontak support langsung dan masih ada Back to dashboard. | Ditambahkan kartu WhatsApp dan Email/Outlook; tombol Back to dashboard dihapus; kartu panduan diberi nomor dan hover state. |
-| Profile settings | Form masih berupa satu kartu sempit dan tema memakai native select. | Dibuat account center dengan hero gradient, kartu personal/photo, security card, dan appearance card; tema memakai kartu pilihan. |
+| Profile settings | Form masih berupa satu kartu sempit, tema memakai native select, dan upload tidak memberi feedback. | Dibuat full-width overview + kartu personal/photo/appearance; tema langsung diterapkan dan disimpan; upload memvalidasi tipe/ukuran serta menampilkan status file. |
 | Change password | Halaman masih memakai form lama dan memakan satu halaman penuh. | Dibuat modal security center dengan panel panduan, form current/new/confirm, show/hide password, checklist real-time, dan layout responsif. Route halaman tetap ada untuk forced password change. |
 | Reports/AQL Table | Layout input AQL dan check sheet Reports berbeda karena input adalah form interaktif dan Reports adalah Form 7.4.3-F1. | Perlu keputusan produk jika harus dibuat identik 1:1; label dan urutan bagian sudah diselaraskan. |
 | Vendor | Hanya account dan nama. | Ditambah contact person, phone/WhatsApp, email, office address, joined date, dan kolom CSV opsional. |
