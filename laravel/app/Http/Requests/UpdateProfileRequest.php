@@ -22,7 +22,7 @@ class UpdateProfileRequest extends FormRequest
             'fullname' => ['required', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:100'],
             'theme' => ['required', 'in:light,dark,system'],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'remove_avatar' => ['sometimes', 'boolean'],
         ];
     }

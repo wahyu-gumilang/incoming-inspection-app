@@ -10,7 +10,7 @@
     const avatar = form.querySelector("[data-profile-avatar]");
     const avatarStatus = form.querySelector("[data-profile-avatar-status]");
     const themeStatus = form.querySelector("[data-profile-theme-status]");
-    const maxBytes = 2 * 1024 * 1024;
+    const maxBytes = 5 * 1024 * 1024;
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 
     const setStatus = (element, message, tone = "") => {
@@ -45,7 +45,7 @@
 
             if (file.size > maxBytes) {
                 avatar.value = "";
-                setStatus(avatarStatus, "The photo must be 2 MB or smaller.", "error");
+                setStatus(avatarStatus, "The photo must be 5 MB or smaller.", "error");
 
                 return;
             }

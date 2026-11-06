@@ -445,7 +445,7 @@ Halaman Profile memakai layout **full-width** yang mengikuti `.page` seperti hal
 - **Profile photo**:
   - Pilih file.
   - Status file yang dipilih.
-  - Validasi tipe dan ukuran maksimal 2 MB.
+  - Validasi tipe dan ukuran maksimal 5 MB.
   - Hapus foto.
 - **Appearance**:
   - Kartu pilihan Light, Dark, atau System.

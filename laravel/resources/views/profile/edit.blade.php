@@ -37,8 +37,12 @@
 
         <section class="card profile-overview">
             <div class="profile-overview-identity">
-                <x-user-avatar :user="$user" :size="64" class="profile-overview-avatar" />
+                <div class="profile-overview-avatar-wrap">
+                    <x-user-avatar :user="$user" :size="64" class="profile-overview-avatar" />
+                    <span class="profile-overview-dot" aria-hidden="true"></span>
+                </div>
                 <div class="profile-overview-copy">
+                    <span class="profile-overview-kicker">Account profile</span>
                     <h2>{{ $user->fullname }}</h2>
                     <div class="profile-overview-line">
                         <x-ui.role-badge :role="$user->role" />
@@ -59,6 +63,10 @@
                 <div>
                     <span>Member since</span>
                     <strong>{{ $user->created_at ? \Illuminate\Support\Carbon::parse($user->created_at)->format('M Y') : '—' }}</strong>
+                </div>
+                <div>
+                    <span>Last sign-in</span>
+                    <strong>{{ $user->last_login_at ? \Illuminate\Support\Carbon::parse($user->last_login_at)->format('d M Y, H:i') : '—' }}</strong>
                 </div>
             </div>
 
@@ -126,7 +134,8 @@
                 </div>
             </section>
 
-            <section class="card account-card">
+            <div class="account-split">
+            <section class="card account-card account-photo-card">
                 <div class="account-section-head">
                     <span class="account-section-icon">
                         <x-icon name="camera" :size="18" />
@@ -153,7 +162,7 @@
                             <x-icon name="upload" :size="16" />
                             Choose photo
                         </label>
-                        <p class="field-hint">JPG, PNG or WebP. Maximum 2 MB.</p>
+                        <p class="field-hint">JPG, PNG or WebP. Maximum 5 MB.</p>
                         <p class="profile-avatar-status" data-profile-avatar-status role="status" aria-live="polite"></p>
 
                         @if ($user->avatar_path)
@@ -170,14 +179,14 @@
                 </div>
             </section>
 
-            <section class="card account-card">
+            <section class="card account-card account-appearance-card">
                 <div class="account-section-head">
                     <span class="account-section-icon">
                         <x-icon name="sun" :size="18" />
                     </span>
                     <div>
                         <h2>Appearance</h2>
-                        <p>Choose how the interface looks on this account. Changes apply immediately.</p>
+                        <p>Choose how the interface looks. Changes apply immediately.</p>
                     </div>
                 </div>
 
@@ -187,7 +196,6 @@
                         <span class="account-theme-icon"><x-icon name="sun" :size="17" /></span>
                         <span class="account-theme-copy">
                             <strong>Light</strong>
-                            <small>Bright and clean</small>
                         </span>
                         <span class="account-theme-check"><x-icon name="check" :size="13" /></span>
                     </label>
@@ -197,7 +205,6 @@
                         <span class="account-theme-icon"><x-icon name="moon" :size="17" /></span>
                         <span class="account-theme-copy">
                             <strong>Dark</strong>
-                            <small>Low-light workspace</small>
                         </span>
                         <span class="account-theme-check"><x-icon name="check" :size="13" /></span>
                     </label>
@@ -207,7 +214,6 @@
                         <span class="account-theme-icon"><x-icon name="monitor" :size="17" /></span>
                         <span class="account-theme-copy">
                             <strong>System</strong>
-                            <small>Follow device setting</small>
                         </span>
                         <span class="account-theme-check"><x-icon name="check" :size="13" /></span>
                     </label>
@@ -219,6 +225,7 @@
                     <p class="field-error">{{ $message }}</p>
                 @enderror
             </section>
+            </div>
 
             <div class="account-actions">
                 <x-ui.button variant="primary" type="submit" icon="save">Save changes</x-ui.button>

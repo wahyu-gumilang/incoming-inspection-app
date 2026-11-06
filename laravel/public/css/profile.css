@@ -3,13 +3,24 @@
 }
 
 .profile-overview {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 18px;
+    overflow: hidden;
     margin-bottom: 16px;
     padding: 18px 20px;
     background:
+        radial-gradient(circle at 92% 0%, color-mix(in srgb, #0f766e 6%, transparent), transparent 30%),
         linear-gradient(135deg, color-mix(in srgb, #0f766e 3%, var(--surface)), var(--surface) 58%);
+}
+
+.profile-overview::before {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, #0f766e, #0284c7, #7c3aed);
+    content: "";
 }
 
 .profile-overview-identity {
@@ -20,14 +31,40 @@
     min-width: 0;
 }
 
+.profile-overview-avatar-wrap {
+    position: relative;
+    flex: 0 0 auto;
+}
+
 .profile-overview-avatar {
     flex: 0 0 64px;
     border: 3px solid var(--surface);
     box-shadow: 0 8px 20px rgba(16, 24, 40, 0.14);
 }
 
+.profile-overview-dot {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 12px;
+    height: 12px;
+    border: 3px solid var(--surface);
+    border-radius: 50%;
+    background: #0f9f6e;
+}
+
 .profile-overview-copy {
     min-width: 0;
+}
+
+.profile-overview-kicker {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--text-3);
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
 }
 
 .profile-overview-copy h2 {
@@ -90,6 +127,18 @@
 
 .account-card {
     padding: 20px;
+}
+
+.account-split {
+    display: grid;
+    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.account-photo-card,
+.account-appearance-card {
+    min-width: 0;
 }
 
 .account-section-head {
@@ -193,6 +242,10 @@
     gap: 8px;
 }
 
+.account-appearance-card .account-theme-options {
+    max-width: 560px;
+}
+
 .account-theme-option {
     position: relative;
     display: flex;
@@ -245,14 +298,6 @@
     color: var(--text);
     font-size: 11.5px;
     font-weight: 750;
-}
-
-.account-theme-copy small {
-    overflow: hidden;
-    color: var(--text-3);
-    font-size: 9.5px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .account-theme-check {
@@ -575,6 +620,7 @@ body.password-modal-open {
         border-left: 0;
     }
 
+    .account-split,
     .password-layout {
         grid-template-columns: minmax(0, 1fr);
     }
