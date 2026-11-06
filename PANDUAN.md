@@ -427,24 +427,30 @@ Role:
 
 ### 4.9 Profile — `/profile`
 
-Halaman Profile memakai satu alur pengaturan yang clean:
+Halaman Profile memakai desain **account center**:
 
-- **Settings tabs** di bawah page header:
-  - Profile
-  - Password
-- **Identity strip** horizontal:
-  - Avatar.
+- **Hero profil** dengan gradient mesh:
+  - Avatar besar dan indikator status.
   - Nama lengkap.
-  - Email.
   - Role.
+  - Email.
   - Username.
   - Status aktif.
-- **Form pengaturan**:
-  - Foto profil: pilih file, hapus foto, batas JPG/PNG/WebP 2 MB.
-  - Informasi pribadi: full name dan email.
-  - Username dan role sebagai field read-only.
-  - Appearance: kartu pilihan Light, Dark, atau System.
-  - Tombol Save changes.
+  - Member since.
+- **Personal details**:
+  - Full name.
+  - Email.
+  - Username dan role read-only.
+- **Profile photo**:
+  - Pilih file.
+  - Hapus foto.
+  - Batas JPG/PNG/WebP 2 MB.
+- **Security card**:
+  - Penjelasan keamanan akun.
+  - Tombol Change password.
+- **Appearance**:
+  - Kartu pilihan Light, Dark, atau System.
+- Tombol Save changes untuk menyimpan seluruh perubahan.
 
 Fitur:
 
@@ -456,24 +462,30 @@ Fitur:
   - Dark.
   - System.
 - Tema disimpan dan langsung diterapkan.
-- **Change password** dibuka melalui tab **Password**.
-- Layout responsif: identity strip dan form menyesuaikan di layar kecil.
+- **Change password** dibuka dari kartu Security.
+- Layout responsif: hero, kartu pengaturan, dan security card menyesuaikan di layar kecil.
 
 #### Change password — `/change-password`
 
-Halaman ini memakai page header dan settings tabs yang sama dengan Profile.
+Halaman ini memakai desain security center:
 
-Isi:
-
+- Panel gelap berisi:
+  - Ikon shield.
+  - Penjelasan keamanan.
+  - Checklist password.
+- Form berisi:
+  - Current password.
+  - New password.
+  - Confirm new password.
+  - Tombol show/hide pada setiap field.
 - Peringatan jika akun masih memakai temporary password.
-- Field current password.
-- Field new password.
-- Field confirm new password.
 - Panduan password:
   - Minimal 8 karakter.
   - Maksimal 72 karakter.
   - Gunakan password unik.
+  - Password disimpan sebagai hash.
 - Tombol Update password.
+- Tombol Back to profile.
 
 Setelah berhasil, password langsung berlaku dan user diarahkan ke Dashboard.
 
@@ -731,7 +743,6 @@ Status yang tersimpan ditampilkan kembali pada report dan PDF.
 | Style account menu | `laravel/public/css/navbar.css` |
 | Halaman Profile | `laravel/resources/views/profile/edit.blade.php` |
 | Halaman Change password | `laravel/resources/views/auth/change-password.blade.php` |
-| Tab Profile/Password | `laravel/resources/views/components/settings-tabs.blade.php` |
 | Style Profile dan Change password | `laravel/public/css/profile.css` |
 | Halaman Help dan support | `laravel/resources/views/help/index.blade.php` |
 | Style Help | `laravel/public/css/help.css` |
@@ -791,8 +802,8 @@ Audit ini dilakukan pada 4 November 2026.
 | Ganti password user | Hak ganti password ada tetapi kurang terlihat. | Change password dipusatkan di **User Settings/Profile**; Account Option hanya berisi User Settings, Help Center, dan Sign out. |
 | Account Option | Item menu masih polos dan Change password duplikat. | User Settings dan Help Center memakai ikon, judul, deskripsi, dan panah; Change password dihapus dari menu. Avatar mendapat tooltip **Account menu**. |
 | Help Center | Belum ada kontak support langsung dan masih ada Back to dashboard. | Ditambahkan kartu WhatsApp dan Email/Outlook; tombol Back to dashboard dihapus; kartu panduan diberi nomor dan hover state. |
-| Profile settings | Form masih berupa satu kartu sempit dan tema memakai native select. | Dibuat settings shell dengan tab Profile/Password, identity strip horizontal, section form yang rapi, dan tema memakai kartu pilihan. |
-| Change password | Halaman masih memakai form lama tanpa desain dan tanpa navigasi antar pengaturan. | Dibuat halaman security dengan tab yang sama, field current/new/confirm, panduan password, dan layout responsif. |
+| Profile settings | Form masih berupa satu kartu sempit dan tema memakai native select. | Dibuat account center dengan hero gradient, kartu personal/photo, security card, dan appearance card; tema memakai kartu pilihan. |
+| Change password | Halaman masih memakai form lama tanpa desain dan tanpa navigasi antar pengaturan. | Dibuat security center dengan panel panduan, form current/new/confirm, show/hide password, dan layout responsif. |
 | Reports/AQL Table | Layout input AQL dan check sheet Reports berbeda karena input adalah form interaktif dan Reports adalah Form 7.4.3-F1. | Perlu keputusan produk jika harus dibuat identik 1:1; label dan urutan bagian sudah diselaraskan. |
 | Vendor | Hanya account dan nama. | Ditambah contact person, phone/WhatsApp, email, office address, joined date, dan kolom CSV opsional. |
 | Table spacing | Dashboard memakai padding lebih rapat daripada tabel lain. | Disamakan ke 12px × 20px. |
