@@ -427,28 +427,29 @@ Role:
 
 ### 4.9 Profile — `/profile`
 
-Halaman Profile memakai layout **settings workspace** full-width:
+Halaman Profile memakai layout **full-width** yang mengikuti `.page` seperti halaman lain:
 
-- **Profile overview card** di atas:
-  - Avatar dengan indikator status.
+- **Profile overview card**:
+  - Avatar.
   - Nama lengkap.
   - Role.
   - Email.
   - Username.
   - Status aktif.
   - Member since.
-  - Last sign-in.
   - Tombol Change password.
-- **Sidebar navigasi**:
-  - Profile details.
-  - Profile photo.
-  - Appearance.
-  - Security.
-- **Panel pengaturan**:
-  - Personal details: full name, email, username dan role read-only.
-  - Profile photo: pilih file, status file, validasi tipe dan ukuran maksimal 5 MB, hapus foto.
-  - Appearance: segmented control Light/Dark/System yang ringkas; perubahan langsung diterapkan dan disimpan.
-  - Security: tombol Change password.
+- **Personal details**:
+  - Full name.
+  - Email.
+  - Username dan role read-only.
+- **Profile photo**:
+  - Pilih file.
+  - Status file yang dipilih.
+  - Validasi tipe dan ukuran maksimal 5 MB.
+  - Hapus foto.
+- **Appearance**:
+  - Kartu pilihan Light, Dark, atau System.
+  - Perubahan tema langsung diterapkan dan disimpan.
 - Tombol Save changes untuk menyimpan data profil.
 
 Fitur:
@@ -461,8 +462,8 @@ Fitur:
   - Dark.
   - System.
 - Tema disimpan dan langsung diterapkan.
-- **Change password** dibuka sebagai modal.
-- Layout responsif: sidebar menjadi navigasi horizontal, lalu panel pengaturan menyesuaikan di layar kecil.
+- **Change password** dibuka sebagai modal dari overview card.
+- Layout responsif: overview dan kartu pengaturan menyesuaikan di layar kecil.
 
 #### Change password — modal dan `/change-password`
 
@@ -812,7 +813,7 @@ Audit ini dilakukan pada 4 November 2026.
 | Ganti password user | Hak ganti password ada tetapi kurang terlihat. | Change password dipusatkan di **User Settings/Profile**; Account Option hanya berisi User Settings, Help Center, dan Sign out. |
 | Account Option | Item menu masih polos dan Change password duplikat. | User Settings dan Help Center memakai ikon, judul, deskripsi, dan panah; Change password dihapus dari menu. Avatar mendapat tooltip **Account menu**. |
 | Help Center | Belum ada kontak support langsung dan masih ada Back to dashboard. | Ditambahkan kartu WhatsApp dan Email/Outlook; tombol Back to dashboard dihapus; kartu panduan diberi nomor dan hover state. |
-| Profile settings | Form masih berupa satu kartu sempit, tema memakai native select, dan upload tidak memberi feedback. | Dibuat settings workspace: overview + sidebar navigasi + panel pengaturan; photo dan appearance dipisah proporsional; tema segmented dan langsung disimpan; upload 5 MB dengan validasi/status. |
+| Profile settings | Form masih berupa satu kartu sempit, tema memakai native select, dan upload tidak memberi feedback. | Dibuat full-width overview + kartu personal/photo/appearance; tema langsung diterapkan dan disimpan; upload memvalidasi tipe/ukuran serta menampilkan status file. |
 | Change password | Halaman masih memakai form lama dan memakan satu halaman penuh. | Dibuat modal security center dengan panel panduan, form current/new/confirm, show/hide password, checklist real-time, dan layout responsif. Route halaman tetap ada untuk forced password change. |
 | Reports/AQL Table | Layout input AQL dan check sheet Reports berbeda karena input adalah form interaktif dan Reports adalah Form 7.4.3-F1. | Perlu keputusan produk jika harus dibuat identik 1:1; label dan urutan bagian sudah diselaraskan. |
 | Vendor | Hanya account dan nama. | Ditambah contact person, phone/WhatsApp, email, office address, joined date, dan kolom CSV opsional. |

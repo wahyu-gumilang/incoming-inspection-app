@@ -18,11 +18,11 @@
         $user = auth()->user();
     @endphp
 
-    <div class="settings-page">
+    <div class="account-page">
         <x-ui.page-header
-            eyebrow="Account"
+            eyebrow="Account center"
             title="Profile settings"
-            description="Manage your identity, photo, appearance, and security."
+            description="Manage your identity, profile photo, and interface preferences."
         />
 
         @if ($errors->any())
@@ -75,206 +75,162 @@
             </x-ui.button>
         </section>
 
-        <div class="settings-workspace">
-            <aside class="settings-sidebar">
-                <span class="settings-sidebar-label">Settings</span>
+        <form
+            method="POST"
+            action="{{ route('profile.update') }}"
+            class="profile-settings-form"
+            enctype="multipart/form-data"
+            data-profile-form
+            data-theme-endpoint="{{ route('profile.theme') }}"
+        >
+            @csrf
+            @method('PUT')
 
-                <nav class="settings-nav" aria-label="Profile settings sections">
-                    <a class="settings-nav-link is-active" href="#profile-details">
-                        <x-icon name="user" :size="16" />
-                        Profile details
-                    </a>
-                    <a class="settings-nav-link" href="#profile-photo">
-                        <x-icon name="camera" :size="16" />
-                        Profile photo
-                    </a>
-                    <a class="settings-nav-link" href="#profile-appearance">
-                        <x-icon name="sun" :size="16" />
-                        Appearance
-                    </a>
-                    <a class="settings-nav-link" href="#profile-security">
-                        <x-icon name="shield" :size="16" />
-                        Security
-                    </a>
-                </nav>
-
-                <div class="settings-sidebar-meta">
+            <section class="card account-card">
+                <div class="account-section-head">
+                    <span class="account-section-icon">
+                        <x-icon name="user" :size="18" />
+                    </span>
                     <div>
-                        <span>Username</span>
-                        <strong>{{ $user->username }}</strong>
-                    </div>
-                    <div>
-                        <span>Status</span>
-                        <x-ui.status-badge :active="$user->active" />
-                    </div>
-                    <div>
-                        <span>Member since</span>
-                        <strong>{{ $user->created_at ? \Illuminate\Support\Carbon::parse($user->created_at)->format('M Y') : '—' }}</strong>
+                        <h2>Personal details</h2>
+                        <p>How your name and contact email appear across the application.</p>
                     </div>
                 </div>
-            </aside>
 
-            <div class="settings-panel">
-                <form
-                    id="profile-form"
-                    method="POST"
-                    action="{{ route('profile.update') }}"
-                    enctype="multipart/form-data"
-                    data-profile-form
-                    data-theme-endpoint="{{ route('profile.theme') }}"
-                >
-                    @csrf
-                    @method('PUT')
+                <div class="account-fields-grid">
+                    <x-ui.field label="Full name" for="profile-fullname" name="fullname">
+                        <input
+                            id="profile-fullname"
+                            class="input"
+                            type="text"
+                            name="fullname"
+                            value="{{ old('fullname', $user->fullname) }}"
+                            maxlength="50"
+                            required
+                        >
+                    </x-ui.field>
 
-                    <section class="settings-block" id="profile-details">
-                        <div class="settings-block-head">
-                            <span class="settings-block-index">01</span>
-                            <div>
-                                <h2>Profile details</h2>
-                                <p>Your name and contact email across the application.</p>
-                            </div>
-                        </div>
+                    <x-ui.field label="Email" for="profile-email" name="email">
+                        <input
+                            id="profile-email"
+                            class="input"
+                            type="email"
+                            name="email"
+                            value="{{ old('email', $user->email) }}"
+                            maxlength="100"
+                            placeholder="Optional"
+                        >
+                    </x-ui.field>
+                </div>
 
-                        <div class="settings-fields">
-                            <x-ui.field label="Full name" for="profile-fullname" name="fullname">
-                                <input
-                                    id="profile-fullname"
-                                    class="input"
-                                    type="text"
-                                    name="fullname"
-                                    value="{{ old('fullname', $user->fullname) }}"
-                                    maxlength="50"
-                                    required
-                                >
-                            </x-ui.field>
+                <div class="account-readonly-grid">
+                    <x-ui.field label="Username" for="profile-username">
+                        <input id="profile-username" class="input" type="text" value="{{ $user->username }}" disabled>
+                    </x-ui.field>
 
-                            <x-ui.field label="Email" for="profile-email" name="email">
-                                <input
-                                    id="profile-email"
-                                    class="input"
-                                    type="email"
-                                    name="email"
-                                    value="{{ old('email', $user->email) }}"
-                                    maxlength="100"
-                                    placeholder="Optional"
-                                >
-                            </x-ui.field>
+                    <x-ui.field label="Role" for="profile-role">
+                        <input id="profile-role" class="input" type="text" value="{{ $user->roleLabel() }}" disabled>
+                    </x-ui.field>
+                </div>
+            </section>
 
-                            <x-ui.field label="Username" for="profile-username">
-                                <input id="profile-username" class="input" type="text" value="{{ $user->username }}" disabled>
-                            </x-ui.field>
-
-                            <x-ui.field label="Role" for="profile-role">
-                                <input id="profile-role" class="input" type="text" value="{{ $user->roleLabel() }}" disabled>
-                            </x-ui.field>
-                        </div>
-                    </section>
-
-                    <div class="settings-duo">
-                        <section class="settings-block" id="profile-photo">
-                            <div class="settings-block-head">
-                                <span class="settings-block-index">02</span>
-                                <div>
-                                    <h2>Profile photo</h2>
-                                    <p>JPG, PNG, or WebP up to 5 MB.</p>
-                                </div>
-                            </div>
-
-                            <div class="settings-photo">
-                                <x-user-avatar :user="$user" :size="72" />
-
-                                <div class="settings-photo-actions">
-                                    <input
-                                        id="profile-avatar"
-                                        class="profile-file-input"
-                                        type="file"
-                                        name="avatar"
-                                        accept="image/jpeg,image/png,image/webp"
-                                        data-profile-avatar
-                                    >
-                                    <label class="btn profile-file-button" for="profile-avatar">
-                                        <x-icon name="upload" :size="16" />
-                                        Choose photo
-                                    </label>
-                                    <p class="profile-avatar-status" data-profile-avatar-status role="status" aria-live="polite"></p>
-
-                                    @if ($user->avatar_path)
-                                        <label class="check-field">
-                                            <input type="checkbox" name="remove_avatar" value="1" @checked(old('remove_avatar'))>
-                                            <span>Remove current photo</span>
-                                        </label>
-                                    @endif
-
-                                    @error('avatar')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-                        </section>
-
-                        <section class="settings-block" id="profile-appearance">
-                            <div class="settings-block-head">
-                                <span class="settings-block-index">03</span>
-                                <div>
-                                    <h2>Appearance</h2>
-                                    <p>Theme changes apply immediately.</p>
-                                </div>
-                            </div>
-
-                            <div class="settings-theme">
-                                <label class="settings-theme-option">
-                                    <input type="radio" name="theme" value="light" @checked(old('theme', $user->theme) === 'light')>
-                                    <x-icon name="sun" :size="15" />
-                                    <span>Light</span>
-                                </label>
-
-                                <label class="settings-theme-option">
-                                    <input type="radio" name="theme" value="dark" @checked(old('theme', $user->theme) === 'dark')>
-                                    <x-icon name="moon" :size="15" />
-                                    <span>Dark</span>
-                                </label>
-
-                                <label class="settings-theme-option">
-                                    <input type="radio" name="theme" value="system" @checked(old('theme', $user->theme) === 'system')>
-                                    <x-icon name="monitor" :size="15" />
-                                    <span>System</span>
-                                </label>
-                            </div>
-
-                            <p class="profile-theme-status" data-profile-theme-status role="status" aria-live="polite"></p>
-
-                            @error('theme')
-                                <p class="field-error">{{ $message }}</p>
-                            @enderror
-                        </section>
+            <div class="account-split">
+            <section class="card account-card account-photo-card">
+                <div class="account-section-head">
+                    <span class="account-section-icon">
+                        <x-icon name="camera" :size="18" />
+                    </span>
+                    <div>
+                        <h2>Profile photo</h2>
+                        <p>A clear photo helps your teammates recognize you.</p>
                     </div>
+                </div>
 
-                    <div class="settings-savebar">
-                        <x-ui.button variant="primary" type="submit" icon="save">Save changes</x-ui.button>
-                    </div>
-                </form>
+                <div class="account-photo-editor">
+                    <x-user-avatar :user="$user" :size="80" />
 
-                <section class="settings-block settings-security" id="profile-security">
-                    <div class="settings-block-head">
-                        <span class="settings-block-index">04</span>
-                        <div>
-                            <h2>Security</h2>
-                            <p>Update the password used to access your account.</p>
-                        </div>
-                    </div>
+                    <div class="account-photo-actions">
+                        <input
+                            id="profile-avatar"
+                            class="profile-file-input"
+                            type="file"
+                            name="avatar"
+                            accept="image/jpeg,image/png,image/webp"
+                            data-profile-avatar
+                        >
+                        <label class="btn profile-file-button" for="profile-avatar">
+                            <x-icon name="upload" :size="16" />
+                            Choose photo
+                        </label>
+                        <p class="field-hint">JPG, PNG or WebP. Maximum 5 MB.</p>
+                        <p class="profile-avatar-status" data-profile-avatar-status role="status" aria-live="polite"></p>
 
-                    <div class="settings-security-row">
-                        <div>
-                            <strong>Password</strong>
-                            <span>Use a unique password with at least 8 characters, a number, and a symbol.</span>
-                        </div>
-                        <x-ui.button type="button" icon="key" data-open-password-modal>
-                            Change password
-                        </x-ui.button>
+                        @if ($user->avatar_path)
+                            <label class="check-field">
+                                <input type="checkbox" name="remove_avatar" value="1" @checked(old('remove_avatar'))>
+                                <span>Remove current photo</span>
+                            </label>
+                        @endif
+
+                        @error('avatar')
+                            <p class="field-error">{{ $message }}</p>
+                        @enderror
                     </div>
-                </section>
+                </div>
+            </section>
+
+            <section class="card account-card account-appearance-card">
+                <div class="account-section-head">
+                    <span class="account-section-icon">
+                        <x-icon name="sun" :size="18" />
+                    </span>
+                    <div>
+                        <h2>Appearance</h2>
+                        <p>Choose how the interface looks. Changes apply immediately.</p>
+                    </div>
+                </div>
+
+                <div class="account-theme-options">
+                    <label class="account-theme-option">
+                        <input type="radio" name="theme" value="light" @checked(old('theme', $user->theme) === 'light')>
+                        <span class="account-theme-icon"><x-icon name="sun" :size="17" /></span>
+                        <span class="account-theme-copy">
+                            <strong>Light</strong>
+                        </span>
+                        <span class="account-theme-check"><x-icon name="check" :size="13" /></span>
+                    </label>
+
+                    <label class="account-theme-option">
+                        <input type="radio" name="theme" value="dark" @checked(old('theme', $user->theme) === 'dark')>
+                        <span class="account-theme-icon"><x-icon name="moon" :size="17" /></span>
+                        <span class="account-theme-copy">
+                            <strong>Dark</strong>
+                        </span>
+                        <span class="account-theme-check"><x-icon name="check" :size="13" /></span>
+                    </label>
+
+                    <label class="account-theme-option">
+                        <input type="radio" name="theme" value="system" @checked(old('theme', $user->theme) === 'system')>
+                        <span class="account-theme-icon"><x-icon name="monitor" :size="17" /></span>
+                        <span class="account-theme-copy">
+                            <strong>System</strong>
+                        </span>
+                        <span class="account-theme-check"><x-icon name="check" :size="13" /></span>
+                    </label>
+                </div>
+
+                <p class="profile-theme-status" data-profile-theme-status role="status" aria-live="polite"></p>
+
+                @error('theme')
+                    <p class="field-error">{{ $message }}</p>
+                @enderror
+            </section>
             </div>
-        </div>
+
+            <div class="account-actions">
+                <x-ui.button variant="primary" type="submit" icon="save">Save changes</x-ui.button>
+            </div>
+        </form>
 
         @php
             $passwordModalOpen = $errors->has('current_password')
