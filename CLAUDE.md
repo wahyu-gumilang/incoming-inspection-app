@@ -363,7 +363,10 @@ controllers, Livewire components or Blade views.
 - Admin user management generates a temporary password, sets must_change_password and shows
   the password once. Never store or display it again.
 - Deactivate users; do not delete them, so names on old inspections remain valid.
-- force password change must block all pages except the profile password page and logout.
+- force password change must block all pages except the password-change page and logout. The
+  normal Profile flow opens password change as a modal; the page remains the forced-change
+  fallback. Passwords require 8-72 characters with upper and lower case, a number and a symbol;
+  the client checklist must mirror the server rule.
 
 ### 9.6 Error handling
 

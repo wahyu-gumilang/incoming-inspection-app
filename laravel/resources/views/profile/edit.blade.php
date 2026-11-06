@@ -6,8 +6,16 @@
     <link rel="stylesheet" href="{{ asset('css/profile.css') }}?v={{ filemtime(public_path('css/profile.css')) }}">
 @endpush
 
+@push('scripts')
+    <script src="{{ asset('js/password-toggle.js') }}?v={{ filemtime(public_path('js/password-toggle.js')) }}" defer></script>
+    <script src="{{ asset('js/password-requirements.js') }}?v={{ filemtime(public_path('js/password-requirements.js')) }}" defer></script>
+    <script src="{{ asset('js/password-modal.js') }}?v={{ filemtime(public_path('js/password-modal.js')) }}" defer></script>
+@endpush
+
 @section('content')
-    @php($user = auth()->user())
+    @php
+        $user = auth()->user();
+    @endphp
 
     <div class="account-page">
         <x-ui.page-header
@@ -156,7 +164,7 @@
                         </span>
                         <h2>Security</h2>
                         <p>Keep your account protected with a password only you know.</p>
-                        <x-ui.button block :href="route('password.change')" icon="key">
+                        <x-ui.button block type="button" icon="key" data-open-password-modal>
                             Change password
                         </x-ui.button>
                     </section>
@@ -215,5 +223,41 @@
                 <x-ui.button variant="primary" type="submit" icon="save">Save changes</x-ui.button>
             </div>
         </form>
+
+        @php
+            $passwordModalOpen = $errors->has('current_password')
+                || $errors->has('password')
+                || $errors->has('password_confirmation');
+        @endphp
+
+        <div
+            class="password-modal-backdrop"
+            data-password-modal
+            @if ($passwordModalOpen) data-auto-open="true" @endif
+            hidden
+        >
+            <div class="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
+                <div class="password-modal-head">
+                    <div>
+                        <span class="account-kicker">Account center</span>
+                        <h2 id="password-modal-title">Change password</h2>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="icon-btn"
+                        data-close-password-modal
+                        data-tooltip="Close dialog"
+                        aria-label="Close change password dialog"
+                    >
+                        <x-icon name="x" :size="18" />
+                    </button>
+                </div>
+
+                <div class="password-modal-body">
+                    @include('auth.partials.password-form')
+                </div>
+            </div>
+        </div>
     </div>
 @endsection

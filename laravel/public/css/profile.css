@@ -1,10 +1,5 @@
 .account-page {
-    max-width: 1040px;
-    margin: 0 auto;
-}
-
-.account-page-narrow {
-    max-width: 1040px;
+    width: 100%;
 }
 
 .account-hero {
@@ -15,22 +10,22 @@
     overflow: hidden;
     margin-bottom: 16px;
     padding: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--border);
     border-radius: 22px;
     background:
-        radial-gradient(circle at 88% 0%, rgba(45, 212, 191, 0.22), transparent 32%),
-        radial-gradient(circle at 4% 100%, rgba(37, 99, 235, 0.24), transparent 36%),
-        linear-gradient(135deg, #0b1220, #13233d 58%, #102b35);
-    box-shadow: 0 22px 54px rgba(16, 24, 40, 0.2);
-    color: #ffffff;
+        radial-gradient(circle at 88% 0%, color-mix(in srgb, #0f766e 8%, transparent), transparent 34%),
+        radial-gradient(circle at 4% 100%, color-mix(in srgb, #2563eb 6%, transparent), transparent 36%),
+        linear-gradient(135deg, color-mix(in srgb, #0f766e 3%, var(--surface)), var(--surface) 62%);
+    box-shadow: var(--shadow);
+    color: var(--text);
 }
 
 .account-hero-grid {
     position: absolute;
     inset: 0;
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+        linear-gradient(color-mix(in srgb, var(--text) 3%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--text) 3%, transparent) 1px, transparent 1px);
     background-size: 28px 28px;
     mask-image: linear-gradient(90deg, #000, transparent 74%);
     pointer-events: none;
@@ -51,8 +46,8 @@
 }
 
 .account-avatar-wrap .user-avatar {
-    border: 3px solid rgba(255, 255, 255, 0.28);
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+    border: 3px solid var(--surface);
+    box-shadow: 0 12px 26px rgba(16, 24, 40, 0.16);
 }
 
 .account-avatar-dot {
@@ -61,9 +56,9 @@
     bottom: 3px;
     width: 13px;
     height: 13px;
-    border: 3px solid #13233d;
+    border: 3px solid var(--surface);
     border-radius: 50%;
-    background: #34d399;
+    background: #0f9f6e;
 }
 
 .account-hero-copy {
@@ -73,7 +68,7 @@
 .account-kicker {
     display: block;
     margin-bottom: 5px;
-    color: rgba(255, 255, 255, 0.58);
+    color: var(--text-3);
     font-size: 9px;
     font-weight: 800;
     letter-spacing: 0.16em;
@@ -82,7 +77,7 @@
 
 .account-hero-copy h2 {
     overflow: hidden;
-    color: #ffffff;
+    color: var(--text);
     font-size: 24px;
     font-weight: 800;
     letter-spacing: -0.035em;
@@ -97,7 +92,7 @@
     gap: 8px;
     min-width: 0;
     margin-top: 7px;
-    color: rgba(255, 255, 255, 0.66);
+    color: var(--text-2);
     font-size: 11.5px;
 }
 
@@ -120,14 +115,13 @@
     gap: 4px;
     min-width: 92px;
     padding: 9px 11px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border);
     border-radius: 11px;
-    background: rgba(255, 255, 255, 0.055);
-    backdrop-filter: blur(8px);
+    background: color-mix(in srgb, var(--surface-2) 64%, var(--surface));
 }
 
 .account-meta-item > span {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-3);
     font-size: 8.5px;
     font-weight: 800;
     letter-spacing: 0.1em;
@@ -135,7 +129,7 @@
 }
 
 .account-meta-item > strong {
-    color: rgba(255, 255, 255, 0.92);
+    color: var(--text-2);
     font-size: 11.5px;
     font-weight: 750;
 }
@@ -245,11 +239,10 @@
 .account-security {
     position: relative;
     overflow: hidden;
-    border-color: rgba(45, 212, 191, 0.22);
+    border-color: color-mix(in srgb, #0f766e 20%, var(--border));
     background:
-        radial-gradient(circle at 100% 0%, rgba(45, 212, 191, 0.2), transparent 44%),
-        linear-gradient(155deg, #0b1220, #13233d);
-    color: #ffffff;
+        radial-gradient(circle at 100% 0%, color-mix(in srgb, #0f766e 8%, transparent), transparent 44%),
+        linear-gradient(155deg, color-mix(in srgb, #0f766e 4%, var(--surface)), var(--surface));
 }
 
 .account-security-glow {
@@ -259,7 +252,7 @@
     width: 140px;
     height: 140px;
     border-radius: 50%;
-    background: rgba(45, 212, 191, 0.16);
+    background: color-mix(in srgb, #0f766e 8%, transparent);
     filter: blur(18px);
     pointer-events: none;
 }
@@ -270,14 +263,14 @@
     width: 42px;
     height: 42px;
     margin-bottom: 14px;
-    border: 1px solid rgba(94, 234, 212, 0.28);
+    border: 1px solid color-mix(in srgb, #0f766e 22%, var(--border));
     border-radius: 12px;
-    background: rgba(94, 234, 212, 0.12);
-    color: #5eead4;
+    background: color-mix(in srgb, #0f766e 8%, var(--surface));
+    color: #0f766e;
 }
 
 .account-security h2 {
-    color: #ffffff;
+    color: var(--text);
     font-size: 17px;
     letter-spacing: -0.03em;
 }
@@ -285,19 +278,12 @@
 .account-security p {
     max-width: 30ch;
     margin: 6px 0 16px;
-    color: rgba(255, 255, 255, 0.62);
+    color: var(--text-3);
     font-size: 11.5px;
 }
 
 .account-security .btn {
     position: relative;
-    border-color: rgba(255, 255, 255, 0.16);
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-}
-
-.account-security .btn:hover {
-    background: rgba(255, 255, 255, 0.16);
 }
 
 .account-theme-options {
@@ -489,16 +475,39 @@
     list-style: none;
 }
 
-.password-requirements li {
+.password-requirement {
     display: flex;
     align-items: center;
     gap: 8px;
     color: rgba(255, 255, 255, 0.7);
     font-size: 10.5px;
+    transition: color 0.16s ease;
 }
 
-.password-requirements .icon {
+.password-requirement-icon {
+    display: inline-grid;
+    flex: 0 0 14px;
+    place-items: center;
+    width: 14px;
+    height: 14px;
+}
+
+.password-requirement-icon [data-requirement-met],
+.password-requirement-icon [data-requirement-unmet] {
+    display: none;
+}
+
+.password-requirement.is-met {
     color: #5eead4;
+}
+
+.password-requirement.is-unmet {
+    color: #fb7185;
+}
+
+.password-requirement.is-met [data-requirement-met],
+.password-requirement.is-unmet [data-requirement-unmet] {
+    display: inline;
 }
 
 .password-form-card {
@@ -547,6 +556,86 @@
     display: none;
 }
 
+body.password-modal-open {
+    overflow: hidden;
+}
+
+.password-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(3, 10, 22, 0.58);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    animation: password-modal-fade 0.18s ease-out both;
+}
+
+.password-modal-backdrop[hidden] {
+    display: none;
+}
+
+.password-modal {
+    display: flex;
+    flex-direction: column;
+    width: min(1000px, 100%);
+    max-height: calc(100dvh - 48px);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.32);
+    animation: password-modal-rise 0.2s ease-out both;
+}
+
+.password-modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+}
+
+.password-modal-head h2 {
+    margin-top: 3px;
+    font-size: 20px;
+    letter-spacing: -0.03em;
+}
+
+.password-modal-body {
+    overflow-y: auto;
+    padding: 18px 22px 22px;
+}
+
+.password-modal-body .password-form-card {
+    box-shadow: none;
+}
+
+@keyframes password-modal-fade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes password-modal-rise {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.99);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 [data-theme="dark"] .account-theme-option:has(input:checked) {
     border-color: color-mix(in srgb, #5eead4 32%, var(--border));
     background: color-mix(in srgb, #5eead4 7%, var(--surface));
@@ -587,6 +676,26 @@
 }
 
 @media (max-width: 720px) {
+    .password-modal-backdrop {
+        padding: 0;
+    }
+
+    .password-modal {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        border: 0;
+        border-radius: 0;
+    }
+
+    .password-modal-head {
+        padding: 16px 18px;
+    }
+
+    .password-modal-body {
+        padding: 16px 18px 20px;
+    }
+
     .account-hero {
         padding: 18px;
     }

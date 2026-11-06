@@ -54,7 +54,9 @@ class ProfileTest extends TestCase
             ->get('/profile')
             ->assertOk()
             ->assertSee('Profile settings')
-            ->assertSee('Budi Santoso');
+            ->assertSee('Budi Santoso')
+            ->assertSee('data-password-modal', false)
+            ->assertSee('Change password');
     }
 
     public function test_user_can_update_the_theme_from_the_navbar(): void

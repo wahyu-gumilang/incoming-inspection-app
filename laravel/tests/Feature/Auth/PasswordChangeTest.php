@@ -51,6 +51,22 @@ class PasswordChangeTest extends TestCase
         $response->assertSessionHasErrors('current_password');
     }
 
+    public function test_password_must_meet_the_displayed_requirements(): void
+    {
+        $user = $this->makeUser();
+
+        $response = $this->actingAs($user)
+            ->from('/change-password')
+            ->post('/change-password', [
+                'current_password' => 'Test-pass-123',
+                'password' => 'alllowercase1',
+                'password_confirmation' => 'alllowercase1',
+            ]);
+
+        $response->assertRedirect('/change-password');
+        $response->assertSessionHasErrors('password');
+    }
+
     public function test_password_confirmation_must_match(): void
     {
         $user = $this->makeUser();

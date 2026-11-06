@@ -429,7 +429,7 @@ Role:
 
 Halaman Profile memakai desain **account center**:
 
-- **Hero profil** dengan gradient mesh:
+- **Hero profil** dengan gradient halus dan grid dekoratif:
   - Avatar besar dan indikator status.
   - Nama lengkap.
   - Role.
@@ -462,30 +462,35 @@ Fitur:
   - Dark.
   - System.
 - Tema disimpan dan langsung diterapkan.
-- **Change password** dibuka dari kartu Security.
+- **Change password** dibuka sebagai modal dari kartu Security.
 - Layout responsif: hero, kartu pengaturan, dan security card menyesuaikan di layar kecil.
 
-#### Change password — `/change-password`
+#### Change password — modal dan `/change-password`
 
-Halaman ini memakai desain security center:
+Dari Profile, tombol Change password membuka **modal** agar tidak memakan satu halaman penuh.
 
-- Panel gelap berisi:
+Modal berisi:
+
+- Panel gelap:
   - Ikon shield.
   - Penjelasan keamanan.
-  - Checklist password.
-- Form berisi:
+  - Checklist password dinamis.
+- Form:
   - Current password.
   - New password.
   - Confirm new password.
   - Tombol show/hide pada setiap field.
-- Peringatan jika akun masih memakai temporary password.
-- Panduan password:
+- Checklist berubah real-time:
   - Minimal 8 karakter.
   - Maksimal 72 karakter.
-  - Gunakan password unik.
-  - Password disimpan sebagai hash.
+  - Huruf besar dan kecil.
+  - Minimal satu angka.
+  - Minimal satu simbol.
+  - Password dan konfirmasi sama.
+- Item yang terpenuhi berwarna hijau; yang belum terpenuhi berwarna merah setelah user mulai mengetik.
 - Tombol Update password.
-- Tombol Back to profile.
+
+Route `/change-password` tetap tersedia untuk alur wajib ganti password setelah login dengan temporary password.
 
 Setelah berhasil, password langsung berlaku dan user diarahkan ke Dashboard.
 
@@ -743,6 +748,10 @@ Status yang tersimpan ditampilkan kembali pada report dan PDF.
 | Style account menu | `laravel/public/css/navbar.css` |
 | Halaman Profile | `laravel/resources/views/profile/edit.blade.php` |
 | Halaman Change password | `laravel/resources/views/auth/change-password.blade.php` |
+| Partial form password | `laravel/resources/views/auth/partials/password-form.blade.php` |
+| Modal Change password | `laravel/public/js/password-modal.js` |
+| Checklist password dinamis | `laravel/public/js/password-requirements.js` |
+| Toggle show/hide password | `laravel/public/js/password-toggle.js` |
 | Style Profile dan Change password | `laravel/public/css/profile.css` |
 | Halaman Help dan support | `laravel/resources/views/help/index.blade.php` |
 | Style Help | `laravel/public/css/help.css` |
@@ -772,7 +781,7 @@ bersama perubahan kode.
 
 ## 10. Catatan QA dan batasan saat ini
 
-- **Tes otomatis:** 125 tests, 568 assertions.
+- **Tes otomatis:** 126 tests, 574 assertions.
 - **Formatter:** Pint lulus untuk 85 file.
 - **Composer audit:** tidak ada security advisory.
 - **PDF:** respons sudah diuji menghasilkan `application/pdf`. Pengecekan visual cetak
@@ -803,7 +812,7 @@ Audit ini dilakukan pada 4 November 2026.
 | Account Option | Item menu masih polos dan Change password duplikat. | User Settings dan Help Center memakai ikon, judul, deskripsi, dan panah; Change password dihapus dari menu. Avatar mendapat tooltip **Account menu**. |
 | Help Center | Belum ada kontak support langsung dan masih ada Back to dashboard. | Ditambahkan kartu WhatsApp dan Email/Outlook; tombol Back to dashboard dihapus; kartu panduan diberi nomor dan hover state. |
 | Profile settings | Form masih berupa satu kartu sempit dan tema memakai native select. | Dibuat account center dengan hero gradient, kartu personal/photo, security card, dan appearance card; tema memakai kartu pilihan. |
-| Change password | Halaman masih memakai form lama tanpa desain dan tanpa navigasi antar pengaturan. | Dibuat security center dengan panel panduan, form current/new/confirm, show/hide password, dan layout responsif. |
+| Change password | Halaman masih memakai form lama dan memakan satu halaman penuh. | Dibuat modal security center dengan panel panduan, form current/new/confirm, show/hide password, checklist real-time, dan layout responsif. Route halaman tetap ada untuk forced password change. |
 | Reports/AQL Table | Layout input AQL dan check sheet Reports berbeda karena input adalah form interaktif dan Reports adalah Form 7.4.3-F1. | Perlu keputusan produk jika harus dibuat identik 1:1; label dan urutan bagian sudah diselaraskan. |
 | Vendor | Hanya account dan nama. | Ditambah contact person, phone/WhatsApp, email, office address, joined date, dan kolom CSV opsional. |
 | Table spacing | Dashboard memakai padding lebih rapat daripada tabel lain. | Disamakan ke 12px × 20px. |
