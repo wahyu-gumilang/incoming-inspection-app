@@ -72,30 +72,36 @@ body {
 .app-body {
     --brand: #101828;
     --brand-600: #1d2939;
-    --brand-50: #f2f4f7;
+    --brand-50: #eaf3fb;
     --on-brand: #ffffff;
-    --bg: #e9edf2;
-    --surface: #ffffff;
-    --surface-2: #f8fafc;
-    --surface-sunk: #f2f4f7;
-    --border: #e4e7ec;
-    --border-strong: #d0d5dd;
+    --bg: #e9f1f8;
+    --surface: #f7fbff;
+    --surface-2: #eef6fc;
+    --surface-sunk: #e5eff8;
+    --border: #d5e2ef;
+    --border-strong: #c1d2e4;
     --text: #101828;
     --text-2: #475467;
-    --text-3: #98a2b3;
+    --text-3: #75879f;
     --ok: #0f766e;
-    --ok-bg: #ccfbf1;
+    --ok-bg: #d9f7f1;
     --ng: #b42318;
     --ng-bg: #fee4e2;
     --warn: #b54708;
     --warn-bg: #fef0c7;
-    --form-border-focus: #98a2b3;
-    --form-ring: rgba(152, 162, 179, 0.22);
+    --form-border-focus: #8fa6bd;
+    --form-ring: rgba(111, 143, 177, 0.22);
+    --page-bg:
+        radial-gradient(circle at 8% 0%, rgba(59, 130, 246, 0.09), transparent 31%),
+        radial-gradient(circle at 92% 4%, rgba(246, 165, 92, 0.09), transparent 27%),
+        radial-gradient(circle at 50% 100%, rgba(15, 118, 110, 0.05), transparent 42%),
+        linear-gradient(180deg, #edf5fb 0%, #e8f0f8 52%, #edf3f9 100%);
     --radius: 18px;
     --radius-sm: 12px;
     --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 12px 32px rgba(16, 24, 40, 0.06);
     color: var(--text);
-    background: var(--bg);
+    background: var(--page-bg);
+    background-attachment: fixed;
     font-family: "Manrope", "Segoe UI", system-ui, sans-serif;
 }
 
@@ -105,6 +111,10 @@ body {
     --brand-50: rgba(226, 232, 240, 0.08);
     --on-brand: #0b1220;
     --bg: #070b12;
+    --page-bg:
+        radial-gradient(circle at 10% 0%, rgba(59, 130, 246, 0.11), transparent 30%),
+        radial-gradient(circle at 90% 6%, rgba(246, 165, 92, 0.08), transparent 28%),
+        linear-gradient(180deg, #070b12 0%, #09111e 52%, #080e18 100%);
     --surface: #0d1524;
     --surface-2: #111a2b;
     --surface-sunk: #162033;

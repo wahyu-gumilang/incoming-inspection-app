@@ -7,14 +7,14 @@
 }
 
 .app-body {
-    --nav-surface: rgba(255, 255, 255, 0.94);
-    --nav-surface-2: rgba(248, 250, 252, 0.92);
-    --nav-border: rgba(16, 24, 40, 0.08);
+    --nav-surface: rgba(249, 252, 255, 0.94);
+    --nav-surface-2: rgba(242, 248, 253, 0.92);
+    --nav-border: rgba(30, 64, 100, 0.09);
     --nav-text: #101828;
     --nav-muted: #667085;
-    --nav-field: rgba(242, 244, 247, 0.92);
-    --nav-field-border: #e4e7ec;
-    --nav-hover: rgba(16, 24, 40, 0.045);
+    --nav-field: rgba(237, 245, 252, 0.92);
+    --nav-field-border: #d9e6f2;
+    --nav-hover: rgba(37, 99, 235, 0.055);
     --nav-accent: #f6a55c;
     --nav-accent-strong: #ea8a3c;
     --nav-focus: rgba(246, 165, 92, 0.2);
