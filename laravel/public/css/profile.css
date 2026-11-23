@@ -478,6 +478,21 @@
     padding-right: 46px;
 }
 
+/* Hide browser-native password reveal controls; the custom eye is the only toggle. */
+.password-input-wrap input[type="password"]::-ms-reveal,
+.password-input-wrap input[type="password"]::-ms-clear {
+    display: none;
+}
+
+.password-input-wrap input[type="password"]::-webkit-credentials-auto-fill-button,
+.password-input-wrap input[type="password"]::-webkit-strong-password-auto-fill-button {
+    position: absolute;
+    right: 0;
+    display: none !important;
+    visibility: hidden;
+    pointer-events: none;
+}
+
 .password-toggle {
     position: absolute;
     top: 50%;
