@@ -84,7 +84,7 @@
     position: absolute;
     inset: 0 0 auto;
     height: 2px;
-    background: linear-gradient(90deg, #0f766e, #0284c7, #7c3aed);
+    background: linear-gradient(90deg, #1f5d53, #5b8a78, #c56b35);
     content: "";
 }
 
@@ -186,8 +186,8 @@
 }
 
 .help-support-email .help-support-icon {
-    background: color-mix(in srgb, #2563eb 10%, var(--surface));
-    color: #2563eb;
+    background: color-mix(in srgb, #b85f2f 10%, var(--surface));
+    color: #b85f2f;
 }
 
 .help-support-copy {
@@ -241,7 +241,7 @@
 }
 
 [data-theme="dark"] .help-support-email .help-support-icon {
-    color: #93c5fd;
+    color: #f3b27a;
 }
 
 @media (max-width: 900px) {

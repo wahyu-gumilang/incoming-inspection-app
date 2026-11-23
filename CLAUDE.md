@@ -498,7 +498,7 @@ Implemented on 2026-10-28.
 | Navbar | Attached full-width sticky header with a bottom divider, light and dark variants. Inner content is max-width 1448px with 24px gutters. |
 | Top tier | Chubbsafes logo only, a shorter pill search, weather badge, date and avatar menu. |
 | Bottom tier | Only the primary navigation, centered. Icons are 17px Lucide outlines; the active item has a short orange underline. |
-| Palette | Ink and soft blue-slate surfaces with an orange accent. The light page background is #d7e6f3 with subtle gradients; the dark page background is #070b12. |
+| Palette | Ink and warm stone surfaces with deep forest and copper accents. The light page background is #e8e6df with subtle gradients; the dark page background is #090b0a. |
 | Type | Manrope for the authenticated shell. Use tabular numbers for weather, dates and metrics. |
 | Forms | Use the gray --form-border-focus and --form-ring tokens for inputs, selects, textareas and buttons. Do not use the near-black brand for input focus. The users filters and the form role select use x-filter-select with a notched panel and coloured option text. |
 | Navigation | Dashboard, AQL Table, Reports, Items, Vendor and User Management. User Management is ADMIN only. AQL plan administration is reachable from the AQL Table page for ADMIN and CHECKER. |

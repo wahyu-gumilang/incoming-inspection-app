@@ -27,26 +27,26 @@
 
 .items-page .btn-primary {
     border-color: transparent;
-    background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+    background: linear-gradient(135deg, #b85f2f 0%, #d98a4a 100%);
     color: #ffffff;
-    box-shadow: 0 10px 24px rgba(234, 88, 12, 0.24);
+    box-shadow: 0 10px 24px rgba(184, 95, 47, 0.22);
 }
 
 .items-page .btn-primary:hover {
     border-color: transparent;
-    background: linear-gradient(135deg, #c2410c 0%, #d97706 100%);
+    background: linear-gradient(135deg, #9e4d25 0%, #c77c3e 100%);
     color: #ffffff;
 }
 
 [data-theme="dark"] .items-page .btn-primary {
-    background: linear-gradient(135deg, #fb923c 0%, #fbbf24 100%);
-    color: #1c1917;
-    box-shadow: 0 10px 24px rgba(251, 146, 60, 0.18);
+    background: linear-gradient(135deg, #e8a373 0%, #f0c88d 100%);
+    color: #0b0f0c;
+    box-shadow: 0 10px 24px rgba(232, 163, 115, 0.16);
 }
 
 [data-theme="dark"] .items-page .btn-primary:hover {
-    background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
-    color: #1c1917;
+    background: linear-gradient(135deg, #d98f5e 0%, #e7bb7d 100%);
+    color: #0b0f0c;
 }
 
 .items-panel {

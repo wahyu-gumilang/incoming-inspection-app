@@ -1,25 +1,25 @@
 .vendors-page .btn-primary {
     border-color: transparent;
-    background: linear-gradient(135deg, #0f766e 0%, #0284c7 100%);
+    background: linear-gradient(135deg, #1f5d53 0%, #2f7d71 100%);
     color: #ffffff;
-    box-shadow: 0 10px 24px rgba(2, 132, 199, 0.22);
+    box-shadow: 0 10px 24px rgba(31, 93, 83, 0.22);
 }
 
 .vendors-page .btn-primary:hover {
     border-color: transparent;
-    background: linear-gradient(135deg, #115e59 0%, #0369a1 100%);
+    background: linear-gradient(135deg, #174a42 0%, #25685e 100%);
     color: #ffffff;
 }
 
 [data-theme="dark"] .vendors-page .btn-primary {
-    background: linear-gradient(135deg, #2dd4bf 0%, #38bdf8 100%);
-    color: #06121f;
-    box-shadow: 0 10px 24px rgba(56, 189, 248, 0.16);
+    background: linear-gradient(135deg, #7dd3c0 0%, #c6d9b8 100%);
+    color: #0b0f0c;
+    box-shadow: 0 10px 24px rgba(125, 211, 192, 0.16);
 }
 
 [data-theme="dark"] .vendors-page .btn-primary:hover {
-    background: linear-gradient(135deg, #14b8a6 0%, #0ea5e9 100%);
-    color: #06121f;
+    background: linear-gradient(135deg, #5eead4 0%, #b4c9a2 100%);
+    color: #0b0f0c;
 }
 
 .vendors-panel {
@@ -35,7 +35,7 @@
     inset: 0 0 auto;
     z-index: 1;
     height: 2px;
-    background: linear-gradient(90deg, #0f766e, #0284c7, #7c3aed);
+    background: linear-gradient(90deg, #1f5d53, #5b8a78, #c56b35);
 }
 
 .vendors-toolbar {
@@ -87,7 +87,7 @@
 }
 
 .vendors-table tbody tr:hover {
-    background: linear-gradient(90deg, color-mix(in srgb, #0f766e 5%, var(--surface)), transparent 70%);
+    background: linear-gradient(90deg, color-mix(in srgb, #1f5d53 6%, var(--surface)), transparent 70%);
 }
 
 .vendors-table tbody tr:last-child td {
@@ -149,7 +149,7 @@
     border: 1px dashed var(--border-strong);
     border-radius: 16px;
     background:
-        radial-gradient(circle at 50% 0%, color-mix(in srgb, #0284c7 7%, transparent), transparent 60%),
+        radial-gradient(circle at 50% 0%, color-mix(in srgb, #1f5d53 8%, transparent), transparent 60%),
         color-mix(in srgb, var(--surface-2) 55%, var(--surface));
 }
 

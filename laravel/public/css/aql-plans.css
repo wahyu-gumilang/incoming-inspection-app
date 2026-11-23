@@ -213,7 +213,7 @@
     inset: 0 0 auto;
     z-index: 1;
     height: 2px;
-    background: linear-gradient(90deg, #b45309, #0f766e, #2563eb);
+    background: linear-gradient(90deg, #a2621b, #1f5d53, #c56b35);
 }
 
 .aql-plans-toolbar {
@@ -265,7 +265,7 @@
 }
 
 .aql-plans-table tbody tr:hover {
-    background: linear-gradient(90deg, color-mix(in srgb, #0f766e 5%, var(--surface)), transparent 70%);
+    background: linear-gradient(90deg, color-mix(in srgb, #1f5d53 6%, var(--surface)), transparent 70%);
 }
 
 .aql-plans-table tbody tr:last-child td {
@@ -544,9 +544,9 @@
 }
 
 .aql-plan-category.is-normal {
-    border-color: color-mix(in srgb, #2563eb 28%, transparent);
-    background: color-mix(in srgb, #2563eb 9%, var(--surface));
-    color: #1d4ed8;
+    border-color: color-mix(in srgb, #1f5d53 28%, transparent);
+    background: color-mix(in srgb, #1f5d53 9%, var(--surface));
+    color: #174a42;
 }
 
 .aql-plan-category.is-reduced {

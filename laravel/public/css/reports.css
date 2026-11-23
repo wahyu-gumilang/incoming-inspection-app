@@ -11,7 +11,7 @@
     inset: 0 0 auto;
     z-index: 1;
     height: 2px;
-    background: linear-gradient(90deg, #2563eb, #7c3aed, #0f766e);
+    background: linear-gradient(90deg, #1f5d53, #5b8a78, #c56b35);
 }
 
 .reports-toolbar {

@@ -11,15 +11,15 @@
     margin-bottom: 16px;
     padding: 18px 20px;
     background:
-        radial-gradient(circle at 92% 0%, color-mix(in srgb, #0f766e 6%, transparent), transparent 30%),
-        linear-gradient(135deg, color-mix(in srgb, #0f766e 3%, var(--surface)), var(--surface) 58%);
+        radial-gradient(circle at 92% 0%, color-mix(in srgb, #1f5d53 7%, transparent), transparent 30%),
+        linear-gradient(135deg, color-mix(in srgb, #1f5d53 4%, var(--surface)), var(--surface) 58%);
 }
 
 .profile-overview::before {
     position: absolute;
     inset: 0 0 auto;
     height: 2px;
-    background: linear-gradient(90deg, #0f766e, #0284c7, #7c3aed);
+    background: linear-gradient(90deg, #1f5d53, #5b8a78, #c56b35);
     content: "";
 }
 
