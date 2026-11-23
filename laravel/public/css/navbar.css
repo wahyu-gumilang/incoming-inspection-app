@@ -15,13 +15,13 @@
     --nav-field: rgba(225, 230, 221, 0.92);
     --nav-field-border: #cbd4c8;
     --nav-hover: rgba(31, 61, 53, 0.07);
-    --nav-accent: #f6a55c;
-    --nav-accent-strong: #ea8a3c;
-    --nav-focus: rgba(246, 165, 92, 0.2);
+    --nav-accent: #c56b35;
+    --nav-accent-strong: #a9572a;
+    --nav-focus: rgba(197, 107, 53, 0.2);
     --nav-active: #101828;
     --nav-weather-bg: linear-gradient(135deg, #f3b26c 0%, #d9773d 100%);
     --nav-weather-text: #24140a;
-    --nav-menu-shadow: 0 24px 70px rgba(16, 24, 40, 0.18), 0 4px 12px rgba(16, 24, 40, 0.06);
+    --nav-menu-shadow: 0 24px 70px rgba(31, 61, 53, 0.18), 0 4px 12px rgba(31, 61, 53, 0.06);
 }
 
 [data-theme="dark"] .app-body {
@@ -33,9 +33,9 @@
     --nav-field: rgba(255, 255, 255, 0.045);
     --nav-field-border: rgba(255, 255, 255, 0.13);
     --nav-hover: rgba(255, 255, 255, 0.065);
-    --nav-accent: #f6a55c;
-    --nav-accent-strong: #ffb877;
-    --nav-focus: rgba(246, 165, 92, 0.22);
+    --nav-accent: #c56b35;
+    --nav-accent-strong: #f0b36e;
+    --nav-focus: rgba(197, 107, 53, 0.22);
     --nav-active: #ffffff;
     --nav-weather-bg: linear-gradient(135deg, #f3b26c 0%, #d9773d 100%);
     --nav-weather-text: #24140a;
@@ -578,7 +578,7 @@
     border-color: color-mix(in srgb, var(--nav-accent) 35%, transparent);
     background: color-mix(in srgb, var(--nav-accent) 12%, var(--surface));
     color: var(--nav-text);
-    box-shadow: 0 4px 12px rgba(246, 165, 92, 0.14);
+    box-shadow: 0 4px 12px rgba(197, 107, 53, 0.18);
 }
 
 .app-navbar-theme-option.is-active .icon {
