@@ -261,7 +261,6 @@
                         :open="$openRowCategory"
                         toggle="toggleRowCategory"
                         select="selectRowCategory"
-                        placement="up"
                     />
                 </x-ui.field>
 
