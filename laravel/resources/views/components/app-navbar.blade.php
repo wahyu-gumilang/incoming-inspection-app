@@ -140,7 +140,9 @@
                         @csrf
                         @method('PATCH')
 
-                        <div class="app-navbar-theme-options" role="group" aria-label="Theme">
+                        <span class="app-navbar-menu-heading" id="theme-title">Theme</span>
+
+                        <div class="app-navbar-theme-options" role="group" aria-labelledby="theme-title">
                             <button
                                 type="submit"
                                 name="theme"
