@@ -355,12 +355,13 @@
     position: relative;
     overflow: hidden;
     padding: 22px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(240, 179, 110, 0.2);
     border-radius: 20px;
     background:
-        radial-gradient(circle at 100% 0%, rgba(197, 107, 53, 0.2), transparent 42%),
-        linear-gradient(155deg, #12241f, #1f3d35);
-    box-shadow: 0 18px 44px rgba(31, 61, 53, 0.2);
+        radial-gradient(circle at 92% 4%, rgba(240, 179, 110, 0.23), transparent 38%),
+        radial-gradient(circle at 0% 100%, rgba(47, 111, 104, 0.34), transparent 52%),
+        linear-gradient(145deg, #13251f 0%, #1f3d35 55%, #392a1d 100%);
+    box-shadow: 0 18px 44px rgba(31, 61, 53, 0.3);
     color: #ffffff;
 }
 
@@ -371,7 +372,7 @@
     width: 160px;
     height: 160px;
     border-radius: 50%;
-    background: rgba(197, 107, 53, 0.22);
+    background: rgba(240, 179, 110, 0.28);
     filter: blur(20px);
     pointer-events: none;
 }
@@ -454,11 +455,11 @@
 }
 
 .password-requirement.is-met {
-    color: #b8d8c8;
+    color: #c6e3cf;
 }
 
 .password-requirement.is-unmet {
-    color: #f3a08d;
+    color: #f4a38d;
 }
 
 .password-requirement.is-met [data-requirement-met],
@@ -549,6 +550,7 @@ body.password-modal-open {
 }
 
 .password-modal {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: min(820px, 100%);
@@ -557,8 +559,19 @@ body.password-modal-open {
     border: 1px solid var(--border);
     border-radius: 22px;
     background: var(--surface);
-    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.32);
+    box-shadow: 0 30px 90px rgba(31, 61, 53, 0.3);
     animation: password-modal-rise 0.2s ease-out both;
+}
+
+.password-modal::before {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 1;
+    height: 3px;
+    border-radius: 22px 22px 0 0;
+    background: linear-gradient(90deg, #1f5d53, #5b8a78, #c56b35);
+    content: "";
+    pointer-events: none;
 }
 
 .password-modal-head {
@@ -568,10 +581,13 @@ body.password-modal-open {
     gap: 16px;
     padding: 18px 22px;
     border-bottom: 1px solid var(--border);
+    border-radius: 22px 22px 0 0;
+    background: color-mix(in srgb, var(--surface-2) 56%, var(--surface));
 }
 
 .password-modal-head h2 {
     margin-top: 3px;
+    color: #1f3d35;
     font-size: 20px;
     letter-spacing: -0.03em;
 }
@@ -579,6 +595,8 @@ body.password-modal-open {
 .password-modal-body {
     overflow: visible;
     padding: 18px 22px 22px;
+    border-radius: 0 0 22px 22px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 25%, var(--surface)), var(--surface));
 }
 
 .password-modal-body .password-form-card {
@@ -708,6 +726,16 @@ body.password-modal-open {
 /* Profile editor */
 .profile-page {
     width: 100%;
+}
+
+.account-kicker {
+    display: block;
+    margin-bottom: 3px;
+    color: #a2621b;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
 }
 
 .profile-editor-card {
