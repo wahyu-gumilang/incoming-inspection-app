@@ -1100,7 +1100,6 @@ input[type="password"]::-webkit-strong-password-auto-fill-button {
 }
 
 .ui-dropdown-links .ui-dropdown-option {
-    color: var(--text);
     text-decoration: none;
 }
 
