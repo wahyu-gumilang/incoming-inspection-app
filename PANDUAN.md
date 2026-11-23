@@ -644,7 +644,7 @@ melalui workflow baru.
 1. Pastikan inspection berstatus **CHECKED**.
 2. Buka detail report.
 3. Klik **Download PDF**.
-4. PDF dibuat dengan DomPDF menggunakan layout A4 landscape.
+4. PDF dibuat dengan DomPDF menggunakan layout A4 portrait.
 5. PDF berisi check sheet yang sudah tersimpan.
 
 ### 6.7 Pengaruh perubahan AQL plan
@@ -702,7 +702,7 @@ Status yang tersimpan ditampilkan kembali pada report dan PDF.
 ### PDF
 
 - Engine: DomPDF.
-- Orientasi: A4 landscape.
+- Orientasi: A4 portrait.
 - Template: `resources/views/reports/pdf.blade.php`.
 - Style: `public/css/pdf.css`.
 - Hanya inspection **CHECKED** yang boleh mengunduh PDF.

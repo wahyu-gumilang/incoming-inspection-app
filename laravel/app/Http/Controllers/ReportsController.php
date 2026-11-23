@@ -61,7 +61,7 @@ class ReportsController extends Controller
         );
 
         $dompdf = new Dompdf;
-        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->setPaper('A4', 'portrait');
         $dompdf->loadHtml(view('reports.pdf', [
             'inspection' => $inspection,
             'stdLines' => $repository->lines($inspectnum),

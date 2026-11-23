@@ -386,7 +386,7 @@ from Quality, as recorded in Section 9.
 | ✓ Done | Check action: only CHECKER or ADMIN; records the checker and timestamp. |
 | ✓ Done | Return action: requires a reason and keeps the inspection editable by its inspector. |
 | ✓ Done | PDF template for Form 7.4.3-F1 with DomPDF. |
-| ✓ Done | A4 landscape PDF with repeated table headers. |
+| ✓ Done | A4 portrait PDF with repeated table headers. |
 | ✗ Planned | Page X of Y and a watermark for non-checked inspections. |
 | ✓ Done | Print and download from the inspection page. |
 | ✓ Done | Tests for the approval flow and the PDF response. |
