@@ -1,0 +1,112 @@
+/*
+ * Warm Stone / Forest / Copper theme layer.
+ * Loaded after page styles so shared colour roles stay consistent across pages.
+ */
+
+.app-body h1,
+.app-body h2,
+.app-body h3 {
+    color: #1f3d35;
+}
+
+.page-eyebrow {
+    color: #a2621b;
+}
+
+.items-table th,
+.items-table-modern th,
+.users-table th,
+.reports-table th,
+.vendors-table th,
+.dashboard-table th {
+    border-bottom-color: #17352e;
+    background: linear-gradient(135deg, #1f3d35 0%, #2f5b4e 100%);
+    color: #f5f1e8;
+}
+
+.items-table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, #1f5d53 8%, var(--surface));
+}
+
+.items-table tbody tr:hover {
+    background: color-mix(in srgb, #c56b35 9%, var(--surface-2));
+}
+
+.inspection-table th {
+    background: color-mix(in srgb, #1f5d53 11%, var(--surface-2));
+    color: var(--text);
+}
+
+.badge-warning,
+.role-admin {
+    border-color: color-mix(in srgb, #a2621b 34%, transparent);
+    background: color-mix(in srgb, #c56b35 13%, var(--surface));
+    color: #8d4d16;
+}
+
+.badge-success,
+.role-checker {
+    border-color: color-mix(in srgb, #1f7a63 32%, transparent);
+    background: color-mix(in srgb, #1f7a63 12%, var(--surface));
+    color: #17634f;
+}
+
+.badge-danger {
+    border-color: color-mix(in srgb, #ad3b2a 32%, transparent);
+    background: color-mix(in srgb, #ad3b2a 12%, var(--surface));
+    color: #923121;
+}
+
+[data-theme="dark"] .app-body h1,
+[data-theme="dark"] .app-body h2,
+[data-theme="dark"] .app-body h3 {
+    color: var(--text);
+}
+
+[data-theme="dark"] .page-eyebrow {
+    color: #f0b36e;
+}
+
+[data-theme="dark"] .items-table th,
+[data-theme="dark"] .items-table-modern th,
+[data-theme="dark"] .users-table th,
+[data-theme="dark"] .reports-table th,
+[data-theme="dark"] .vendors-table th,
+[data-theme="dark"] .dashboard-table th {
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+    background: linear-gradient(135deg, #1f3d35 0%, #2b4d43 100%);
+    color: #f2f5f2;
+}
+
+[data-theme="dark"] .items-table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, #1f5d53 12%, transparent);
+}
+
+[data-theme="dark"] .items-table tbody tr:hover {
+    background: color-mix(in srgb, #c56b35 11%, var(--surface-2));
+}
+
+[data-theme="dark"] .inspection-table th {
+    background: color-mix(in srgb, #1f5d53 14%, var(--surface-2));
+    color: var(--text);
+}
+
+[data-theme="dark"] .badge-warning,
+[data-theme="dark"] .role-admin {
+    border-color: rgba(240, 179, 110, 0.28);
+    background: rgba(197, 107, 53, 0.16);
+    color: #f0b36e;
+}
+
+[data-theme="dark"] .badge-success,
+[data-theme="dark"] .role-checker {
+    border-color: rgba(94, 234, 212, 0.24);
+    background: rgba(31, 122, 99, 0.16);
+    color: #9be3d2;
+}
+
+[data-theme="dark"] .badge-danger {
+    border-color: rgba(251, 113, 133, 0.26);
+    background: rgba(173, 59, 42, 0.16);
+    color: #fb9b9b;
+}

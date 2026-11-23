@@ -19,8 +19,8 @@
     --nav-accent-strong: #ea8a3c;
     --nav-focus: rgba(246, 165, 92, 0.2);
     --nav-active: #101828;
-    --nav-weather-bg: linear-gradient(135deg, #f7b267 0%, #f59e0b 100%);
-    --nav-weather-text: #1c1917;
+    --nav-weather-bg: linear-gradient(135deg, #f3b26c 0%, #d9773d 100%);
+    --nav-weather-text: #24140a;
     --nav-menu-shadow: 0 24px 70px rgba(16, 24, 40, 0.18), 0 4px 12px rgba(16, 24, 40, 0.06);
 }
 
@@ -37,8 +37,8 @@
     --nav-accent-strong: #ffb877;
     --nav-focus: rgba(246, 165, 92, 0.22);
     --nav-active: #ffffff;
-    --nav-weather-bg: linear-gradient(135deg, #f7b267 0%, #f59e0b 100%);
-    --nav-weather-text: #1c1917;
+    --nav-weather-bg: linear-gradient(135deg, #f3b26c 0%, #d9773d 100%);
+    --nav-weather-text: #24140a;
     --nav-menu-shadow: 0 28px 80px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
@@ -191,7 +191,8 @@
     border-radius: 999px;
     background: var(--nav-weather-bg);
     color: var(--nav-weather-text);
-    box-shadow: 0 10px 22px rgba(245, 158, 11, 0.25);
+    border: 1px solid rgba(197, 107, 53, 0.22);
+    box-shadow: 0 10px 22px rgba(197, 107, 53, 0.26);
     font-size: 13px;
     font-weight: 800;
     font-variant-numeric: tabular-nums;

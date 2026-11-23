@@ -74,15 +74,15 @@ body {
     --brand-600: #152d27;
     --brand-50: #e3ece7;
     --on-brand: #ffffff;
-    --bg: #e8e6df;
-    --surface: #f4f2eb;
-    --surface-2: #ebe9e1;
-    --surface-sunk: #dfdcd3;
-    --border: #d3d0c7;
-    --border-strong: #c1bdb2;
+    --bg: #e3dfd4;
+    --surface: #f1eee4;
+    --surface-2: #e7e2d6;
+    --surface-sunk: #dad4c7;
+    --border: #cec7b9;
+    --border-strong: #b9b1a2;
     --text: #1e211d;
-    --text-2: #50564f;
-    --text-3: #7b8178;
+    --text-2: #4b534c;
+    --text-3: #6f776d;
     --ok: #1f7a63;
     --ok-bg: #d7eee7;
     --ng: #ad3b2a;
@@ -95,7 +95,7 @@ body {
         radial-gradient(circle at 5% -8%, rgba(47, 111, 104, 0.13), transparent 35%),
         radial-gradient(circle at 95% 3%, rgba(197, 107, 53, 0.14), transparent 30%),
         radial-gradient(circle at 50% 105%, rgba(31, 61, 53, 0.06), transparent 45%),
-        linear-gradient(145deg, #e9e9e1 0%, #f0eee7 48%, #eee8dd 100%);
+        linear-gradient(145deg, #e5e1d6 0%, #ece9df 48%, #f0e8dc 100%);
     --radius: 18px;
     --radius-sm: 12px;
     --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 12px 32px rgba(16, 24, 40, 0.06);

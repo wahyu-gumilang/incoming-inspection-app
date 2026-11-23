@@ -76,7 +76,7 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | Avatar | usertable.avatar_path photo when present; initials otherwise. Upload and remove on the Profile page. |
 | Theme | Light, Dark and System segmented control below a divider. It saves usertable.theme and applies immediately. |
 | Help | /help is a real Help Center page with access, inspection and support guidance. |
-| Palette | Ink and warm stone surfaces with deep forest and copper accents. Light page #e8e6df with subtle gradients; dark page #090b0a. |
+| Palette | Ink and warm stone surfaces with deep forest and copper accents. Light page #e3dfd4 with subtle gradients; dark page #090b0a. |
 | Type | Manrope, bundled locally at public/fonts/manrope-latin.woff2. No icon font. |
 | Search | Submits to the Items page and prefills the item search. |
 | Weather | Open-Meteo with Jakarta coordinates, a 15-minute browser cache and a --°C fallback. Keep fixed widths for the badge and date block so loading does not move the navbar. Confirm the plant location. |
