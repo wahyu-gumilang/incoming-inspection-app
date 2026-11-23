@@ -775,6 +775,13 @@ p {
     display: none;
 }
 
+.auth-input::-webkit-credentials-auto-fill-button,
+.auth-input::-webkit-strong-password-auto-fill-button {
+    display: none !important;
+    visibility: hidden;
+    pointer-events: none;
+}
+
 .auth-input:hover {
     border-color: #c3cfdf;
 }
