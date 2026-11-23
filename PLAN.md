@@ -107,7 +107,7 @@ Date: 2026-10-28. Reference: `C:\Apps\Doc_QC-incoming-inspection\Navbar Idea 1.w
 | ✓ Done | Dashboard | Workflow counters, recent inspections, quick actions and a master-data summary are available. NG chart remains optional. |
 | ✓ Done | Inspection workflow | Draft/returned inspections can be edited, submitted by their inspector, and approved or returned with a reason by a CHECKER. |
 | ✓ Done | Reporting | Saved check sheets with search and status filters, workflow actions and final PDF download for checked inspections using DomPDF. |
-| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit, AQL calculations, AQL plan administration, inspection workflows, inspection saving, report filters and PDF output with 126 tests and 574 assertions. |
+| ✓ Done | Authentication tests | PHPUnit covers login, logout, roles, forced password change, profile settings, dashboard, items, Remember me, the remembered username, the application navbar, the user menu, Help Center, theme persistence, profile photos, user management, the UI kit, AQL calculations, AQL plan administration, inspection workflows, inspection saving, report filters and PDF output with 126 tests and 578 assertions. |
 
 Local addresses while the migration is in progress:
 

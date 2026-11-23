@@ -20,17 +20,35 @@ class ReportsController extends Controller
         $status = is_string($statusRaw) ? strtoupper(trim($statusRaw)) : '';
         $status = in_array($status, InspectionStatus::all(), true) ? $status : '';
 
+        $statusOptions = [
+            '' => 'All statuses',
+            InspectionStatus::DRAFT => 'Draft',
+            InspectionStatus::SUBMITTED => 'Submitted',
+            InspectionStatus::CHECKED => 'Checked',
+            InspectionStatus::RETURNED => 'Returned',
+        ];
+        $statusLinks = [];
+
+        foreach (array_keys($statusOptions) as $value) {
+            $params = [];
+
+            if ($search !== '') {
+                $params['search'] = $search;
+            }
+
+            if ($value !== '') {
+                $params['status'] = $value;
+            }
+
+            $statusLinks[$value] = route('reports.index', $params);
+        }
+
         return view('reports.index', [
             'inspections' => $repository->paginate($search, 20, $status !== '' ? $status : null),
             'search' => $search,
             'status' => $status,
-            'statusOptions' => [
-                '' => 'All statuses',
-                InspectionStatus::DRAFT => 'Draft',
-                InspectionStatus::SUBMITTED => 'Submitted',
-                InspectionStatus::CHECKED => 'Checked',
-                InspectionStatus::RETURNED => 'Returned',
-            ],
+            'statusOptions' => $statusOptions,
+            'statusLinks' => $statusLinks,
         ]);
     }
 

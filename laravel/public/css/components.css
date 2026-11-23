@@ -1079,6 +1079,31 @@ input[type="password"]::-webkit-strong-password-auto-fill-button {
     width: 100%;
 }
 
+.ui-dropdown-links > summary {
+    list-style: none;
+}
+
+.ui-dropdown-links > summary::-webkit-details-marker {
+    display: none;
+}
+
+.ui-dropdown-links[open] .ui-dropdown-chevron {
+    transform: rotate(180deg);
+}
+
+.ui-dropdown-links .ui-dropdown-panel {
+    display: none;
+}
+
+.ui-dropdown-links[open] .ui-dropdown-panel {
+    display: block;
+}
+
+.ui-dropdown-links .ui-dropdown-option {
+    color: var(--text);
+    text-decoration: none;
+}
+
 .ui-dropdown.is-disabled .ui-dropdown-trigger {
     border-color: var(--border);
     background: color-mix(in srgb, var(--surface-sunk) 82%, var(--text-3) 8%);

@@ -25,6 +25,8 @@
                 action="{{ route('reports.index') }}"
                 data-auto-submit-search
             >
+                <input type="hidden" name="status" value="{{ $status }}">
+
                 <x-ui.search
                     name="search"
                     value="{{ $search }}"
@@ -33,11 +35,13 @@
                 />
 
                 <div class="reports-status-filter">
-                    <x-ui.select name="status" aria-label="Filter reports by status" onchange="this.form.submit()">
-                        @foreach ($statusOptions as $value => $label)
-                            <option value="{{ $value }}" @selected($status === $value)>{{ $label }}</option>
-                        @endforeach
-                    </x-ui.select>
+                    <x-ui.dropdown
+                        :label="$statusOptions[$status] ?? 'All statuses'"
+                        :value="$status"
+                        :options="$statusOptions"
+                        :links="$statusLinks"
+                        aria-label="Filter reports by status"
+                    />
                 </div>
 
                 @if ($search !== '' || $status !== '')

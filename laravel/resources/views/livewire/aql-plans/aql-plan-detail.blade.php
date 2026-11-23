@@ -118,7 +118,9 @@
                     </thead>
                     <tbody>
                         @foreach ($rows as $row)
-                            @php($category = $categories[(int) $row->inspectcategory] ?? ['label' => '—', 'class' => ''])
+                            @php
+                                $category = $categories[(int) $row->inspectcategory] ?? ['label' => '—', 'class' => ''];
+                            @endphp
                             <tr wire:key="aql-row-{{ $row->inspectcategory }}-{{ $row->lotmin }}">
                                 <td>
                                     <span class="aql-plan-category {{ $category['class'] }}">{{ $category['label'] }}</span>
@@ -235,12 +237,25 @@
             close="closeRow"
         >
             <form wire:submit="saveRow" class="form">
+                @php
+                    $categoryOptions = [];
+                    foreach ($categories as $categoryValue => $category) {
+                        $categoryOptions[$categoryValue] = $category['label'];
+                    }
+                @endphp
+
                 <x-ui.field label="Inspection category" for="aql-row-category" name="rowCategory">
-                    <x-ui.select id="aql-row-category" wire:model="rowCategory">
-                        @foreach ($categories as $categoryValue => $category)
-                            <option value="{{ $categoryValue }}">{{ $category['label'] }}</option>
-                        @endforeach
-                    </x-ui.select>
+                    <x-ui.dropdown
+                        id="aql-row-category"
+                        class="ui-dropdown-full"
+                        :label="$categories[$rowCategory]['label'] ?? 'Normal'"
+                        :value="$rowCategory"
+                        :options="$categoryOptions"
+                        :open="$openRowCategory"
+                        toggle="toggleRowCategory"
+                        select="selectRowCategory"
+                        placement="up"
+                    />
                 </x-ui.field>
 
                 <div class="aql-plan-row-form-grid is-two">

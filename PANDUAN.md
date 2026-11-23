@@ -771,7 +771,7 @@ bersama perubahan kode.
 
 ## 10. Catatan QA dan batasan saat ini
 
-- **Tes otomatis:** 126 tests, 574 assertions.
+- **Tes otomatis:** 126 tests, 578 assertions.
 - **Formatter:** Pint lulus untuk 85 file.
 - **Composer audit:** tidak ada security advisory.
 - **PDF:** respons sudah diuji menghasilkan `application/pdf`. Pengecekan visual cetak

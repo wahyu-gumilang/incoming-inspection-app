@@ -45,6 +45,8 @@ class AqlPlanDetail extends Component
 
     public int $rowCategory = 1;
 
+    public bool $openRowCategory = false;
+
     public string $rowLotmin = '';
 
     public string $rowLotmax = '';
@@ -170,6 +172,7 @@ class AqlPlanDetail extends Component
 
         $this->resetRowForm();
         $this->rowCategory = 1;
+        $this->openRowCategory = false;
         $this->editingRow = false;
         $this->showRow = true;
         $this->showEditPlan = false;
@@ -190,6 +193,7 @@ class AqlPlanDetail extends Component
         $this->originalCategory = $category;
         $this->originalLotmin = $lotmin;
         $this->rowCategory = (int) $row->inspectcategory;
+        $this->openRowCategory = false;
         $this->rowLotmin = (string) $row->lotmin;
         $this->rowLotmax = $row->lotmax === null ? '' : (string) $row->lotmax;
         $this->rowCodeletter = (string) $row->codeletter;
@@ -207,7 +211,26 @@ class AqlPlanDetail extends Component
     public function closeRow(): void
     {
         $this->showRow = false;
+        $this->openRowCategory = false;
         $this->resetRowForm();
+    }
+
+    public function toggleRowCategory(): void
+    {
+        $this->openRowCategory = ! $this->openRowCategory;
+    }
+
+    public function selectRowCategory(string $category): void
+    {
+        $category = (int) $category;
+
+        if (! array_key_exists($category, self::CATEGORY_META)) {
+            return;
+        }
+
+        $this->rowCategory = $category;
+        $this->openRowCategory = false;
+        $this->resetValidation('rowCategory');
     }
 
     public function saveRow(): void
@@ -382,6 +405,7 @@ class AqlPlanDetail extends Component
     private function resetRowForm(): void
     {
         $this->rowCategory = 1;
+        $this->openRowCategory = false;
         $this->rowLotmin = '';
         $this->rowLotmax = '';
         $this->rowCodeletter = '';
