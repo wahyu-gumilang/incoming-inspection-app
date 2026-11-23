@@ -72,30 +72,30 @@ body {
 .app-body {
     --brand: #101828;
     --brand-600: #1d2939;
-    --brand-50: #eaf3fb;
+    --brand-50: #d9eaf8;
     --on-brand: #ffffff;
-    --bg: #e9f1f8;
-    --surface: #f7fbff;
-    --surface-2: #eef6fc;
-    --surface-sunk: #e5eff8;
-    --border: #d5e2ef;
-    --border-strong: #c1d2e4;
+    --bg: #d7e6f3;
+    --surface: #eaf4fc;
+    --surface-2: #deedf8;
+    --surface-sunk: #cfe2f1;
+    --border: #b7cee0;
+    --border-strong: #9fbcd4;
     --text: #101828;
-    --text-2: #475467;
-    --text-3: #75879f;
+    --text-2: #344054;
+    --text-3: #66788d;
     --ok: #0f766e;
-    --ok-bg: #d9f7f1;
+    --ok-bg: #c9f2eb;
     --ng: #b42318;
-    --ng-bg: #fee4e2;
+    --ng-bg: #fbd9d6;
     --warn: #b54708;
-    --warn-bg: #fef0c7;
-    --form-border-focus: #8fa6bd;
-    --form-ring: rgba(111, 143, 177, 0.22);
+    --warn-bg: #f9e6b8;
+    --form-border-focus: #7e9bb5;
+    --form-ring: rgba(94, 132, 166, 0.24);
     --page-bg:
-        radial-gradient(circle at 8% 0%, rgba(59, 130, 246, 0.09), transparent 31%),
-        radial-gradient(circle at 92% 4%, rgba(246, 165, 92, 0.09), transparent 27%),
-        radial-gradient(circle at 50% 100%, rgba(15, 118, 110, 0.05), transparent 42%),
-        linear-gradient(180deg, #edf5fb 0%, #e8f0f8 52%, #edf3f9 100%);
+        radial-gradient(circle at 6% -8%, rgba(37, 99, 235, 0.17), transparent 34%),
+        radial-gradient(circle at 96% 2%, rgba(246, 165, 92, 0.16), transparent 29%),
+        radial-gradient(circle at 48% 104%, rgba(15, 118, 110, 0.09), transparent 44%),
+        linear-gradient(145deg, #d8e9f7 0%, #e4effa 45%, #f1e9df 100%);
     --radius: 18px;
     --radius-sm: 12px;
     --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 12px 32px rgba(16, 24, 40, 0.06);

@@ -981,6 +981,10 @@
     letter-spacing: 0.04em;
 }
 
+.items-table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--surface-2) 58%, transparent);
+}
+
 .items-table tbody tr:hover {
     background: var(--surface-2);
 }
