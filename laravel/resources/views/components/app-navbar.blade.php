@@ -88,6 +88,7 @@
                         <x-user-avatar :user="$user" :size="36" />
                         <div class="app-navbar-menu-profile-text">
                             <strong>{{ $user->fullname }}</strong>
+                            <span>{{ $user->roleLabel() }}</span>
                         </div>
                     </div>
 
