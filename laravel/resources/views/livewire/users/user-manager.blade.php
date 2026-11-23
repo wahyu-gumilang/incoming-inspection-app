@@ -18,7 +18,6 @@
         description="Accounts and roles. Only administrators can manage users."
     >
         <x-slot:actions>
-            <x-ui.badge variant="warning">Admin access</x-ui.badge>
             <x-ui.button variant="primary" icon="user-plus" wire:click="openCreate">Add user</x-ui.button>
         </x-slot:actions>
     </x-ui.page-header>

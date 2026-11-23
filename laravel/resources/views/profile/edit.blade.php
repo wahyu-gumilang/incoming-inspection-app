@@ -92,7 +92,6 @@
                         <h2>Personal information</h2>
                         <p>These details appear on your profile and inspection records.</p>
                     </div>
-                    <x-ui.role-badge :role="$user->role" />
                 </div>
 
                 <div class="profile-fields">
