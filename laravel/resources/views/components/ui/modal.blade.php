@@ -1,4 +1,12 @@
-@props(['title', 'close', 'subtitle' => null])
+@props(['title', 'close', 'subtitle' => null, 'size' => 'md'])
+
+@php
+    $sizeClass = match ($size) {
+        'lg' => 'modal-card-lg',
+        'xl' => 'modal-card-xl',
+        default => '',
+    };
+@endphp
 
 @teleport('body')
     <div
@@ -6,7 +14,7 @@
         wire:click.self="{{ $close }}"
         wire:keydown.escape.window="{{ $close }}"
     >
-        <div class="modal-card" role="dialog" aria-modal="true" aria-label="{{ $title }}">
+        <div class="modal-card {{ $sizeClass }}" role="dialog" aria-modal="true" aria-label="{{ $title }}">
             <div class="modal-head">
                 <div>
                     <h2>{{ $title }}</h2>

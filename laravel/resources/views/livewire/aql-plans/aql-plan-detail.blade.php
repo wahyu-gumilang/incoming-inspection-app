@@ -235,6 +235,7 @@
             :title="$editingRow ? 'Edit sampling row' : 'Add sampling row'"
             :subtitle="'Plan '.$plan->name.' · '.$plan->inspectlevel.' / '.$plan->aql"
             close="closeRow"
+            size="lg"
         >
             <form wire:submit="saveRow" class="form">
                 @php
@@ -250,21 +251,21 @@
                     ];
                 @endphp
 
-                <x-ui.field label="Inspection category" for="aql-row-category" name="rowCategory">
-                    <x-ui.dropdown
-                        id="aql-row-category"
-                        class="ui-dropdown-full"
-                        :label="$categories[$rowCategory]['label'] ?? 'Normal'"
-                        :value="$rowCategory"
-                        :options="$categoryOptions"
-                        :tones="$categoryTones"
-                        :open="$openRowCategory"
-                        toggle="toggleRowCategory"
-                        select="selectRowCategory"
-                    />
-                </x-ui.field>
+                <div class="aql-plan-row-form-grid is-three">
+                    <x-ui.field label="Inspection category" for="aql-row-category" name="rowCategory">
+                        <x-ui.dropdown
+                            id="aql-row-category"
+                            class="ui-dropdown-full"
+                            :label="$categories[$rowCategory]['label'] ?? 'Normal'"
+                            :value="$rowCategory"
+                            :options="$categoryOptions"
+                            :tones="$categoryTones"
+                            :open="$openRowCategory"
+                            toggle="toggleRowCategory"
+                            select="selectRowCategory"
+                        />
+                    </x-ui.field>
 
-                <div class="aql-plan-row-form-grid is-two">
                     <x-ui.field label="Lot minimum" for="aql-row-lotmin" name="rowLotmin">
                         <input
                             id="aql-row-lotmin"

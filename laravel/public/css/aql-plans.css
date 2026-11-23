@@ -620,6 +620,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.aql-plan-row-form-grid.is-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .aql-plan-lot-preview {
     display: flex;
     align-items: center;
@@ -712,7 +716,8 @@
 
     .aql-plan-form-grid,
     .aql-plan-row-form-grid,
-    .aql-plan-row-form-grid.is-two {
+    .aql-plan-row-form-grid.is-two,
+    .aql-plan-row-form-grid.is-three {
         grid-template-columns: minmax(0, 1fr);
     }
 

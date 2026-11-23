@@ -1329,6 +1329,14 @@ input[type="password"]::-webkit-strong-password-auto-fill-button {
     animation: modal-rise 0.18s ease-out both;
 }
 
+.modal-card-lg {
+    width: min(760px, 100%);
+}
+
+.modal-card-xl {
+    width: min(920px, 100%);
+}
+
 .modal-head {
     display: flex;
     align-items: flex-start;
