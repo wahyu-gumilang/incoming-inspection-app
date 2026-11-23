@@ -1363,6 +1363,19 @@ input[type="password"]::-webkit-strong-password-auto-fill-button {
     font-size: 13px;
 }
 
+.modal-body textarea {
+    max-height: 220px;
+    resize: none;
+}
+
+body > .modal-backdrop:not(:last-of-type) {
+    display: none !important;
+}
+
+body:has(.modal-backdrop) .aql-plan-admin-overlay {
+    display: none !important;
+}
+
 .modal-foot {
     display: flex;
     align-items: center;
