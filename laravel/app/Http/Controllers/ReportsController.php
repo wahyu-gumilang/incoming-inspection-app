@@ -27,6 +27,13 @@ class ReportsController extends Controller
             InspectionStatus::CHECKED => 'Checked',
             InspectionStatus::RETURNED => 'Returned',
         ];
+        $statusTones = [
+            '' => 'neutral',
+            InspectionStatus::DRAFT => 'inspector',
+            InspectionStatus::SUBMITTED => 'admin',
+            InspectionStatus::CHECKED => 'active',
+            InspectionStatus::RETURNED => 'inactive',
+        ];
         $statusLinks = [];
 
         foreach (array_keys($statusOptions) as $value) {
@@ -48,6 +55,7 @@ class ReportsController extends Controller
             'search' => $search,
             'status' => $status,
             'statusOptions' => $statusOptions,
+            'statusTones' => $statusTones,
             'statusLinks' => $statusLinks,
         ]);
     }

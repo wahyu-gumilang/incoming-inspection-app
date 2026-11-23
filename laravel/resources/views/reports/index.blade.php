@@ -39,6 +39,7 @@
                         :label="$statusOptions[$status] ?? 'All statuses'"
                         :value="$status"
                         :options="$statusOptions"
+                        :tones="$statusTones"
                         :links="$statusLinks"
                         aria-label="Filter reports by status"
                     />

@@ -242,6 +242,12 @@
                     foreach ($categories as $categoryValue => $category) {
                         $categoryOptions[$categoryValue] = $category['label'];
                     }
+
+                    $categoryTones = [
+                        1 => 'active',
+                        2 => 'admin',
+                        3 => 'inactive',
+                    ];
                 @endphp
 
                 <x-ui.field label="Inspection category" for="aql-row-category" name="rowCategory">
@@ -251,6 +257,7 @@
                         :label="$categories[$rowCategory]['label'] ?? 'Normal'"
                         :value="$rowCategory"
                         :options="$categoryOptions"
+                        :tones="$categoryTones"
                         :open="$openRowCategory"
                         toggle="toggleRowCategory"
                         select="selectRowCategory"
