@@ -256,26 +256,82 @@
 }
 
 @media print {
-    .app-navbar-wrap,
-    .page-header,
-    .report-sheet-hint {
-        display: none;
+    @page {
+        size: A4 landscape;
+        margin: 8mm;
     }
 
-    .report-sheet-scroll {
-        overflow: visible;
-        padding: 0;
+    .app-navbar-wrap,
+    .page-header,
+    .report-page-header,
+    .inspection-workflow,
+    .report-sheet-hint {
+        display: none !important;
+    }
+
+    .page {
+        max-width: none !important;
+        padding: 0 !important;
+    }
+
+    .report-sheet-scroll,
+    .aql-table-scroll {
+        width: 100% !important;
+        overflow: visible !important;
+        padding: 0 !important;
     }
 
     .aql-page {
-        padding: 0;
-        background: #ffffff;
+        display: block !important;
+        width: 100% !important;
+        padding: 0 !important;
+        background: #ffffff !important;
     }
 
     .aql-sheet {
-        max-width: none;
-        min-width: 0;
-        padding: 0;
-        border: 0;
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .aql-form-table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        border-collapse: collapse !important;
+    }
+
+    .aql-form-table th,
+    .aql-form-table td {
+        height: 18px !important;
+        padding: 1px 2px !important;
+        font-size: 8px !important;
+        line-height: 1.1 !important;
+        overflow: hidden;
+        word-break: normal;
+    }
+
+    .aql-form-table th {
+        font-size: 8.5px !important;
+    }
+
+    .aql-group-row th {
+        height: 20px !important;
+        font-size: 9px !important;
+    }
+
+    .aql-sign-table td {
+        height: 20px !important;
+        padding: 2px !important;
+        font-size: 8px !important;
+    }
+
+    .aql-note {
+        font-size: 8px !important;
+        gap: 2px 12px !important;
     }
 }
