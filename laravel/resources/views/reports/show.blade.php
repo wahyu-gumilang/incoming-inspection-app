@@ -103,7 +103,7 @@
                             <th>Tolerance</th>
                             @for ($column = 0; $column < 7; $column++)
                                 <th>Actual</th>
-                                <th>OK/<br>NG</th>
+                                <th class="aql-ok-ng">OK/<br>NG</th>
                             @endfor
                         </tr>
                     </thead>

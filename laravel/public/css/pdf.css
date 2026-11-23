@@ -123,6 +123,11 @@ table {
     font-size: 7px;
 }
 
+.form-table .ok-ng {
+    padding: 1px 1px;
+    line-height: 1.15;
+}
+
 .form-table .number {
     font-weight: 700;
 }
